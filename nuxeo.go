@@ -4,6 +4,10 @@ package nuxeo
 
 import (
 	"context"
+	"log"
+	"net/http"
+
+	"github.com/anselm94/nuxeo/internal"
 )
 
 // Option configures the NuxeoClient.
@@ -21,10 +25,11 @@ type Hook interface {
 }
 
 type NuxeoClient struct {
-	options BaseOptions
-	logger  Logger
-	hook    Hook
-	// TODO: Add config, auth, http client, etc.
+	options    BaseOptions
+	logger     Logger
+	hook       Hook
+	httpClient *http.Client
+	// TODO: Add config, auth, etc.
 }
 
 // NewClient creates a new NuxeoClient with the given options.
@@ -50,6 +55,7 @@ func NewClient(ctx context.Context, opts ...Option) (*NuxeoClient, error) {
 	if client.logger == nil {
 		client.logger = defaultLogger{}
 	}
+	client.httpClient = internal.NewHTTPClient()
 	// TODO: Implement client construction and option handling
 	return client, nil
 }
@@ -58,5 +64,5 @@ func NewClient(ctx context.Context, opts ...Option) (*NuxeoClient, error) {
 type defaultLogger struct{}
 
 func (l defaultLogger) Printf(format string, v ...any) {
-	// No-op or use log.Printf(format, v...) if desired
+	log.Printf(format, v...)
 }
