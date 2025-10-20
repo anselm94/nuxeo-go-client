@@ -1,4 +1,4 @@
-# Nuxeo Go Client
+# [🚧 WIP - NOT READY] Nuxeo Go Client
 
 A modern, idiomatic Go SDK for the Nuxeo Platform REST API.  
 Designed for composability, testability, and developer experience.
