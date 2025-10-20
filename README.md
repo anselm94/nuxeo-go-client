@@ -61,22 +61,169 @@ func main() {
 
 ## Authentication
 
-Supports multiple strategies:
-- Basic
-- Token
-- Bearer
-- Portal
-- OAuth2
+The Nuxeo Go client supports multiple authentication strategies, matching those available on the Nuxeo Platform. You specify the method and credentials when constructing the client.
 
-Example:
+### Supported Methods
+
+- Basic: Username and password
+- Portal: Username and portal secret
+- Token: Server-issued authentication token
+- Bearer/OAuth2: OAuth2 access token or full token object (with automatic refresh)
+- Custom: Register your own authenticator
+
+### Basic Authentication
 
 ```go
-client := nuxeo.NewClient("https://nuxeo.example.com", nuxeo.AuthInfo{
-    Method: "oauth2",
-    OAuth2Token: nuxeo.OAuth2Token{
-        AccessToken: "your-access-token",
+client := nuxeo.NewClient(ctx,
+    nuxeo.WithBaseURL("https://nuxeo.example.com"),
+    nuxeo.WithAuth(nuxeo.AuthInfo{
+        Method:   "basic",
+        User:     "Administrator",
+        Password: "Administrator",
+    }),
+)
+```
+
+### Portal Authentication
+
+```go
+client := nuxeo.NewClient(ctx,
+    nuxeo.WithBaseURL("https://nuxeo.example.com"),
+    nuxeo.WithAuth(nuxeo.AuthInfo{
+        Method: "portal",
+        User:   "joe",
+        Secret: "shared-secret-from-server",
+    }),
+)
+```
+
+### Token Authentication
+
+```go
+client := nuxeo.NewClient(ctx,
+    nuxeo.WithBaseURL("https://nuxeo.example.com"),
+    nuxeo.WithAuth(nuxeo.AuthInfo{
+        Method: "token",
+        Token:  "a-token",
+    }),
+)
+```
+
+To request a token from the server using your credentials:
+
+```go
+token, err := nuxeo.RequestAuthenticationToken(ctx, "https://nuxeo.example.com", nuxeo.AuthInfo{
+    Method:   "basic",
+    User:     "Administrator",
+    Password: "Administrator",
+}, "My App", "deviceUID", "deviceName", "rw")
+if err != nil {
+    panic(err)
+}
+client := nuxeo.NewClient(ctx,
+    nuxeo.WithBaseURL("https://nuxeo.example.com"),
+    nuxeo.WithAuth(nuxeo.AuthInfo{
+        Method: "token",
+        Token:  token,
+    }),
+)
+```
+
+### OAuth2 / Bearer Token Authentication
+
+```go
+client := nuxeo.NewClient(ctx,
+    nuxeo.WithBaseURL("https://nuxeo.example.com"),
+    nuxeo.WithAuth(nuxeo.AuthInfo{
+        Method: "bearerToken", // or "bearer"
+        Bearer: "access_token", // or use OAuth2 field for full token object
+        ClientID: "my-app",     // optional, for automatic refresh
+        ClientSecret: "my-secret", // required if the client defines a secret
+        OAuth2: &nuxeo.OAuth2Token{
+            AccessToken:  "access_token",
+            RefreshToken: "refresh_token",
+            TokenType:    "bearer",
+            ExpiresIn:    3600,
+        },
+    }),
+)
+```
+
+#### OAuth2 & JWT Grant Helpers
+
+Generate an authorization URL (using oauth2.Config):
+
+```go
+import (
+    "golang.org/x/oauth2"
+    "github.com/anselm94/nuxeo"
+)
+
+config := &oauth2.Config{
+    ClientID:     "my-app",
+    ClientSecret: "my-secret",
+    Endpoint: oauth2.Endpoint{
+        AuthURL:  "https://nuxeo.example.com/oauth2/authorize",
+        TokenURL: "https://nuxeo.example.com/oauth2/token",
     },
-})
+    Scopes: []string{"openid"},
+}
+url := nuxeo.GetAuthorizationURL(config, "xyz")
+fmt.Println(url)
+```
+
+Exchange an authorization code for an access token:
+
+```go
+token, err := nuxeo.FetchAccessTokenFromAuthorizationCode(ctx, config, "AUTH_CODE")
+if err != nil {
+    panic(err)
+}
+```
+
+JWT Bearer Grant:
+
+```go
+jwt := "<your-jwt-token>"
+token, err := nuxeo.FetchAccessTokenFromJWTToken(ctx, config, jwt)
+if err != nil {
+    panic(err)
+}
+client := nuxeo.NewClient(ctx,
+    nuxeo.WithBaseURL("https://nuxeo.example.com"),
+    nuxeo.WithAuth(nuxeo.AuthInfo{
+        Method:      "oauth2",
+        OAuth2Token: token,
+        JWT:         jwt, // optional, for refresh
+    }),
+)
+```
+
+Refresh an access token:
+
+```go
+token, err := nuxeo.RefreshAccessToken(ctx, config, token)
+if err != nil {
+    panic(err)
+}
+```
+
+### Migration Note
+
+If you previously used manual token structs or custom expiry logic, migrate to using `*oauth2.Token` and the provided helpers. All expiry and refresh logic is now handled automatically and idiomatically via the Go standard library and SDK helpers.
+
+### Custom Authenticators
+
+You can register your own authentication strategy by implementing the `Authenticator` interface:
+
+```go
+type MyAuth struct{}
+func (a *MyAuth) ComputeAuthenticationHeaders(auth nuxeo.AuthInfo) map[string]string { ... }
+func (a *MyAuth) AuthenticateURL(url string, auth nuxeo.AuthInfo) string { ... }
+func (a *MyAuth) CanRefreshAuthentication() bool { ... }
+func (a *MyAuth) RefreshAuthentication(ctx context.Context, baseURL string, auth nuxeo.AuthInfo) (nuxeo.AuthInfo, error) { ... }
+
+nuxeo.RegisterAuthenticator("myMethod", &MyAuth{})
 ```
 
 ## Document Operations

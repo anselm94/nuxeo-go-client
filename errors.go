@@ -2,15 +2,17 @@ package nuxeo
 
 import "fmt"
 
-// APIError represents an error returned by the Nuxeo API.
-type APIError struct {
-	StatusCode int
-	Message    string
+// NuxeoError represents an error returned by the Nuxeo API.
+type NuxeoError struct {
+	EntityType string `json:"entity-type"`
+	Status     int    `json:"status"`
+	Message    string `json:"message"`
+	Stack      string `json:"stack"`
 }
 
-func (e *APIError) Error() string {
-	return fmt.Sprintf("nuxeo api error: %d %s", e.StatusCode, e.Message)
+func (e *NuxeoError) Error() string {
+	return fmt.Sprintf("Nuxeo API Exception: %d - %s", e.Status, e.Message)
 }
 
 // ErrAuthFailed is returned when authentication fails.
-var ErrAuthFailed = &APIError{StatusCode: 401, Message: "authentication failed"}
+var ErrAuthFailed = &NuxeoError{Status: 401, Message: "authentication failed"}

@@ -2,10 +2,18 @@ package nuxeo
 
 // Document represents a Nuxeo document entity.
 type Document struct {
-	ID         string
-	Type       string
-	Path       string
-	Properties map[string]any
+	ID           string         `json:"uid"`
+	Path         string         `json:"path"`
+	Type         string         `json:"type"`
+	State        string         `json:"state"`
+	Title        string         `json:"title"`
+	LastModified string         `json:"lastModified"`
+	Properties   map[string]any `json:"properties"`
+}
+
+type DocumentList struct {
+	EntityType string     `json:"entity-type"`
+	Entries    []Document `json:"entries"`
 }
 
 // NewDocument creates a new Document instance.

@@ -1,6 +1,7 @@
 package nuxeo
 
 import (
+	"context"
 	"fmt"
 	"strings"
 )
@@ -10,6 +11,16 @@ type ServerVersion struct {
 	Major int
 	Minor int
 	Patch int
+}
+
+func (c *NuxeoClient) ServerVersion(ctx context.Context) (*ServerVersion, error) {
+	capabilities, err := c.Capabilities(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get server version: %w", err)
+	}
+
+	version := ParseServerVersion(capabilities.Server.DistributionVersion)
+	return version, nil
 }
 
 // ParseServerVersion parses a version string (e.g., "10.2.3") into a ServerVersion.
