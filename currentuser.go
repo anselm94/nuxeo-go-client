@@ -2,7 +2,6 @@ package nuxeo
 
 import (
 	"context"
-	"encoding/json"
 )
 
 type resLoginInfo struct {
@@ -10,19 +9,17 @@ type resLoginInfo struct {
 }
 
 func (c *NuxeoClient) CurrentUser(ctx context.Context) (*User, error) {
-	resOperation, err := c.NewOperation(ctx, "login", nil).Execute()
-	if err != nil {
-		c.logger.Error("Failed to get current user", "error", err)
-		return nil, err
-	}
-	defer resOperation.Close()
-
+	// first get the username via the login operation
 	loginInfo := &resLoginInfo{}
-	err = json.NewDecoder(resOperation).Decode(loginInfo)
-	if err != nil {
+	if err := c.NewOperation(ctx, "login", &NuxeoRequestOption{
+		Enrichers: map[string][]string{
+			"user": {"userprofile"},
+		},
+	}).ExecuteInto(loginInfo); err != nil {
 		c.logger.Error("Failed to get current user", "error", err)
 		return nil, err
 	}
 
+	// then fetch the user details
 	return c.FetchUser(ctx, loginInfo.Username, nil)
 }

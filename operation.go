@@ -95,8 +95,21 @@ func (o *Operation) SetParams(params map[string]any) *Operation {
 	return o
 }
 
+// ExecuteInto executes the operation and decodes the response into out.
+func (o *Operation) ExecuteInto(out any) error {
+	res, err := o.Execute()
+	if err != nil {
+		return err
+	}
+	defer res.Close()
+
+	return json.NewDecoder(res).Decode(out)
+}
+
 // Execute runs the operation using the client.
 func (o *Operation) Execute() (io.ReadCloser, error) {
+	o.request.SetDoNotParseResponse(true)
+
 	if len(o.inputBlobs) > 0 {
 		return o.executeViaMultipart()
 	}
@@ -104,8 +117,6 @@ func (o *Operation) Execute() (io.ReadCloser, error) {
 }
 
 func (o *Operation) executeViaJson() (io.ReadCloser, error) {
-	o.request.SetDoNotParseResponse(true)
-
 	payload := payloadOperation{
 		Params:  o.params,
 		Context: o.context,
@@ -121,6 +132,8 @@ func (o *Operation) executeViaJson() (io.ReadCloser, error) {
 	if err != nil || res.StatusCode() != 200 {
 		o.logger.Error("Failed to execute operation", "error", err, "status", res.StatusCode())
 		return nil, fmt.Errorf("failed to execute operation: %d %w", res.StatusCode(), err)
+	} else if res.StatusCode() == 204 {
+		return nil, nil
 	}
 
 	return res.Body, err
@@ -128,7 +141,6 @@ func (o *Operation) executeViaJson() (io.ReadCloser, error) {
 
 func (o *Operation) executeViaMultipart() (io.ReadCloser, error) {
 	o.request.SetContentType("multipart/related")
-	o.request.SetDoNotParseResponse(true)
 
 	// add json payload as `application/json+nxrequest` part
 	payloadBytes, _ := json.Marshal(payloadOperation{
@@ -147,6 +159,8 @@ func (o *Operation) executeViaMultipart() (io.ReadCloser, error) {
 	if err != nil || res.StatusCode() != 200 {
 		o.logger.Error("Failed to execute operation with blobs", "error", err, "status", res.StatusCode())
 		return nil, fmt.Errorf("failed to execute operation with blobs: %d %w", res.StatusCode(), err)
+	} else if res.StatusCode() == 204 {
+		return nil, nil
 	}
 
 	return res.Body, nil
