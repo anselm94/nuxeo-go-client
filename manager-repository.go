@@ -3,11 +3,10 @@ package nuxeo
 // Repository represents a Nuxeo repository.
 type Repository struct {
 	Name string
-}
 
-// NewRepository creates a new Repository instance.
-func NewRepository(name string) *Repository {
-	return &Repository{Name: name}
+	// internal
+
+	client *NuxeoClient
 }
 
 // GetDocument fetches a document by ID.

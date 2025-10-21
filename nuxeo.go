@@ -4,62 +4,70 @@ package nuxeo
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/anselm94/nuxeo/auth"
-	"github.com/anselm94/nuxeo/hook"
 	"resty.dev/v3"
 )
 
-// Option configures the NuxeoClient.
-type Option func(*NuxeoClient)
+// NuxeoClientOption configures the NuxeoClient.
+type NuxeoClientOption func(*NuxeoClient)
 
 // Authenticator defines the interface for authentication strategies.
 type Authenticator interface {
 	GetAuthHeaders(ctx context.Context, req *http.Request) map[string]string
 }
 
-// Hook allows instrumentation of requests and responses for metrics/tracing.
-type Hook interface {
-	BeforeRequest(method, url string)
-	AfterResponse(method, url string, status int)
-}
-
-func WithLogger(logger slog.Logger) Option {
+func WithLogger(logger slog.Logger) NuxeoClientOption {
 	return func(c *NuxeoClient) {
 		c.logger = &logger
 	}
 }
 
-func WithHook(hook Hook) Option {
+func WithBeforeRequestMiddleware(middleware resty.RequestMiddleware) NuxeoClientOption {
 	return func(c *NuxeoClient) {
-		c.hook = hook
+		c.middlewareBeforeRequest = &middleware
 	}
 }
 
-func WithAuthenticator(authenticator Authenticator) Option {
+func WithAfterResponseMiddleware(middleware resty.ResponseMiddleware) NuxeoClientOption {
+	return func(c *NuxeoClient) {
+		c.middlewareAfterResponse = &middleware
+	}
+}
+
+func WithAuthenticator(authenticator Authenticator) NuxeoClientOption {
 	return func(c *NuxeoClient) {
 		c.authenticator = authenticator
 	}
 }
 
-func WithTimeOut(timeout time.Duration) Option {
+func WithTimeOut(timeout time.Duration) NuxeoClientOption {
 	return func(c *NuxeoClient) {
 		c.timeout = timeout
 	}
 }
 
 type NuxeoClient struct {
-	logger        *slog.Logger
-	authenticator Authenticator
-	hook          Hook
-	timeout       time.Duration
-	restClient    *resty.Client
+	logger                  *slog.Logger
+	middlewareBeforeRequest *resty.RequestMiddleware
+	middlewareAfterResponse *resty.ResponseMiddleware
+	authenticator           Authenticator
+
+	// config
+
+	timeout time.Duration
+
+	// internal
+
+	restClient *resty.Client
 }
 
-func NewClient(baseUrl string, opts ...Option) *NuxeoClient {
+func NewClient(baseUrl string, opts ...NuxeoClientOption) *NuxeoClient {
 	client := &NuxeoClient{}
 
 	for _, opt := range opts {
@@ -82,18 +90,13 @@ func NewClient(baseUrl string, opts ...Option) *NuxeoClient {
 		return nil
 	})
 
-	// setup hooks
-	if client.hook == nil {
-		client.hook = hook.NewNoOpHook()
+	// setup middlewares
+	if client.middlewareBeforeRequest != nil {
+		client.restClient.AddRequestMiddleware(*client.middlewareBeforeRequest)
 	}
-	client.restClient.AddRequestMiddleware(func(c *resty.Client, r *resty.Request) error {
-		client.hook.BeforeRequest(r.Method, r.URL)
-		return nil
-	})
-	client.restClient.AddResponseMiddleware(func(c *resty.Client, r *resty.Response) error {
-		client.hook.AfterResponse(r.Request.Method, r.Request.URL, r.StatusCode())
-		return nil
-	})
+	if client.middlewareAfterResponse != nil {
+		client.restClient.AddResponseMiddleware(*client.middlewareAfterResponse)
+	}
 
 	// setup logger
 	if client.logger == nil {
@@ -111,4 +114,105 @@ func NewClient(baseUrl string, opts ...Option) *NuxeoClient {
 
 func (c *NuxeoClient) Close() error {
 	return c.restClient.Close()
+}
+
+func (c *NuxeoClient) CapabilitiesManager(ctx context.Context) *CapabilitiesManager {
+	return &CapabilitiesManager{
+		client: c,
+		logger: c.logger,
+	}
+}
+
+func (c *NuxeoClient) Repository() *Repository {
+	return &Repository{
+		Name:   "default",
+		client: c,
+	}
+}
+
+func (c *NuxeoClient) RepositoryWithName(name string) *Repository {
+	return &Repository{
+		Name:   name,
+		client: c,
+	}
+}
+
+func (c *NuxeoClient) OperationManager() *OperationManager {
+	return &OperationManager{
+		client: c,
+		logger: c.logger,
+	}
+}
+
+func (c *NuxeoClient) UserManager() *UserManager {
+	return &UserManager{
+		client: c,
+		logger: c.logger,
+	}
+}
+
+func (c *NuxeoClient) DirectoryManager() *DirectoryManager {
+	return &DirectoryManager{
+		client: c,
+		logger: c.logger,
+	}
+}
+
+func (c *NuxeoClient) TaskManager() *TaskManager {
+	return &TaskManager{
+		client: c,
+		logger: c.logger,
+	}
+}
+
+func (c *NuxeoClient) UploadManager() *UploadManager {
+	return &UploadManager{
+		client: c,
+		logger: c.logger,
+	}
+}
+
+func (c *NuxeoClient) ConfigManager() *ConfigManager {
+	return &ConfigManager{
+		client: c,
+		logger: c.logger,
+	}
+}
+
+////////////////////////
+//// COMMON METHODS ////
+////////////////////////
+
+func (c *NuxeoClient) CurrentUser(ctx context.Context) (*User, error) {
+	return c.UserManager().CurrentUser(ctx)
+}
+
+// ServerVersion represents the Nuxeo server version.
+type ServerVersion struct {
+	Major int
+	Minor int
+	Patch int
+}
+
+func (c *NuxeoClient) ServerVersion(ctx context.Context) (*ServerVersion, error) {
+	version := &ServerVersion{}
+
+	// first get the server version from capabilities
+	capabilities, err := c.CapabilitiesManager(ctx).FetchCapabilities(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get server version: %w", err)
+	}
+
+	// parse version string
+	parts := strings.Split(capabilities.Server.DistributionVersion, ".")
+	if len(parts) > 0 {
+		fmt.Sscanf(parts[0], "%d", &version.Major)
+	}
+	if len(parts) > 1 {
+		fmt.Sscanf(parts[1], "%d", &version.Minor)
+	}
+	if len(parts) > 2 {
+		fmt.Sscanf(parts[2], "%d", &version.Patch)
+	}
+	return version, nil
 }

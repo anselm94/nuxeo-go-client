@@ -7,7 +7,7 @@ import (
 	"resty.dev/v3"
 )
 
-type NuxeoRequestOption struct {
+type NuxeoRequestOptions struct {
 	RepositoryName      string
 	Schemas             []string
 	Enrichers           map[string][]string
@@ -30,7 +30,7 @@ func (c *NuxeoClient) NewRequest(ctx context.Context) *NuxeoRequest {
 	}
 }
 
-func (r *NuxeoRequest) SetNuxeoOption(options *NuxeoRequestOption) *NuxeoRequest {
+func (r *NuxeoRequest) SetNuxeoOption(options *NuxeoRequestOptions) *NuxeoRequest {
 	if options == nil {
 		return r
 	}
