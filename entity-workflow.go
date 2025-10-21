@@ -7,13 +7,8 @@ type Workflow struct {
 	Properties map[string]any
 }
 
-// NewWorkflow creates a new Workflow instance.
-func NewWorkflow(id, name string, props map[string]any) *Workflow {
-	return &Workflow{
-		ID:         id,
-		Name:       name,
-		Properties: props,
-	}
+type Workflows struct {
+	Entries []Workflow
 }
 
 // Task represents a workflow task.

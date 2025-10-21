@@ -165,8 +165,8 @@ func (c *NuxeoClient) TaskManager() *TaskManager {
 	}
 }
 
-func (c *NuxeoClient) UploadManager() *UploadManager {
-	return &UploadManager{
+func (c *NuxeoClient) BatchUploadManager() *BatchUploadManager {
+	return &BatchUploadManager{
 		client: c,
 		logger: c.logger,
 	}
@@ -184,7 +184,7 @@ func (c *NuxeoClient) ConfigManager() *ConfigManager {
 ////////////////////////
 
 func (c *NuxeoClient) CurrentUser(ctx context.Context) (*User, error) {
-	return c.UserManager().CurrentUser(ctx)
+	return c.UserManager().FetchCurrentUser(ctx)
 }
 
 // ServerVersion represents the Nuxeo server version.

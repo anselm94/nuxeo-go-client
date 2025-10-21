@@ -50,8 +50,8 @@ type ACE struct {
 type DocumentContextParameters struct {
 	ACLs        []ACL        `json:"acls,omitempty"`
 	Audit       []AuditEntry `json:"audit,omitempty"`
-	Breadcrumb  DocumentList `json:"breadcrumb,omitempty"`
-	Children    DocumentList `json:"children,omitempty"`
+	Breadcrumb  Documents    `json:"breadcrumb,omitempty"`
+	Children    Documents    `json:"children,omitempty"`
 	Collections []any        `json:"collections,omitempty"`
 	DocumentUrl string       `json:"documentUrl,omitempty"`
 	Favorites   struct {
@@ -79,11 +79,6 @@ type DocumentContextParameters struct {
 		URL string `json:"url,omitempty"`
 	} `json:"thumbnail,omitempty"`
 	UserVisiblePermissions []string `json:"userVisiblePermissions,omitempty"`
-}
-
-type DocumentList struct {
-	EntityType string     `json:"entity-type"`
-	Entries    []Document `json:"entries"`
 }
 
 // Document represents a Nuxeo document entity.
@@ -127,6 +122,8 @@ func (d *Document) IsCollection() bool {
 func (d *Document) IsCollectable() bool {
 	return d.HasFacet("NotCollectionMember")
 }
+
+type Documents PaginatedEntities[Document]
 
 func (c *NuxeoClient) FetchBlob(ctx context.Context, documentId string, xPath string, options *NuxeoRequestOptions) (*Blob, error) {
 	if xPath == "" {

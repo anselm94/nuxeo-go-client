@@ -6,10 +6,4 @@ type Group struct {
 	Properties map[string]any
 }
 
-// NewGroup creates a new Group instance.
-func NewGroup(name string, props map[string]any) *Group {
-	return &Group{
-		Name:       name,
-		Properties: props,
-	}
-}
+type Groups PaginatedEntities[Group]

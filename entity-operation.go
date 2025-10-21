@@ -10,12 +10,15 @@ import (
 	"time"
 )
 
-// Operation represents a Nuxeo operation.
-type Operation struct {
+type OperationPayload struct {
 	Input   string            `json:"input,omitempty"`
 	Params  map[string]string `json:"params,omitempty"`
 	Context map[string]string `json:"context,omitempty"`
+}
 
+// Operation represents a Nuxeo operation.
+type Operation struct {
+	payload OperationPayload
 	// internal
 
 	automationId   string
@@ -52,7 +55,7 @@ func (o *Operation) SetBlobListInput(blobs []io.Reader) *Operation {
 }
 
 func (o *Operation) SetContext(key string, value string) *Operation {
-	o.Context[key] = value
+	o.payload.Context[key] = value
 	return o
 }
 
@@ -60,17 +63,17 @@ func (o *Operation) SetContext(key string, value string) *Operation {
 func (o *Operation) SetParam(key string, value any) *Operation {
 	switch v := value.(type) {
 	case string:
-		o.Params[key] = v
+		o.payload.Params[key] = v
 	case int, int32, int64:
-		o.Params[key] = fmt.Sprintf("%d", v)
+		o.payload.Params[key] = fmt.Sprintf("%d", v)
 	case float32, float64:
-		o.Params[key] = fmt.Sprintf("%f", v)
+		o.payload.Params[key] = fmt.Sprintf("%f", v)
 	case time.Time:
-		o.Params[key] = v.Format(time.RFC3339)
+		o.payload.Params[key] = v.Format(time.RFC3339)
 	case bool:
-		o.Params[key] = fmt.Sprintf("%t", v)
+		o.payload.Params[key] = fmt.Sprintf("%t", v)
 	default:
-		o.Params[key] = fmt.Sprintf("%v", v)
+		o.payload.Params[key] = fmt.Sprintf("%v", v)
 	}
 	return o
 }
@@ -108,12 +111,12 @@ func (o *Operation) Execute() (io.ReadCloser, error) {
 func (o *Operation) executeViaJson() (io.ReadCloser, error) {
 	// compute Input field based on inputDocuments
 	if len(o.inputDocuments) == 1 {
-		o.Input = "doc:" + o.inputDocuments[0]
+		o.payload.Input = "doc:" + o.inputDocuments[0]
 	} else if len(o.inputDocuments) > 1 {
-		o.Input = "docs:" + strings.Join(o.inputDocuments, ",")
+		o.payload.Input = "docs:" + strings.Join(o.inputDocuments, ",")
 	}
 
-	o.request.SetBody(o)
+	o.request.SetBody(o.payload)
 
 	res, err := o.request.Post("/site/automation/" + o.automationId)
 	if err != nil || res.StatusCode() != 200 {
@@ -130,7 +133,7 @@ func (o *Operation) executeViaMultipart() (io.ReadCloser, error) {
 	o.request.SetContentType("multipart/related")
 
 	// add json payload as `application/json+nxrequest` part
-	payloadBytes, _ := json.Marshal(o)
+	payloadBytes, _ := json.Marshal(o.payload)
 	o.request.SetMultipartField("root", "", "application/json+nxrequest", bytes.NewReader(payloadBytes))
 
 	// add input documents one by one
