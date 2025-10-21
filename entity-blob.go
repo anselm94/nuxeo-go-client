@@ -7,5 +7,5 @@ type Blob struct {
 	Filename string
 	MimeType string
 	Length   int64
-	Data     io.ReadCloser
+	Stream   io.ReadCloser
 }

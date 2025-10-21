@@ -154,7 +154,7 @@ func (c *NuxeoClient) FetchBlob(ctx context.Context, documentId string, xPath st
 	return &Blob{
 		Filename: filename,
 		MimeType: contentType,
-		Data:     res.Body,
+		Stream:   res.Body,
 	}, nil
 }
 

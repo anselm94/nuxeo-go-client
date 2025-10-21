@@ -99,11 +99,9 @@ func (um *UserManager) FetchCurrentUser(ctx context.Context) (*User, error) {
 	loginInfo := &struct {
 		Username string `json:"username"`
 	}{}
-	if err := um.client.OperationManager().NewOperation(ctx, "login", &NuxeoRequestOptions{
-		Enrichers: map[string][]string{
-			"user": {"userprofile"},
-		},
-	}).ExecuteInto(loginInfo); err != nil {
+	operationMgr := um.client.OperationManager()
+	operationLogin := operationMgr.NewOperation("login")
+	if err := operationMgr.ExecuteInto(ctx, operationLogin, loginInfo); err != nil {
 		um.logger.Error("Failed to get current user", "error", err)
 		return nil, err
 	}
