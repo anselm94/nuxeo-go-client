@@ -47,11 +47,11 @@ func (r *Repository) DeleteDocument(ctx context.Context, documentId string) erro
 //// QUERY ////
 ///////////////
 
-func (r *Repository) Query(ctx context.Context, query string, queryParams map[string]any, paginationOptions *SortedPaginationOptions) (*Documents, error) {
+func (r *Repository) Query(ctx context.Context, query string, queryParams []string, paginationOptions *SortedPaginationOptions) (*Documents, error) {
 	return nil, nil
 }
 
-func (r *Repository) QueryByProvider(ctx context.Context, providerName string, queryParams map[string]any, namedQueryParams map[string]any, paginationOptions *SortedPaginationOptions) (*Documents, error) {
+func (r *Repository) QueryByProvider(ctx context.Context, providerName string, queryParams []string, namedQueryParams map[string]string, paginationOptions *SortedPaginationOptions) (*Documents, error) {
 	return nil, nil
 }
 
@@ -151,18 +151,18 @@ func (r *Repository) FetchWorkflowModels(ctx context.Context) (*Workflows, error
 //// WEB ADAPTER ////
 /////////////////////
 
-func (r *Repository) CreateForAdapter(ctx context.Context, documentId string, adapter string, pathSuffix string, queryParams map[string]any, payload any) (*any, error) {
+func (r *Repository) CreateForAdapter(ctx context.Context, documentId string, adapter string, pathSuffix string, queryParams []string, payload any) (*any, error) {
 	return nil, nil
 }
 
-func (r *Repository) FetchForAdapter(ctx context.Context, documentId string, adapter string, pathSuffix string, queryParams map[string]any) (*any, error) {
+func (r *Repository) FetchForAdapter(ctx context.Context, documentId string, adapter string, pathSuffix string, queryParams []string) (*any, error) {
 	return nil, nil
 }
 
-func (r *Repository) UpdateForAdapter(ctx context.Context, documentId string, adapter string, pathSuffix string, queryParams map[string]any, payload any) (*any, error) {
+func (r *Repository) UpdateForAdapter(ctx context.Context, documentId string, adapter string, pathSuffix string, queryParams []string, payload any) (*any, error) {
 	return nil, nil
 }
 
-func (r *Repository) DeleteForAdapter(ctx context.Context, documentId string, adapter string, pathSuffix string, queryParams map[string]any) error {
+func (r *Repository) DeleteForAdapter(ctx context.Context, documentId string, adapter string, pathSuffix string, queryParams []string) error {
 	return nil
 }

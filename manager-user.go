@@ -51,8 +51,8 @@ func (um *UserManager) fetchGroupMemberGroups(ctx context.Context, idOrGroupName
 //// USERS ////
 ///////////////
 
-func (um *UserManager) FetchUser(ctx context.Context, id string, options *NuxeoRequestOptions) (*User, error) {
-	res, err := um.client.NewRequest(ctx).SetNuxeoOption(options).SetResult(&User{}).Get("/api/v1/user/" + id)
+func (um *UserManager) FetchUser(ctx context.Context, id string, options *nuxeoRequestOptions) (*User, error) {
+	res, err := um.client.NewRequest(ctx, options).SetResult(&User{}).Get("/api/v1/user/" + id)
 
 	if err != nil || res.StatusCode() != 200 {
 		um.logger.Error("Failed to fetch user", "error", err, "status", res.StatusCode())
@@ -61,8 +61,8 @@ func (um *UserManager) FetchUser(ctx context.Context, id string, options *NuxeoR
 	return res.Result().(*User), nil
 }
 
-func (um *UserManager) CreateUser(ctx context.Context, user *User) (*User, error) {
-	res, err := um.client.NewRequest(ctx).SetBody(User{
+func (um *UserManager) CreateUser(ctx context.Context, user *User, options *nuxeoRequestOptions) (*User, error) {
+	res, err := um.client.NewRequest(ctx, options).SetBody(User{
 		entity: entity{
 			EntityType: "user",
 		},

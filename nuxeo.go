@@ -52,6 +52,12 @@ func WithTimeOut(timeout time.Duration) NuxeoClientOption {
 	}
 }
 
+func WithHeader(key string, value string) NuxeoClientOption {
+	return func(c *NuxeoClient) {
+		c.headers[key] = value
+	}
+}
+
 type NuxeoClient struct {
 	logger                  *slog.Logger
 	middlewareBeforeRequest *resty.RequestMiddleware
@@ -61,6 +67,7 @@ type NuxeoClient struct {
 	// config
 
 	timeout time.Duration
+	headers map[string]string
 
 	// internal
 
@@ -68,7 +75,9 @@ type NuxeoClient struct {
 }
 
 func NewClient(baseUrl string, opts ...NuxeoClientOption) *NuxeoClient {
-	client := &NuxeoClient{}
+	client := &NuxeoClient{
+		headers: make(map[string]string),
+	}
 
 	for _, opt := range opts {
 		opt(client)
@@ -114,6 +123,19 @@ func NewClient(baseUrl string, opts ...NuxeoClientOption) *NuxeoClient {
 
 func (c *NuxeoClient) Close() error {
 	return c.restClient.Close()
+}
+
+func (c *NuxeoClient) NewRequest(ctx context.Context, options *nuxeoRequestOptions) *nuxeoRequest {
+	req := &nuxeoRequest{
+		Request: c.restClient.R().SetContext(ctx),
+	}
+
+	// set headers from client
+	for k, v := range c.headers {
+		req.SetHeader(k, v)
+	}
+
+	return req.setNuxeoOption(options)
 }
 
 func (c *NuxeoClient) CapabilitiesManager(ctx context.Context) *CapabilitiesManager {
@@ -179,9 +201,9 @@ func (c *NuxeoClient) ConfigManager() *ConfigManager {
 	}
 }
 
-////////////////////////
-//// COMMON METHODS ////
-////////////////////////
+/////////////////
+//// METHODS ////
+/////////////////
 
 func (c *NuxeoClient) CurrentUser(ctx context.Context) (*User, error) {
 	return c.UserManager().FetchCurrentUser(ctx)

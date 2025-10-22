@@ -13,7 +13,7 @@ type CapabilitiesManager struct {
 
 func (cm *CapabilitiesManager) FetchCapabilities(ctx context.Context) (*Capabilities, error) {
 	capabilities := &Capabilities{}
-	res, err := cm.client.NewRequest(ctx).SetResult(capabilities).Get("/api/v1/capabilities")
+	res, err := cm.client.NewRequest(ctx, nil).SetResult(capabilities).Get("/api/v1/capabilities")
 
 	if err != nil || res.StatusCode() != 200 {
 		cm.logger.Error("Failed to get server capabilities", "error", err, "status", res.StatusCode())

@@ -28,8 +28,8 @@ func (om *OperationManager) NewOperation(operationId string) *Operation {
 }
 
 // ExecuteInto executes the operation and decodes the response into out.
-func (o *OperationManager) ExecuteInto(ctx context.Context, operation *Operation, out any) error {
-	res, err := o.Execute(ctx, operation)
+func (o *OperationManager) ExecuteInto(ctx context.Context, operation Operation, requestOptions *nuxeoRequestOptions, out any) error {
+	res, err := o.Execute(ctx, operation, requestOptions)
 	if err != nil {
 		return err
 	}
@@ -39,17 +39,17 @@ func (o *OperationManager) ExecuteInto(ctx context.Context, operation *Operation
 }
 
 // Execute runs the operation using the client.
-func (o *OperationManager) Execute(ctx context.Context, operation *Operation) (io.ReadCloser, error) {
+func (o *OperationManager) Execute(ctx context.Context, operation Operation, requestOptions *nuxeoRequestOptions) (io.ReadCloser, error) {
 	// decide execution method based on presence of blobs
 	if len(operation.blobs()) > 0 {
-		return o.executeViaMultipart(ctx, operation)
+		return o.executeViaMultipart(ctx, operation, requestOptions)
 	} else {
-		return o.executeViaJson(ctx, operation)
+		return o.executeViaJson(ctx, operation, requestOptions)
 	}
 }
 
-func (o *OperationManager) executeViaJson(ctx context.Context, operation *Operation) (io.ReadCloser, error) {
-	request := o.client.NewRequest(ctx)
+func (o *OperationManager) executeViaJson(ctx context.Context, operation Operation, requestOptions *nuxeoRequestOptions) (io.ReadCloser, error) {
+	request := o.client.NewRequest(ctx, requestOptions)
 	request.SetDoNotParseResponse(true)
 
 	if operation.isVoid {
@@ -69,8 +69,8 @@ func (o *OperationManager) executeViaJson(ctx context.Context, operation *Operat
 	return res.Body, err
 }
 
-func (o *OperationManager) executeViaMultipart(ctx context.Context, operation *Operation) (io.ReadCloser, error) {
-	request := o.client.NewRequest(ctx)
+func (o *OperationManager) executeViaMultipart(ctx context.Context, operation Operation, requestOptions *nuxeoRequestOptions) (io.ReadCloser, error) {
+	request := o.client.NewRequest(ctx, requestOptions)
 	request.SetDoNotParseResponse(true)
 
 	if operation.isVoid {
@@ -123,7 +123,7 @@ type Operation struct {
 	context          map[string]string
 	isVoid           bool
 
-	request *NuxeoRequest
+	request *nuxeoRequest
 	logger  slog.Logger
 }
 
