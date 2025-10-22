@@ -63,7 +63,9 @@ func (um *UserManager) FetchUser(ctx context.Context, id string, options *NuxeoR
 
 func (um *UserManager) CreateUser(ctx context.Context, user *User) (*User, error) {
 	res, err := um.client.NewRequest(ctx).SetBody(User{
-		EntityType: "user",
+		entity: entity{
+			EntityType: "user",
+		},
 		Properties: user.Properties,
 	}).SetResult(&User{}).Post("/api/v1/user/")
 

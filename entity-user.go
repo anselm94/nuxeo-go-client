@@ -1,16 +1,5 @@
 package nuxeo
 
-const (
-	UserPropertyFirstName = "firstName"
-	UserPropertyLastName  = "lastName"
-	UserPropertyEmail     = "email"
-	UserPropertyGroups    = "groups"
-	UserPropertyUsername  = "username"
-	UserPropertyCompany   = "company"
-	UserPropertyPassword  = "password"
-	UserPropertyTenantId  = "tenantId"
-)
-
 type ExtendedGroup struct {
 	Name  string `json:"name"`
 	Label string `json:"label"`
@@ -19,7 +8,7 @@ type ExtendedGroup struct {
 
 // User represents a Nuxeo user.
 type User struct {
-	EntityType      string          `json:"entity-type"`
+	entity
 	Id              string          `json:"id"`
 	IsAdministrator bool            `json:"isAdministrator"`
 	IsAnonymous     bool            `json:"isAnonymous"`
@@ -74,4 +63,4 @@ func (u *User) TenantId() string {
 	return u.Properties[UserPropertyTenantId].(string)
 }
 
-type Users PaginatedEntities[User]
+type Users paginableEntities[User]

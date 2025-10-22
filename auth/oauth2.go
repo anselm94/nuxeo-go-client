@@ -69,10 +69,10 @@ import (
 )
 
 const (
-	NUXEO_OAUTH2_TOKEN_PATH = "/oauth2/token"
-	NUXEO_OAUTH2_AUTH_PATH  = "/oauth2/authorize"
+	oauth2TokenPath = "/oauth2/token"
+	oauth2AuthPath  = "/oauth2/authorize"
 
-	OAUTH2_AUTHORIZE_STATE = "nuxeo-go-client-state"
+	OAuth2AuthorizeState = "nuxeo-go-client-state"
 )
 
 type OAuth2Info struct {
@@ -129,8 +129,8 @@ func (a *OAuth2Authenticator) getAuthGrantFlowConfig() oauth2.Config {
 		Scopes:      []string{},
 		RedirectURL: a.authInfo.RedirectURL,
 		Endpoint: oauth2.Endpoint{
-			TokenURL: a.baseUrl + NUXEO_OAUTH2_TOKEN_PATH,
-			AuthURL:  a.baseUrl + NUXEO_OAUTH2_AUTH_PATH,
+			TokenURL: a.baseUrl + oauth2TokenPath,
+			AuthURL:  a.baseUrl + oauth2AuthPath,
 		},
 	}
 }
@@ -140,7 +140,7 @@ func (a *OAuth2Authenticator) getClientCredentialsFlowConfig() clientcredentials
 		ClientID:     a.authInfo.ClientID,
 		ClientSecret: a.authInfo.ClientSecret,
 		Scopes:       []string{},
-		TokenURL:     a.baseUrl + NUXEO_OAUTH2_TOKEN_PATH,
+		TokenURL:     a.baseUrl + oauth2TokenPath,
 	}
 }
 
@@ -170,7 +170,7 @@ func (a *OAuth2Authenticator) GetTokenSource(ctx context.Context) oauth2.TokenSo
 
 func (a *OAuth2Authenticator) AuthCodeUrl(ctx context.Context) string {
 	config := a.getAuthGrantFlowConfig()
-	return config.AuthCodeURL(OAUTH2_AUTHORIZE_STATE, oauth2.AccessTypeOffline)
+	return config.AuthCodeURL(OAuth2AuthorizeState, oauth2.AccessTypeOffline)
 }
 
 func (a *OAuth2Authenticator) SetAuthCode(ctx context.Context, code string) error {

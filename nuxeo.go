@@ -125,14 +125,14 @@ func (c *NuxeoClient) CapabilitiesManager(ctx context.Context) *CapabilitiesMana
 
 func (c *NuxeoClient) Repository() *Repository {
 	return &Repository{
-		Name:   "default",
+		name:   RepositoryDefault,
 		client: c,
 	}
 }
 
 func (c *NuxeoClient) RepositoryWithName(name string) *Repository {
 	return &Repository{
-		Name:   name,
+		name:   name,
 		client: c,
 	}
 }

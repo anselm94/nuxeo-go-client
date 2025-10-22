@@ -6,7 +6,7 @@ import (
 )
 
 type Schema struct {
-	EntityType    string                 `json:"entity-type,omitempty"`
+	entity
 	Name          string                 `json:"name"`
 	Prefix        string                 `json:"prefix"`
 	PrefixAliased string                 `json:"@prefix"`
@@ -83,19 +83,19 @@ func (sf *SchemaField) UnmarshalJSON(data []byte) error {
 type Schemas []Schema
 
 type Facet struct {
-	EntityType string   `json:"entity-type,omitempty"`
-	Name       string   `json:"name,omitempty"`
-	Schemas    []Schema `json:"schemas"`
+	entity
+	Name    string   `json:"name,omitempty"`
+	Schemas []Schema `json:"schemas"`
 }
 
 type Facets []Facet
 
 type DocType struct {
-	EntityType string   `json:"entity-type,omitempty"`
-	Name       string   `json:"name,omitempty"`
-	Parent     string   `json:"parent"`
-	Facets     []string `json:"facets"`
-	Schemas    []Schema `json:"schemas"` // can be []string or "Schema" based on get all doc types vs get single doc type
+	entity
+	Name    string   `json:"name,omitempty"`
+	Parent  string   `json:"parent"`
+	Facets  []string `json:"facets"`
+	Schemas []Schema `json:"schemas"` // can be []string or "Schema" based on get all doc types vs get single doc type
 }
 
 type DocTypes struct {

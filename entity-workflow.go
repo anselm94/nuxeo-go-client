@@ -2,27 +2,22 @@ package nuxeo
 
 // Workflow represents a Nuxeo workflow.
 type Workflow struct {
-	ID         string
-	Name       string
-	Properties map[string]any
+	entity
+	Id                  string         `json:"id"`
+	Name                string         `json:"name"`
+	Title               string         `json:"title"`
+	State               string         `json:"state"`
+	WorkflowModelName   string         `json:"workflowModelName"`
+	Initiator           User           `json:"initiator"`           // TODO: JSON unmarshal string to user
+	AttachedDocumentIds []Document     `json:"attachedDocumentIds"` // TODO: JSON unmarshal string to document
+	Variables           map[string]any `json:"variables"`
+	GraphResource       string         `json:"graphResource"`
 }
 
-type Workflows struct {
-	Entries []Workflow
-}
+type Workflows entities[Workflow]
 
-// Task represents a workflow task.
-type Task struct {
-	ID         string
-	Name       string
-	Properties map[string]any
-}
-
-// NewTask creates a new Task instance.
-func NewTask(id, name string, props map[string]any) *Task {
-	return &Task{
-		ID:         id,
-		Name:       name,
-		Properties: props,
-	}
+type WorkflowGraph struct {
+	entity
+	Nodes       map[string]any `json:"nodes"`
+	Transitions map[string]any `json:"transitions"`
 }

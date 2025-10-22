@@ -1,13 +1,15 @@
 package nuxeo
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // NuxeoError represents an error returned by the Nuxeo API.
 type NuxeoError struct {
-	EntityType string `json:"entity-type"`
-	Status     int    `json:"status"`
-	Message    string `json:"message"`
-	Stack      string `json:"stack"`
+	entity
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+	Stack   string `json:"stack"`
 }
 
 func (e *NuxeoError) Error() string {

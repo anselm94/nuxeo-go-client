@@ -48,7 +48,7 @@ func main() {
         panic(err)
     }
 
-    repo := nuxeo.NewRepository("default")
+    repo := nuxeo.NewRepository(nuxeo.RepositoryDefault)
     docs, err := repo.QueryDocuments("SELECT * FROM Document WHERE ecm:parentId IS NULL")
     if err != nil {
         panic(err)
@@ -260,7 +260,7 @@ user, err := client.Users().Fetch(ctx, "jsmith")
 group, err := client.Groups().Fetch(ctx, "administrators")
 dir := client.Directory("countries")
 entries, err := dir.FetchAll(ctx)
-wf, err := client.Workflows("default").Start(ctx, "SerialDocumentReview", nil)
+wf, err := client.Workflows(nuxeo.RepositoryDefault).Start(ctx, "SerialDocumentReview", nil)
 ```
 
 ## Error Handling & Thread Safety
