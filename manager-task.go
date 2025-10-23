@@ -12,19 +12,19 @@ type TaskManager struct {
 	logger *slog.Logger
 }
 
-func (t *TaskManager) FetchTasks(ctx context.Context) (*Tasks, error) {
+func (t *TaskManager) FetchTasks(ctx context.Context, options *nuxeoRequestOptions) (*Tasks, error) {
 	return nil, nil
 }
 
-func (t *TaskManager) FetchTask(ctx context.Context, taskId string) (*Task, error) {
+func (t *TaskManager) FetchTask(ctx context.Context, taskId string, options *nuxeoRequestOptions) (*Task, error) {
 	return nil, nil
 }
 
-func (t *TaskManager) ReassignTask(ctx context.Context, taskId string, actors string, comment string) (*Task, error) {
+func (t *TaskManager) ReassignTask(ctx context.Context, taskId string, actors string, comment string, options *nuxeoRequestOptions) (*Task, error) {
 	return nil, nil
 }
 
-func (t *TaskManager) DelegateTask(ctx context.Context, taskId string, actors string, comment string) (*Task, error) {
+func (t *TaskManager) DelegateTask(ctx context.Context, taskId string, actors string, comment string, options *nuxeoRequestOptions) (*Task, error) {
 	return nil, nil
 }
 
@@ -34,6 +34,6 @@ type TaskCompletionRequest struct {
 	Variables map[string]any `json:"variables,omitempty"`
 }
 
-func (t *TaskManager) CompleteTask(ctx context.Context, taskId string, action string, request TaskCompletionRequest) (*Task, error) {
+func (t *TaskManager) CompleteTask(ctx context.Context, taskId string, action string, request TaskCompletionRequest, options *nuxeoRequestOptions) (*Task, error) {
 	return nil, nil
 }

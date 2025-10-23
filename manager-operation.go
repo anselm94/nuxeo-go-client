@@ -16,8 +16,8 @@ type OperationManager struct {
 	logger *slog.Logger
 }
 
-func (om *OperationManager) NewOperation(operationId string) *Operation {
-	return &Operation{
+func (om *OperationManager) NewOperation(operationId string) *operation {
+	return &operation{
 		operationId:      operationId,
 		params:           make(map[string]string),
 		context:          make(map[string]string),
@@ -28,7 +28,7 @@ func (om *OperationManager) NewOperation(operationId string) *Operation {
 }
 
 // ExecuteInto executes the operation and decodes the response into out.
-func (o *OperationManager) ExecuteInto(ctx context.Context, operation Operation, requestOptions *nuxeoRequestOptions, out any) error {
+func (o *OperationManager) ExecuteInto(ctx context.Context, operation operation, requestOptions *nuxeoRequestOptions, out any) error {
 	res, err := o.Execute(ctx, operation, requestOptions)
 	if err != nil {
 		return err
@@ -39,7 +39,7 @@ func (o *OperationManager) ExecuteInto(ctx context.Context, operation Operation,
 }
 
 // Execute runs the operation using the client.
-func (o *OperationManager) Execute(ctx context.Context, operation Operation, requestOptions *nuxeoRequestOptions) (io.ReadCloser, error) {
+func (o *OperationManager) Execute(ctx context.Context, operation operation, requestOptions *nuxeoRequestOptions) (io.ReadCloser, error) {
 	// decide execution method based on presence of blobs
 	if len(operation.blobs()) > 0 {
 		return o.executeViaMultipart(ctx, operation, requestOptions)
@@ -48,7 +48,7 @@ func (o *OperationManager) Execute(ctx context.Context, operation Operation, req
 	}
 }
 
-func (o *OperationManager) executeViaJson(ctx context.Context, operation Operation, requestOptions *nuxeoRequestOptions) (io.ReadCloser, error) {
+func (o *OperationManager) executeViaJson(ctx context.Context, operation operation, requestOptions *nuxeoRequestOptions) (io.ReadCloser, error) {
 	request := o.client.NewRequest(ctx, requestOptions)
 	request.SetDoNotParseResponse(true)
 
@@ -69,7 +69,7 @@ func (o *OperationManager) executeViaJson(ctx context.Context, operation Operati
 	return res.Body, err
 }
 
-func (o *OperationManager) executeViaMultipart(ctx context.Context, operation Operation, requestOptions *nuxeoRequestOptions) (io.ReadCloser, error) {
+func (o *OperationManager) executeViaMultipart(ctx context.Context, operation operation, requestOptions *nuxeoRequestOptions) (io.ReadCloser, error) {
 	request := o.client.NewRequest(ctx, requestOptions)
 	request.SetDoNotParseResponse(true)
 
@@ -114,8 +114,8 @@ type operationPayload struct {
 	Context map[string]string `json:"context,omitempty"`
 }
 
-// Operation represents a Nuxeo operation.
-type Operation struct {
+// operation represents a Nuxeo operation.
+type operation struct {
 	operationId      string
 	inputDocumentIds []string
 	inputBlobs       []Blob
@@ -128,37 +128,37 @@ type Operation struct {
 }
 
 // SetInput sets the input for the operation.
-func (o *Operation) SetInputDocumentId(docIdOrPath string) *Operation {
+func (o *operation) SetInputDocumentId(docIdOrPath string) *operation {
 	o.inputDocumentIds = []string{
 		docIdOrPath,
 	}
 	return o
 }
 
-func (o *Operation) SetInputDocumentIds(docIdsOrPaths []string) *Operation {
+func (o *operation) SetInputDocumentIds(docIdsOrPaths []string) *operation {
 	o.inputDocumentIds = docIdsOrPaths
 	return o
 }
 
-func (o *Operation) SetInputBlob(blob Blob) *Operation {
+func (o *operation) SetInputBlob(blob Blob) *operation {
 	o.inputBlobs = []Blob{
 		blob,
 	}
 	return o
 }
 
-func (o *Operation) SetInputBlobs(blobs []Blob) *Operation {
+func (o *operation) SetInputBlobs(blobs []Blob) *operation {
 	o.inputBlobs = blobs
 	return o
 }
 
-func (o *Operation) SetContext(key string, value string) *Operation {
+func (o *operation) SetContext(key string, value string) *operation {
 	o.context[key] = value
 	return o
 }
 
 // SetParam sets a parameter for the operation.
-func (o *Operation) SetParam(key string, value any) *Operation {
+func (o *operation) SetParam(key string, value any) *operation {
 	switch v := value.(type) {
 	case string:
 		o.params[key] = v
@@ -176,19 +176,19 @@ func (o *Operation) SetParam(key string, value any) *Operation {
 	return o
 }
 
-func (o *Operation) SetParams(params map[string]any) *Operation {
+func (o *operation) SetParams(params map[string]any) *operation {
 	for key, val := range params {
 		o.SetParam(key, val)
 	}
 	return o
 }
 
-func (o *Operation) SetVoidOperation(isVoid bool) *Operation {
+func (o *operation) SetVoidOperation(isVoid bool) *operation {
 	o.isVoid = isVoid
 	return o
 }
 
-func (o *Operation) payload() *operationPayload {
+func (o *operation) payload() *operationPayload {
 	payload := &operationPayload{
 		Params:  o.params,
 		Context: o.context,
@@ -202,6 +202,6 @@ func (o *Operation) payload() *operationPayload {
 	return payload
 }
 
-func (o *Operation) blobs() []Blob {
+func (o *operation) blobs() []Blob {
 	return o.inputBlobs
 }

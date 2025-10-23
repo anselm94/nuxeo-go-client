@@ -24,27 +24,27 @@ type BatchUpload struct {
 	ChunkCount       int    `json:"chunkCount"`
 }
 
-func (bum *BatchUploadManager) CreateBatch(ctx context.Context, totalSize int64, fileCount int) (*BatchUpload, error) {
+func (bum *BatchUploadManager) CreateBatch(ctx context.Context, totalSize int64, fileCount int, options *nuxeoRequestOptions) (*BatchUpload, error) {
 	return nil, nil
 }
 
-func (bum *BatchUploadManager) FetchBatchUploads(ctx context.Context, batchId string) (*[]BatchUpload, error) {
+func (bum *BatchUploadManager) FetchBatchUploads(ctx context.Context, batchId string, options *nuxeoRequestOptions) (*[]BatchUpload, error) {
 	return nil, nil
 }
 
-func (bum *BatchUploadManager) FetchBatchUpload(ctx context.Context, batchId string, fileIdx string) (*BatchUpload, error) {
+func (bum *BatchUploadManager) FetchBatchUpload(ctx context.Context, batchId string, fileIdx string, options *nuxeoRequestOptions) (*BatchUpload, error) {
 	return nil, nil
 }
 
-func (bum *BatchUploadManager) CancelBatch(ctx context.Context, batchId string) error {
+func (bum *BatchUploadManager) CancelBatch(ctx context.Context, batchId string, options *nuxeoRequestOptions) error {
 	return nil
 }
 
-func (bum *BatchUploadManager) ExecuteBatchUploads(ctx context.Context, batchId string, operationId string, operationPayload operationPayload) (any, error) {
+func (bum *BatchUploadManager) ExecuteBatchUploads(ctx context.Context, batchId string, operationId string, operationPayload operationPayload, options *nuxeoRequestOptions) (any, error) {
 	return nil, nil
 }
 
-func (bum *BatchUploadManager) ExecuteBatchUpload(ctx context.Context, batchId string, fileIdx string, operationId string, operationPayload operationPayload) (any, error) {
+func (bum *BatchUploadManager) ExecuteBatchUpload(ctx context.Context, batchId string, fileIdx string, operationId string, operationPayload operationPayload, options *nuxeoRequestOptions) (any, error) {
 	return nil, nil
 }
 
@@ -57,6 +57,6 @@ type UploadOptions struct {
 	TotalChunkCount  int64
 }
 
-func (bum *BatchUploadManager) Upload(ctx context.Context, batchId string, fileIdx string, blob io.Reader, options UploadOptions) (*BatchUpload, error) {
+func (bum *BatchUploadManager) Upload(ctx context.Context, batchId string, fileIdx string, blob io.Reader, uploadOptions UploadOptions, options *nuxeoRequestOptions) (*BatchUpload, error) {
 	return nil, nil
 }

@@ -1,10 +1,26 @@
 package nuxeo
 
+import "net/url"
+
 type EntityType string
 
 type PaginationOptions struct {
 	CurrentPageIndex string `json:"currentPageIndex"`
 	PageSize         string `json:"pageSize"`
+}
+
+func (p *PaginationOptions) QueryParams() string {
+	if p == nil {
+		return ""
+	}
+	queryParams := url.Values{}
+	if p.CurrentPageIndex != "" {
+		queryParams.Add("currentPageIndex", p.CurrentPageIndex)
+	}
+	if p.PageSize != "" {
+		queryParams.Add("pageSize", p.PageSize)
+	}
+	return queryParams.Encode()
 }
 
 type SortedPaginationOptions struct {
@@ -13,6 +29,29 @@ type SortedPaginationOptions struct {
 	MaxResults       string `json:"maxResults"`
 	SortBy           string `json:"sortBy"`
 	SortOrder        string `json:"sortOrder"`
+}
+
+func (p *SortedPaginationOptions) QueryParams() string {
+	if p == nil {
+		return ""
+	}
+	queryParams := url.Values{}
+	if p.CurrentPageIndex != "" {
+		queryParams.Add("currentPageIndex", p.CurrentPageIndex)
+	}
+	if p.PageSize != "" {
+		queryParams.Add("pageSize", p.PageSize)
+	}
+	if p.MaxResults != "" {
+		queryParams.Add("maxResults", p.MaxResults)
+	}
+	if p.SortBy != "" {
+		queryParams.Add("sortBy", p.SortBy)
+	}
+	if p.SortOrder != "" {
+		queryParams.Add("sortOrder", p.SortOrder)
+	}
+	return queryParams.Encode()
 }
 
 type entity struct {

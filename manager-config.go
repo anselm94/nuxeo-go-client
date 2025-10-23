@@ -15,7 +15,7 @@ type ConfigManager struct {
 }
 
 func (cm *ConfigManager) FetchTypes(ctx context.Context) (*DocTypes, error) {
-	res, err := cm.client.NewRequest(ctx, nil).SetResult(&DocTypes{}).Get("/api/v1/config/types")
+	res, err := cm.client.NewRequest(ctx, nil).SetResult(&DocTypes{}).Get(apiV1 + "/config/types")
 
 	if err != nil || res.StatusCode() != 200 {
 		cm.logger.Error("Failed to fetch document types", "error", err)
@@ -26,7 +26,7 @@ func (cm *ConfigManager) FetchTypes(ctx context.Context) (*DocTypes, error) {
 }
 
 func (cm *ConfigManager) FetchType(ctx context.Context, name string) (*DocType, error) {
-	res, err := cm.client.NewRequest(ctx, nil).SetResult(&DocType{}).Get("/api/v1/config/types/" + name)
+	res, err := cm.client.NewRequest(ctx, nil).SetResult(&DocType{}).Get(apiV1 + "/config/types/" + name)
 
 	if err != nil || res.StatusCode() != 200 {
 		cm.logger.Error("Failed to fetch document type", "error", err)
@@ -37,7 +37,7 @@ func (cm *ConfigManager) FetchType(ctx context.Context, name string) (*DocType, 
 }
 
 func (cm *ConfigManager) FetchSchemas(ctx context.Context) (*Schemas, error) {
-	res, err := cm.client.NewRequest(ctx, nil).SetResult(&Schemas{}).Get("/api/v1/config/schemas")
+	res, err := cm.client.NewRequest(ctx, nil).SetResult(&Schemas{}).Get(apiV1 + "/config/schemas")
 
 	if err != nil || res.StatusCode() != 200 {
 		cm.logger.Error("Failed to fetch schemas", "error", err)
@@ -48,7 +48,7 @@ func (cm *ConfigManager) FetchSchemas(ctx context.Context) (*Schemas, error) {
 }
 
 func (cm *ConfigManager) FetchSchema(ctx context.Context, name string) (*Schema, error) {
-	res, err := cm.client.NewRequest(ctx, nil).SetResult(&Schema{}).Get("/api/v1/config/schemas/" + name)
+	res, err := cm.client.NewRequest(ctx, nil).SetResult(&Schema{}).Get(apiV1 + "/config/schemas/" + name)
 
 	if err != nil || res.StatusCode() != 200 {
 		cm.logger.Error("Failed to fetch schema", "error", err)
@@ -59,7 +59,7 @@ func (cm *ConfigManager) FetchSchema(ctx context.Context, name string) (*Schema,
 }
 
 func (cm *ConfigManager) FetchFacets(ctx context.Context) (*Facets, error) {
-	res, err := cm.client.NewRequest(ctx, nil).SetResult(&Facets{}).Get("/api/v1/config/facets")
+	res, err := cm.client.NewRequest(ctx, nil).SetResult(&Facets{}).Get(apiV1 + "/config/facets")
 
 	if err != nil || res.StatusCode() != 200 {
 		cm.logger.Error("Failed to fetch facets", "error", err)
@@ -70,7 +70,7 @@ func (cm *ConfigManager) FetchFacets(ctx context.Context) (*Facets, error) {
 }
 
 func (cm *ConfigManager) FetchFacet(ctx context.Context, name string) (*Facet, error) {
-	res, err := cm.client.NewRequest(ctx, nil).SetResult(&Facet{}).Get("/api/v1/config/facets/" + name)
+	res, err := cm.client.NewRequest(ctx, nil).SetResult(&Facet{}).Get(apiV1 + "/config/facets/" + name)
 
 	if err != nil || res.StatusCode() != 200 {
 		cm.logger.Error("Failed to fetch facet", "error", err)

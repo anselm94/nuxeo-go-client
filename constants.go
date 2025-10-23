@@ -1,5 +1,11 @@
 package nuxeo
 
+// Private
+
+const (
+	apiV1 = "/api/v1"
+)
+
 // Headers
 
 const (

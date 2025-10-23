@@ -12,26 +12,26 @@ type DirectoryManager struct {
 	logger *slog.Logger
 }
 
-func (dm *DirectoryManager) FetchDirectories(ctx context.Context) (*Directories, error) {
+func (dm *DirectoryManager) FetchDirectories(ctx context.Context, options *nuxeoRequestOptions) (*Directories, error) {
 	return nil, nil
 }
 
-func (dm *DirectoryManager) FetchDirectoryEntries(ctx context.Context, directoryName string, paginationOptions *SortedPaginationOptions) (*DirectoryEntries, error) {
+func (dm *DirectoryManager) FetchDirectoryEntries(ctx context.Context, directoryName string, paginationOptions *SortedPaginationOptions, options *nuxeoRequestOptions) (*DirectoryEntries, error) {
 	return nil, nil
 }
 
-func (dm *DirectoryManager) CreateDirectoryEntry(ctx context.Context, directoryName string, entry DirectoryEntry) (*DirectoryEntry, error) {
+func (dm *DirectoryManager) CreateDirectoryEntry(ctx context.Context, directoryName string, entry DirectoryEntry, options *nuxeoRequestOptions) (*DirectoryEntry, error) {
 	return nil, nil
 }
 
-func (dm *DirectoryManager) FetchDirectoryEntry(ctx context.Context, directoryName string, directoryEntryId string) (*DirectoryEntry, error) {
+func (dm *DirectoryManager) FetchDirectoryEntry(ctx context.Context, directoryName string, directoryEntryId string, options *nuxeoRequestOptions) (*DirectoryEntry, error) {
 	return nil, nil
 }
 
-func (dm *DirectoryManager) UpdateDirectoryEntry(ctx context.Context, directoryName string, directoryEntryId string, entry DirectoryEntry) (*DirectoryEntry, error) {
+func (dm *DirectoryManager) UpdateDirectoryEntry(ctx context.Context, directoryName string, directoryEntryId string, entry DirectoryEntry, options *nuxeoRequestOptions) (*DirectoryEntry, error) {
 	return nil, nil
 }
 
-func (dm *DirectoryManager) DeleteDirectoryEntry(ctx context.Context, directoryName string, directoryEntryId string) error {
+func (dm *DirectoryManager) DeleteDirectoryEntry(ctx context.Context, directoryName string, directoryEntryId string, options *nuxeoRequestOptions) error {
 	return nil
 }
