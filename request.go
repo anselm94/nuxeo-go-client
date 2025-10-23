@@ -12,48 +12,48 @@ import (
 ///////////////////////////////
 
 type nuxeoRequestOptions struct {
-	RepositoryName      string
-	CustomHeaders       map[string]string
-	Enrichers           map[string][]string
-	FetchProperties     map[string][]string
-	TranslateProperties map[string][]string
-	Schemas             []string
-	Depth               int
-	Version             string
-	TransactionTimeout  int
-	HttpTimeout         int
+	repositoryName      string
+	customHeaders       map[string]string
+	enrichers           map[string][]string
+	fetchProperties     map[string][]string
+	translateProperties map[string][]string
+	schemas             []string
+	depth               int
+	version             string
+	transactionTimeout  int
+	httpTimeout         int
 }
 
 func NewNuxeoRequestOptions() *nuxeoRequestOptions {
 	return &nuxeoRequestOptions{
-		Enrichers:           make(map[string][]string),
-		FetchProperties:     make(map[string][]string),
-		TranslateProperties: make(map[string][]string),
+		enrichers:           make(map[string][]string),
+		fetchProperties:     make(map[string][]string),
+		translateProperties: make(map[string][]string),
 	}
 }
 
 func (o *nuxeoRequestOptions) SetRepositoryName(name string) *nuxeoRequestOptions {
-	o.RepositoryName = name
+	o.repositoryName = name
 	return o
 }
 
 func (o *nuxeoRequestOptions) SetHeader(key string, value string) *nuxeoRequestOptions {
-	o.CustomHeaders[key] = value
+	o.customHeaders[key] = value
 	return o
 }
 
 func (o *nuxeoRequestOptions) SetTransactionTimeout(timeout int) *nuxeoRequestOptions {
-	o.TransactionTimeout = timeout
+	o.transactionTimeout = timeout
 	return o
 }
 
 func (o *nuxeoRequestOptions) SetHttpTimeout(timeout int) *nuxeoRequestOptions {
-	o.HttpTimeout = timeout
+	o.httpTimeout = timeout
 	return o
 }
 
 func (o *nuxeoRequestOptions) SetEnricher(entityType string, values []string) *nuxeoRequestOptions {
-	o.Enrichers[entityType] = values
+	o.enrichers[entityType] = values
 	return o
 }
 
@@ -66,7 +66,7 @@ func (o *nuxeoRequestOptions) SetEnricherForUser(values []string) *nuxeoRequestO
 }
 
 func (o *nuxeoRequestOptions) SetFetchProperties(entityType string, values []string) *nuxeoRequestOptions {
-	o.FetchProperties[entityType] = values
+	o.fetchProperties[entityType] = values
 	return o
 }
 
@@ -91,7 +91,7 @@ func (o *nuxeoRequestOptions) SetFetchPropertiesForWorkflow(values []string) *nu
 }
 
 func (o *nuxeoRequestOptions) SetTranslatedProperties(entityType string, values []string) *nuxeoRequestOptions {
-	o.TranslateProperties[entityType] = values
+	o.translateProperties[entityType] = values
 	return o
 }
 
@@ -100,17 +100,17 @@ func (o *nuxeoRequestOptions) SetTranslatedPropertiesForDirectory(values []strin
 }
 
 func (o *nuxeoRequestOptions) SetSchemas(schemas []string) *nuxeoRequestOptions {
-	o.Schemas = schemas
+	o.schemas = schemas
 	return o
 }
 
 func (o *nuxeoRequestOptions) SetDepth(depth int) *nuxeoRequestOptions {
-	o.Depth = depth
+	o.depth = depth
 	return o
 }
 
 func (o *nuxeoRequestOptions) SetVersion(version string) *nuxeoRequestOptions {
-	o.Version = version
+	o.version = version
 	return o
 }
 
@@ -128,57 +128,57 @@ func (r *nuxeoRequest) setNuxeoOption(options *nuxeoRequestOptions) *nuxeoReques
 	}
 
 	// repository name as header
-	if options.RepositoryName != "" {
-		r.SetHeader(HeaderXRepository, options.RepositoryName)
+	if options.repositoryName != "" {
+		r.SetHeader(HeaderXRepository, options.repositoryName)
 	}
 
 	// set custom headers
-	for key, value := range options.CustomHeaders {
+	for key, value := range options.customHeaders {
 		r.SetHeader(key, value)
 	}
 
 	// Set enrichers as headers
-	for key, values := range options.Enrichers {
+	for key, values := range options.enrichers {
 		r.SetHeader("enrichers-"+key, strings.Join(values, ","))
 	}
 
 	// Set fetch properties as headers
-	for key, values := range options.FetchProperties {
+	for key, values := range options.fetchProperties {
 		r.SetHeader("fetch-"+key, strings.Join(values, ","))
 	}
 
 	// Set translate properties as headers
-	for key, values := range options.TranslateProperties {
+	for key, values := range options.translateProperties {
 		r.SetHeader("translate-"+key, strings.Join(values, ","))
 	}
 
 	// Set schemas as header
-	if len(options.Schemas) > 0 {
-		r.SetHeader(HeaderProperties, strings.Join(options.Schemas, ","))
+	if len(options.schemas) > 0 {
+		r.SetHeader(HeaderProperties, strings.Join(options.schemas, ","))
 	}
 
 	// Set depth as header
-	if options.Depth > 0 {
-		r.SetHeader(HeaderDepth, strconv.Itoa(options.Depth))
+	if options.depth > 0 {
+		r.SetHeader(HeaderDepth, strconv.Itoa(options.depth))
 	}
 
 	// set version as header
-	if options.Version != "" {
-		r.SetHeader(HeaderXVersioningOption, options.Version)
+	if options.version != "" {
+		r.SetHeader(HeaderXVersioningOption, options.version)
 	}
 
 	// Set transaction timeout as header
-	if options.TransactionTimeout > 0 {
-		r.SetHeader(HeaderNuxeoTxTimeout, strconv.Itoa(options.TransactionTimeout))
+	if options.transactionTimeout > 0 {
+		r.SetHeader(HeaderNuxeoTxTimeout, strconv.Itoa(options.transactionTimeout))
 	}
 
 	// Set HTTP timeout as header
-	if options.TransactionTimeout > 0 && options.HttpTimeout == 0 {
+	if options.transactionTimeout > 0 && options.httpTimeout == 0 {
 		// make the http timeout a bit longer than the transaction timeout
-		options.HttpTimeout = options.TransactionTimeout + 5
+		options.httpTimeout = options.transactionTimeout + 5
 	}
-	if options.HttpTimeout > 0 {
-		r.SetHeader(HeaderTimeout, strconv.Itoa(options.HttpTimeout))
+	if options.httpTimeout > 0 {
+		r.SetHeader(HeaderTimeout, strconv.Itoa(options.httpTimeout))
 	}
 
 	return r

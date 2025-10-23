@@ -16,6 +16,18 @@ type User struct {
 	ExtendedGroups  []ExtendedGroup `json:"extendedGroups,omitempty"`
 }
 
+func NewUser(id string) *User {
+	properties := make(map[string]any)
+	properties[UserPropertyUsername] = id // Set username by default
+	return &User{
+		entity: entity{
+			EntityType: EntityTypeUser,
+		},
+		Id:         id,
+		Properties: properties,
+	}
+}
+
 func (u *User) IdOrUsername() string {
 	if u.Id != "" {
 		return u.Id
@@ -61,6 +73,14 @@ func (u *User) Company() string {
 
 func (u *User) TenantId() string {
 	return u.Properties[UserPropertyTenantId].(string)
+}
+
+func (u *User) Property(key string) any {
+	return u.Properties[key]
+}
+
+func (u *User) SetProperty(key string, value any) {
+	u.Properties[key] = value
 }
 
 type Users paginableEntities[User]
