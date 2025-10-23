@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"net/url"
 	"strings"
 	"time"
 )
@@ -58,7 +59,8 @@ func (o *OperationManager) executeViaJson(ctx context.Context, operation operati
 
 	request.SetBody(operation.payload())
 
-	res, err := request.Post("/site/automation/" + operation.operationId)
+	path := "/site/automation/" + url.PathEscape(operation.operationId)
+	res, err := request.Post(path)
 	if err != nil || res.StatusCode() != 200 {
 		o.logger.Error("Failed to execute operation", "error", err, "status", res.StatusCode())
 		return nil, fmt.Errorf("failed to execute operation: %d %w", res.StatusCode(), err)
@@ -89,7 +91,8 @@ func (o *OperationManager) executeViaMultipart(ctx context.Context, operation op
 		request.SetMultipartField(fieldName, fmt.Sprintf("blob%d", i+1), "application/octet-stream", blob.Stream)
 	}
 
-	res, err := request.Post("/site/automation/" + operation.operationId)
+	path := "/site/automation/" + url.PathEscape(operation.operationId)
+	res, err := request.Post(path)
 	if err != nil || res.StatusCode() != 200 {
 		o.logger.Error("Failed to execute operation with blobs", "error", err, "status", res.StatusCode())
 		return nil, fmt.Errorf("failed to execute operation with blobs: %d %w", res.StatusCode(), err)

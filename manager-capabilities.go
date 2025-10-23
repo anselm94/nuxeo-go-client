@@ -11,7 +11,8 @@ type CapabilitiesManager struct {
 }
 
 func (cm *CapabilitiesManager) FetchCapabilities(ctx context.Context) (*Capabilities, error) {
-	res, err := cm.client.NewRequest(ctx, nil).SetResult(&Capabilities{}).SetError(&NuxeoError{}).Get(apiV1 + "/capabilities")
+	path := apiV1 + "/capabilities"
+	res, err := cm.client.NewRequest(ctx, nil).SetResult(&Capabilities{}).SetError(&NuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		cm.logger.Error("Failed to fetch capabilities", slog.String("error", err.Error()))

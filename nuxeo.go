@@ -149,6 +149,7 @@ func (c *NuxeoClient) Repository() *Repository {
 	return &Repository{
 		name:   RepositoryDefault,
 		client: c,
+		logger: c.logger,
 	}
 }
 

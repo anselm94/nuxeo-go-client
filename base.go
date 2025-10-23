@@ -12,18 +12,18 @@ type PaginationOptions struct {
 	PageSize         int `json:"pageSize"`
 }
 
-func (p *PaginationOptions) QueryParams() string {
+func (p *PaginationOptions) QueryParams() url.Values {
 	if p == nil {
-		return ""
+		return nil
 	}
-	queryParams := url.Values{}
+	queryParams := make(url.Values)
 	if p.CurrentPageIndex > -1 {
-		queryParams.Add("currentPageIndex", fmt.Sprintf("%d", p.CurrentPageIndex))
+		queryParams.Set("currentPageIndex", fmt.Sprintf("%d", p.CurrentPageIndex))
 	}
 	if p.PageSize != 0 {
-		queryParams.Add("pageSize", fmt.Sprintf("%d", p.PageSize))
+		queryParams.Set("pageSize", fmt.Sprintf("%d", p.PageSize))
 	}
-	return queryParams.Encode()
+	return queryParams
 }
 
 type SortedPaginationOptions struct {
@@ -34,27 +34,27 @@ type SortedPaginationOptions struct {
 	SortOrder        string `json:"sortOrder"`
 }
 
-func (p *SortedPaginationOptions) QueryParams() string {
+func (p *SortedPaginationOptions) QueryParams() url.Values {
 	if p == nil {
-		return ""
+		return nil
 	}
-	queryParams := url.Values{}
+	queryParams := make(url.Values)
 	if p.CurrentPageIndex > -1 {
-		queryParams.Add("currentPageIndex", fmt.Sprintf("%d", p.CurrentPageIndex))
+		queryParams.Set("currentPageIndex", fmt.Sprintf("%d", p.CurrentPageIndex))
 	}
 	if p.PageSize != 0 {
-		queryParams.Add("pageSize", fmt.Sprintf("%d", p.PageSize))
+		queryParams.Set("pageSize", fmt.Sprintf("%d", p.PageSize))
 	}
 	if p.MaxResults != 0 {
-		queryParams.Add("maxResults", fmt.Sprintf("%d", p.MaxResults))
+		queryParams.Set("maxResults", fmt.Sprintf("%d", p.MaxResults))
 	}
 	if p.SortBy != "" {
-		queryParams.Add("sortBy", p.SortBy)
+		queryParams.Set("sortBy", p.SortBy)
 	}
 	if p.SortOrder != "" {
-		queryParams.Add("sortOrder", p.SortOrder)
+		queryParams.Set("sortOrder", p.SortOrder)
 	}
-	return queryParams.Encode()
+	return queryParams
 }
 
 type entity struct {
