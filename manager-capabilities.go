@@ -2,7 +2,6 @@ package nuxeo
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 )
 
@@ -12,13 +11,11 @@ type CapabilitiesManager struct {
 }
 
 func (cm *CapabilitiesManager) FetchCapabilities(ctx context.Context) (*Capabilities, error) {
-	capabilities := &Capabilities{}
-	res, err := cm.client.NewRequest(ctx, nil).SetResult(capabilities).Get(apiV1 + "/capabilities")
+	res, err := cm.client.NewRequest(ctx, nil).SetResult(&Capabilities{}).SetError(&NuxeoError{}).Get(apiV1 + "/capabilities")
 
-	if err != nil || res.StatusCode() != 200 {
-		cm.logger.Error("Failed to get server capabilities", "error", err, "status", res.StatusCode())
-		return nil, fmt.Errorf("failed to get server capabilities: %d %w", res.StatusCode(), err)
+	if err := handleNuxeoError(err, res); err != nil {
+		cm.logger.Error("Failed to fetch capabilities", slog.String("error", err.Error()))
+		return nil, err
 	}
-
-	return capabilities, nil
+	return res.Result().(*Capabilities), nil
 }
