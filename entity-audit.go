@@ -1,9 +1,5 @@
 package nuxeo
 
-import (
-	"time"
-)
-
 type AuditLogEntry struct {
 	entity
 	ID            int            `json:"id"`
@@ -16,8 +12,8 @@ type AuditLogEntry struct {
 	DocUUID       string         `json:"docUUID"`
 	EventID       string         `json:"eventId"`
 	RepositoryID  string         `json:"repositoryId"`
-	EventDate     time.Time      `json:"eventDate"`
-	LogDate       time.Time      `json:"logDate"`
+	EventDate     *ISO8601Time   `json:"eventDate"`
+	LogDate       *ISO8601Time   `json:"logDate"`
 	Extended      map[string]any `json:"extended"`
 }
 

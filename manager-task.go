@@ -4,6 +4,8 @@ import (
 	"context"
 	"log/slog"
 	"net/url"
+
+	"github.com/anselm94/nuxeo/internal"
 )
 
 type TaskManager struct {
@@ -14,7 +16,7 @@ type TaskManager struct {
 }
 
 func (t *TaskManager) FetchTasks(ctx context.Context, userId, workflowInstanceId, workflowModelName string, options *nuxeoRequestOptions) (*Tasks, error) {
-	path := apiV1 + "/task"
+	path := internal.PathApiV1 + "/task"
 	params := url.Values{}
 	if userId != "" {
 		params.Add("userId", userId)
@@ -39,7 +41,7 @@ func (t *TaskManager) FetchTasks(ctx context.Context, userId, workflowInstanceId
 }
 
 func (t *TaskManager) FetchTask(ctx context.Context, taskId string, options *nuxeoRequestOptions) (*Task, error) {
-	path := apiV1 + "/task/" + url.PathEscape(taskId)
+	path := internal.PathApiV1 + "/task/" + url.PathEscape(taskId)
 	res, err := t.client.NewRequest(ctx, options).SetResult(&Task{}).SetError(&NuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
@@ -50,7 +52,7 @@ func (t *TaskManager) FetchTask(ctx context.Context, taskId string, options *nux
 }
 
 func (t *TaskManager) ReassignTask(ctx context.Context, taskId string, actors string, comment string, options *nuxeoRequestOptions) (*Task, error) {
-	path := apiV1 + "/task/" + url.PathEscape(taskId) + "/reassign"
+	path := internal.PathApiV1 + "/task/" + url.PathEscape(taskId) + "/reassign"
 	params := url.Values{}
 	if actors != "" {
 		params.Add("actors", actors)
@@ -72,7 +74,7 @@ func (t *TaskManager) ReassignTask(ctx context.Context, taskId string, actors st
 }
 
 func (t *TaskManager) DelegateTask(ctx context.Context, taskId string, actors string, comment string, options *nuxeoRequestOptions) (*Task, error) {
-	path := apiV1 + "/task/" + url.PathEscape(taskId) + "/delegate"
+	path := internal.PathApiV1 + "/task/" + url.PathEscape(taskId) + "/delegate"
 	params := url.Values{}
 	if actors != "" {
 		params.Add("actors", actors)
@@ -100,7 +102,7 @@ type TaskCompletionRequest struct {
 }
 
 func (t *TaskManager) CompleteTask(ctx context.Context, taskId string, action string, request TaskCompletionRequest, options *nuxeoRequestOptions) (*Task, error) {
-	path := apiV1 + "/task/" + url.PathEscape(taskId) + "/" + url.PathEscape(action)
+	path := internal.PathApiV1 + "/task/" + url.PathEscape(taskId) + "/" + url.PathEscape(action)
 	res, err := t.client.NewRequest(ctx, options).SetBody(request).SetResult(&Task{}).SetError(&NuxeoError{}).Put(path)
 
 	if err := handleNuxeoError(err, res); err != nil {

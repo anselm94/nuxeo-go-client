@@ -1,7 +1,5 @@
 package nuxeo
 
-import "time"
-
 // Task represents a workflow task.
 type Task struct {
 	entity
@@ -15,8 +13,8 @@ type Task struct {
 	GraphResource          string        `json:"graphResource"`
 	State                  string        `json:"state"`
 	Directive              string        `json:"directive"`
-	Created                time.Time     `json:"created"`
-	DueDate                time.Time     `json:"dueDate"`
+	Created                *ISO8601Time  `json:"created"`
+	DueDate                *ISO8601Time  `json:"dueDate"`
 	NodeName               string        `json:"nodeName"`
 	TargetDocumentIds      []Document    `json:"targetDocumentIds"` // TODO: json unmarshal documents from strings
 	Actors                 []User        `json:"actors"`            // TODO: json unmarshal users from { "id": "username" }
@@ -29,16 +27,16 @@ type Task struct {
 type Tasks entities[Task]
 
 type TaskComment struct {
-	Author string    `json:"author"`
-	Text   string    `json:"text"`
-	Date   time.Time `json:"date"`
+	Author string       `json:"author"`
+	Text   string       `json:"text"`
+	Date   *ISO8601Time `json:"date"`
 }
 
 type TaskVariables struct {
-	Comment      string    `json:"comment"`
-	Assignees    []string  `json:"assignees"`
-	EndDate      time.Time `json:"end_date"`
-	Participants []string  `json:"participants"`
+	Comment      string       `json:"comment"`
+	Assignees    []string     `json:"assignees"`
+	EndDate      *ISO8601Time `json:"end_date"`
+	Participants []string     `json:"participants"`
 }
 
 type TaskInfo struct {

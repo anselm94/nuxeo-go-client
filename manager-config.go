@@ -3,6 +3,8 @@ package nuxeo
 import (
 	"context"
 	"log/slog"
+
+	"github.com/anselm94/nuxeo/internal"
 )
 
 type ConfigManager struct {
@@ -14,7 +16,7 @@ type ConfigManager struct {
 }
 
 func (cm *ConfigManager) FetchTypes(ctx context.Context) (*DocTypes, error) {
-	path := apiV1 + "/config/types"
+	path := internal.PathApiV1 + "/config/types"
 	res, err := cm.client.NewRequest(ctx, nil).SetResult(&DocTypes{}).SetError(&NuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
@@ -25,7 +27,7 @@ func (cm *ConfigManager) FetchTypes(ctx context.Context) (*DocTypes, error) {
 }
 
 func (cm *ConfigManager) FetchType(ctx context.Context, name string) (*DocType, error) {
-	path := apiV1 + "/config/types/" + name
+	path := internal.PathApiV1 + "/config/types/" + name
 	res, err := cm.client.NewRequest(ctx, nil).SetResult(&DocType{}).SetError(&NuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
@@ -36,7 +38,7 @@ func (cm *ConfigManager) FetchType(ctx context.Context, name string) (*DocType, 
 }
 
 func (cm *ConfigManager) FetchSchemas(ctx context.Context) (*Schemas, error) {
-	path := apiV1 + "/config/schemas"
+	path := internal.PathApiV1 + "/config/schemas"
 	res, err := cm.client.NewRequest(ctx, nil).SetResult(&Schemas{}).SetError(&NuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
@@ -47,7 +49,7 @@ func (cm *ConfigManager) FetchSchemas(ctx context.Context) (*Schemas, error) {
 }
 
 func (cm *ConfigManager) FetchSchema(ctx context.Context, name string) (*Schema, error) {
-	path := apiV1 + "/config/schemas/" + name
+	path := internal.PathApiV1 + "/config/schemas/" + name
 	res, err := cm.client.NewRequest(ctx, nil).SetResult(&Schema{}).SetError(&NuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
@@ -58,7 +60,7 @@ func (cm *ConfigManager) FetchSchema(ctx context.Context, name string) (*Schema,
 }
 
 func (cm *ConfigManager) FetchFacets(ctx context.Context) (*Facets, error) {
-	path := apiV1 + "/config/facets"
+	path := internal.PathApiV1 + "/config/facets"
 	res, err := cm.client.NewRequest(ctx, nil).SetResult(&Facets{}).SetError(&NuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
@@ -69,7 +71,7 @@ func (cm *ConfigManager) FetchFacets(ctx context.Context) (*Facets, error) {
 }
 
 func (cm *ConfigManager) FetchFacet(ctx context.Context, name string) (*Facet, error) {
-	path := apiV1 + "/config/facets/" + name
+	path := internal.PathApiV1 + "/config/facets/" + name
 	res, err := cm.client.NewRequest(ctx, nil).SetResult(&Facet{}).SetError(&NuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {

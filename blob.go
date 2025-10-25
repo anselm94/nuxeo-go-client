@@ -9,11 +9,16 @@ type Blob struct {
 	Length   int64         `json:"length"`
 	Stream   io.ReadCloser `json:"-"`
 
-	Encoding        string `json:"encoding,omitempty"`
-	DigestAlgorithm string `json:"digestAlgorithm"`
-	Digest          string `json:"digest"`
-	Data            string `json:"data"`
-	BlobUrl         string `json:"blobUrl"`
+	// (Present only as Document property blob) Encoding
+	Encoding *string `json:"encoding,omitempty"`
+	// (Present only as Document property blob) Digest Algorithm
+	DigestAlgorithm *string `json:"digestAlgorithm"`
+	// (Present only as Document property blob) Digest
+	Digest *string `json:"digest"`
+	// (Present only as Document property blob) Data URL
+	Data *string `json:"data"`
+	// (Present only as Document property blob) Blob URL
+	BlobUrl *string `json:"blobUrl"`
 }
 
 type Blobs entities[Blob]

@@ -18,7 +18,7 @@ type UserManager struct {
 ////////////////
 
 func (um *UserManager) FetchGroup(ctx context.Context, name string, options *nuxeoRequestOptions) (*Group, error) {
-	path := apiV1 + "/group/" + url.PathEscape(name)
+	path := internal.PathApiV1 + "/group/" + url.PathEscape(name)
 	res, err := um.client.NewRequest(ctx, options).SetResult(&Group{}).SetError(&NuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
@@ -29,7 +29,7 @@ func (um *UserManager) FetchGroup(ctx context.Context, name string, options *nux
 }
 
 func (um *UserManager) CreateGroup(ctx context.Context, group Group, options *nuxeoRequestOptions) (*Group, error) {
-	path := apiV1 + "/group"
+	path := internal.PathApiV1 + "/group"
 	res, err := um.client.NewRequest(ctx, options).SetBody(group).SetResult(&Group{}).SetError(&NuxeoError{}).Post(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
@@ -40,7 +40,7 @@ func (um *UserManager) CreateGroup(ctx context.Context, group Group, options *nu
 }
 
 func (um *UserManager) UpdateGroup(ctx context.Context, name string, group Group, options *nuxeoRequestOptions) (*Group, error) {
-	path := apiV1 + "/group/" + url.PathEscape(name)
+	path := internal.PathApiV1 + "/group/" + url.PathEscape(name)
 	res, err := um.client.NewRequest(ctx, options).SetBody(group).SetResult(&Group{}).SetError(&NuxeoError{}).Put(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
@@ -51,7 +51,7 @@ func (um *UserManager) UpdateGroup(ctx context.Context, name string, group Group
 }
 
 func (um *UserManager) DeleteGroup(ctx context.Context, name string, options *nuxeoRequestOptions) error {
-	path := apiV1 + "/group/" + url.PathEscape(name)
+	path := internal.PathApiV1 + "/group/" + url.PathEscape(name)
 	res, err := um.client.NewRequest(ctx, options).SetResult(&Group{}).SetError(&NuxeoError{}).Delete(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
@@ -62,7 +62,7 @@ func (um *UserManager) DeleteGroup(ctx context.Context, name string, options *nu
 }
 
 func (um *UserManager) SearchGroup(ctx context.Context, query string, paginationOptions *PaginationOptions, options *nuxeoRequestOptions) (*Groups, error) {
-	path := apiV1 + "/group/search"
+	path := internal.PathApiV1 + "/group/search"
 
 	params := url.Values{}
 	params.Add("q", query)
@@ -79,7 +79,7 @@ func (um *UserManager) SearchGroup(ctx context.Context, query string, pagination
 }
 
 func (um *UserManager) AttachGroupToUser(ctx context.Context, idOrGroupName string, idOrUsername string, options *nuxeoRequestOptions) (*Group, error) {
-	path := apiV1 + "/group/" + url.PathEscape(idOrGroupName) + "/user/" + url.PathEscape(idOrUsername)
+	path := internal.PathApiV1 + "/group/" + url.PathEscape(idOrGroupName) + "/user/" + url.PathEscape(idOrUsername)
 	res, err := um.client.NewRequest(ctx, options).SetResult(&Group{}).SetError(&NuxeoError{}).Post(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
@@ -90,7 +90,7 @@ func (um *UserManager) AttachGroupToUser(ctx context.Context, idOrGroupName stri
 }
 
 func (um *UserManager) FetchGroupMemberUsers(ctx context.Context, idOrGroupName string, paginationOptions *PaginationOptions, options *nuxeoRequestOptions) (*Users, error) {
-	path := apiV1 + "/group/" + url.PathEscape(idOrGroupName) + "/@users"
+	path := internal.PathApiV1 + "/group/" + url.PathEscape(idOrGroupName) + "/@users"
 
 	if queryPagination := paginationOptions.QueryParams(); queryPagination != nil {
 		path += "?" + queryPagination.Encode()
@@ -106,7 +106,7 @@ func (um *UserManager) FetchGroupMemberUsers(ctx context.Context, idOrGroupName 
 }
 
 func (um *UserManager) FetchGroupMemberGroups(ctx context.Context, idOrGroupName string, paginationOptions *PaginationOptions, options *nuxeoRequestOptions) (*Groups, error) {
-	path := apiV1 + "/group/" + url.PathEscape(idOrGroupName) + "/@groups"
+	path := internal.PathApiV1 + "/group/" + url.PathEscape(idOrGroupName) + "/@groups"
 
 	if queryPagination := paginationOptions.QueryParams(); queryPagination != nil {
 		path += "?" + queryPagination.Encode()
@@ -126,7 +126,7 @@ func (um *UserManager) FetchGroupMemberGroups(ctx context.Context, idOrGroupName
 ///////////////
 
 func (um *UserManager) FetchUser(ctx context.Context, id string, options *nuxeoRequestOptions) (*User, error) {
-	path := apiV1 + "/user/" + url.PathEscape(id)
+	path := internal.PathApiV1 + "/user/" + url.PathEscape(id)
 	res, err := um.client.NewRequest(ctx, options).SetResult(&User{}).SetError(&NuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
@@ -137,7 +137,7 @@ func (um *UserManager) FetchUser(ctx context.Context, id string, options *nuxeoR
 }
 
 func (um *UserManager) CreateUser(ctx context.Context, user User, options *nuxeoRequestOptions) (*User, error) {
-	path := apiV1 + "/user"
+	path := internal.PathApiV1 + "/user"
 	res, err := um.client.NewRequest(ctx, options).SetBody(user).SetResult(&User{}).SetError(&NuxeoError{}).Post(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
@@ -148,7 +148,7 @@ func (um *UserManager) CreateUser(ctx context.Context, user User, options *nuxeo
 }
 
 func (um *UserManager) UpdateUser(ctx context.Context, idOrUsername string, user User, options *nuxeoRequestOptions) (*User, error) {
-	path := apiV1 + "/user/" + url.PathEscape(idOrUsername)
+	path := internal.PathApiV1 + "/user/" + url.PathEscape(idOrUsername)
 	res, err := um.client.NewRequest(ctx, options).SetBody(user).SetResult(&User{}).SetError(&NuxeoError{}).Put(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
@@ -159,7 +159,7 @@ func (um *UserManager) UpdateUser(ctx context.Context, idOrUsername string, user
 }
 
 func (um *UserManager) DeleteUser(ctx context.Context, idOrUsername string, options *nuxeoRequestOptions) error {
-	path := apiV1 + "/user/" + url.PathEscape(idOrUsername)
+	path := internal.PathApiV1 + "/user/" + url.PathEscape(idOrUsername)
 	res, err := um.client.NewRequest(ctx, options).SetError(&NuxeoError{}).Delete(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
@@ -170,7 +170,7 @@ func (um *UserManager) DeleteUser(ctx context.Context, idOrUsername string, opti
 }
 
 func (um *UserManager) SearchUsers(ctx context.Context, query string, paginationOptions *PaginationOptions, options *nuxeoRequestOptions) (*Users, error) {
-	path := apiV1 + "/user/search"
+	path := internal.PathApiV1 + "/user/search"
 
 	params := url.Values{}
 	params.Add("q", query)
@@ -188,7 +188,7 @@ func (um *UserManager) SearchUsers(ctx context.Context, query string, pagination
 }
 
 func (um *UserManager) AddUserToGroup(ctx context.Context, idOrUsername string, idOrGroupName string, options *nuxeoRequestOptions) (*User, error) {
-	path := apiV1 + "/user/" + url.PathEscape(idOrUsername) + "/group/" + url.PathEscape(idOrGroupName)
+	path := internal.PathApiV1 + "/user/" + url.PathEscape(idOrUsername) + "/group/" + url.PathEscape(idOrGroupName)
 	res, err := um.client.NewRequest(ctx, options).SetResult(&User{}).SetError(&NuxeoError{}).Post(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
@@ -219,7 +219,7 @@ func (um *UserManager) FetchCurrentUser(ctx context.Context) (*User, error) {
 }
 
 func (um *UserManager) FetchWorkflowInstances(ctx context.Context, options *nuxeoRequestOptions) (*Workflows, error) {
-	path := apiV1 + "/workflow"
+	path := internal.PathApiV1 + "/workflow"
 	res, err := um.client.NewRequest(ctx, options).SetResult(&Workflows{}).SetError(&NuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
@@ -230,7 +230,7 @@ func (um *UserManager) FetchWorkflowInstances(ctx context.Context, options *nuxe
 }
 
 func (um *UserManager) StartWorkflowInstance(ctx context.Context, workflow Workflow, options *nuxeoRequestOptions) (*Workflow, error) {
-	path := apiV1 + "/workflow"
+	path := internal.PathApiV1 + "/workflow"
 	res, err := um.client.NewRequest(ctx, options).SetBody(workflow).SetResult(&Workflow{}).SetError(&NuxeoError{}).Post(path)
 
 	if err := handleNuxeoError(err, res); err != nil {

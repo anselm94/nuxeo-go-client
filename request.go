@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/anselm94/nuxeo/internal"
 	"resty.dev/v3"
 )
 
@@ -129,7 +130,7 @@ func (r *nuxeoRequest) setNuxeoOption(options *nuxeoRequestOptions) *nuxeoReques
 
 	// repository name as header
 	if options.repositoryName != "" {
-		r.SetHeader(HeaderXRepository, options.repositoryName)
+		r.SetHeader(internal.HeaderXRepository, options.repositoryName)
 	}
 
 	// set custom headers
@@ -154,22 +155,22 @@ func (r *nuxeoRequest) setNuxeoOption(options *nuxeoRequestOptions) *nuxeoReques
 
 	// Set schemas as header
 	if len(options.schemas) > 0 {
-		r.SetHeader(HeaderProperties, strings.Join(options.schemas, ","))
+		r.SetHeader(internal.HeaderProperties, strings.Join(options.schemas, ","))
 	}
 
 	// Set depth as header
 	if options.depth > 0 {
-		r.SetHeader(HeaderDepth, strconv.Itoa(options.depth))
+		r.SetHeader(internal.HeaderDepth, strconv.Itoa(options.depth))
 	}
 
 	// set version as header
 	if options.version != "" {
-		r.SetHeader(HeaderXVersioningOption, options.version)
+		r.SetHeader(internal.HeaderXVersioningOption, options.version)
 	}
 
 	// Set transaction timeout as header
 	if options.transactionTimeout > 0 {
-		r.SetHeader(HeaderNuxeoTxTimeout, strconv.Itoa(options.transactionTimeout))
+		r.SetHeader(internal.HeaderNuxeoTxTimeout, strconv.Itoa(options.transactionTimeout))
 	}
 
 	// Set HTTP timeout as header
@@ -178,7 +179,7 @@ func (r *nuxeoRequest) setNuxeoOption(options *nuxeoRequestOptions) *nuxeoReques
 		options.httpTimeout = options.transactionTimeout + 5
 	}
 	if options.httpTimeout > 0 {
-		r.SetHeader(HeaderTimeout, strconv.Itoa(options.httpTimeout))
+		r.SetHeader(internal.HeaderTimeout, strconv.Itoa(options.httpTimeout))
 	}
 
 	return r

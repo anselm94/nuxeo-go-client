@@ -17,4 +17,20 @@ type DirectoryEntry struct {
 	Properties    map[string]any `json:"properties"`
 }
 
+func (d DirectoryEntry) Label() string {
+	return d.Properties[DirectoryPropertyLabel].(string)
+}
+
+func (d DirectoryEntry) Ordering() float64 {
+	return d.Properties[DirectoryPropertyOrdering].(float64)
+}
+
+func (d DirectoryEntry) Obsolete() float64 {
+	return d.Properties[DirectoryPropertyObsolete].(float64)
+}
+
+func (d DirectoryEntry) Property(key string) any {
+	return d.Properties[key]
+}
+
 type DirectoryEntries entities[DirectoryEntry]

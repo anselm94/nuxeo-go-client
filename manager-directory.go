@@ -4,6 +4,8 @@ import (
 	"context"
 	"log/slog"
 	"net/url"
+
+	"github.com/anselm94/nuxeo/internal"
 )
 
 type DirectoryManager struct {
@@ -14,7 +16,7 @@ type DirectoryManager struct {
 }
 
 func (dm *DirectoryManager) FetchDirectories(ctx context.Context, options *nuxeoRequestOptions) (*Directories, error) {
-	path := apiV1 + "/directory"
+	path := internal.PathApiV1 + "/directory"
 	res, err := dm.client.NewRequest(ctx, options).SetResult(&Directories{}).SetError(&NuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
@@ -25,7 +27,7 @@ func (dm *DirectoryManager) FetchDirectories(ctx context.Context, options *nuxeo
 }
 
 func (dm *DirectoryManager) FetchDirectoryEntries(ctx context.Context, directoryName string, paginationOptions *SortedPaginationOptions, options *nuxeoRequestOptions) (*DirectoryEntries, error) {
-	path := apiV1 + "/directory/" + url.PathEscape(directoryName)
+	path := internal.PathApiV1 + "/directory/" + url.PathEscape(directoryName)
 
 	if query := paginationOptions.QueryParams(); query != nil {
 		path += "?" + query.Encode()
@@ -40,7 +42,7 @@ func (dm *DirectoryManager) FetchDirectoryEntries(ctx context.Context, directory
 }
 
 func (dm *DirectoryManager) CreateDirectoryEntry(ctx context.Context, directoryName string, entry DirectoryEntry, options *nuxeoRequestOptions) (*DirectoryEntry, error) {
-	path := apiV1 + "/directory/" + url.PathEscape(directoryName)
+	path := internal.PathApiV1 + "/directory/" + url.PathEscape(directoryName)
 	res, err := dm.client.NewRequest(ctx, options).SetBody(entry).SetResult(&DirectoryEntry{}).SetError(&NuxeoError{}).Post(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
@@ -51,7 +53,7 @@ func (dm *DirectoryManager) CreateDirectoryEntry(ctx context.Context, directoryN
 }
 
 func (dm *DirectoryManager) FetchDirectoryEntry(ctx context.Context, directoryName string, directoryEntryId string, options *nuxeoRequestOptions) (*DirectoryEntry, error) {
-	path := apiV1 + "/directory/" + url.PathEscape(directoryName) + "/" + url.PathEscape(directoryEntryId)
+	path := internal.PathApiV1 + "/directory/" + url.PathEscape(directoryName) + "/" + url.PathEscape(directoryEntryId)
 	res, err := dm.client.NewRequest(ctx, options).SetResult(&DirectoryEntry{}).SetError(&NuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
@@ -62,7 +64,7 @@ func (dm *DirectoryManager) FetchDirectoryEntry(ctx context.Context, directoryNa
 }
 
 func (dm *DirectoryManager) UpdateDirectoryEntry(ctx context.Context, directoryName string, directoryEntryId string, entry DirectoryEntry, options *nuxeoRequestOptions) (*DirectoryEntry, error) {
-	path := apiV1 + "/directory/" + url.PathEscape(directoryName) + "/" + url.PathEscape(directoryEntryId)
+	path := internal.PathApiV1 + "/directory/" + url.PathEscape(directoryName) + "/" + url.PathEscape(directoryEntryId)
 	res, err := dm.client.NewRequest(ctx, options).SetBody(entry).SetResult(&DirectoryEntry{}).SetError(&NuxeoError{}).Put(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
@@ -73,7 +75,7 @@ func (dm *DirectoryManager) UpdateDirectoryEntry(ctx context.Context, directoryN
 }
 
 func (dm *DirectoryManager) DeleteDirectoryEntry(ctx context.Context, directoryName string, directoryEntryId string, options *nuxeoRequestOptions) error {
-	path := apiV1 + "/directory/" + url.PathEscape(directoryName) + "/" + url.PathEscape(directoryEntryId)
+	path := internal.PathApiV1 + "/directory/" + url.PathEscape(directoryName) + "/" + url.PathEscape(directoryEntryId)
 	res, err := dm.client.NewRequest(ctx, options).SetError(&NuxeoError{}).Delete(path)
 
 	if err := handleNuxeoError(err, res); err != nil {

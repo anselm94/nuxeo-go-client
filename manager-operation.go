@@ -10,6 +10,8 @@ import (
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/anselm94/nuxeo/internal"
 )
 
 type OperationManager struct {
@@ -54,7 +56,7 @@ func (o *OperationManager) executeViaJson(ctx context.Context, operation operati
 	request.SetDoNotParseResponse(true)
 
 	if operation.isVoid {
-		request.SetHeader(HeaderXVoidOperation, "true")
+		request.SetHeader(internal.HeaderXVoidOperation, "true")
 	}
 
 	request.SetBody(operation.payload())
@@ -76,7 +78,7 @@ func (o *OperationManager) executeViaMultipart(ctx context.Context, operation op
 	request.SetDoNotParseResponse(true)
 
 	if operation.isVoid {
-		request.SetHeader(HeaderXVoidOperation, "true")
+		request.SetHeader(internal.HeaderXVoidOperation, "true")
 	}
 
 	request.SetContentType("multipart/related")
@@ -170,7 +172,7 @@ func (o *operation) SetParam(key string, value any) *operation {
 	case float32, float64:
 		o.params[key] = fmt.Sprintf("%f", v)
 	case time.Time:
-		o.params[key] = v.Format(time.RFC3339)
+		o.params[key] = v.Format(ISO8601TimeLayout)
 	case bool:
 		o.params[key] = fmt.Sprintf("%t", v)
 	default:

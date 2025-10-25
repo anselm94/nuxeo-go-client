@@ -2,7 +2,6 @@ package nuxeo
 
 import (
 	"slices"
-	"time"
 )
 
 // Document represents a Nuxeo document entity.
@@ -25,7 +24,7 @@ type Document struct {
 	VersionLabel                string         `json:"versionLabel"`
 	LockOwner                   string         `json:"lockOwner"`
 	LockCreated                 string         `json:"lockCreated"`
-	LastModified                time.Time      `json:"lastModified"`
+	LastModified                *ISO8601Time   `json:"lastModified"`
 	IsRecord                    bool           `json:"isRecord"`
 	RetainUntil                 string         `json:"retainUntil"`
 	HasLegalHold                bool           `json:"hasLegalHold"`

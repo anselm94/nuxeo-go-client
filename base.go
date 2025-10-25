@@ -3,6 +3,7 @@ package nuxeo
 import (
 	"fmt"
 	"net/url"
+	"time"
 )
 
 type EntityType string
@@ -87,4 +88,25 @@ type paginableEntities[T any] struct {
 	PageIndex               int  `json:"pageIndex"`
 	PageCount               int  `json:"pageCount"`
 	Entries                 []T  `json:"entries"`
+}
+
+//////////////////////
+//// ISO8601 Time ////
+//////////////////////
+
+type ISO8601Time time.Time
+
+const ISO8601TimeLayout = "2006-01-02T15:04:05.999Z"
+
+func (t *ISO8601Time) UnmarshalJSON(data []byte) error {
+	parsedTime, err := time.Parse(`"`+ISO8601TimeLayout+`"`, string(data))
+	if err != nil {
+		return err
+	}
+	*t = ISO8601Time(parsedTime)
+	return nil
+}
+
+func (t ISO8601Time) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + time.Time(t).Format(ISO8601TimeLayout) + `"`), nil
 }

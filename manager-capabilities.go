@@ -3,6 +3,8 @@ package nuxeo
 import (
 	"context"
 	"log/slog"
+
+	"github.com/anselm94/nuxeo/internal"
 )
 
 type CapabilitiesManager struct {
@@ -11,7 +13,7 @@ type CapabilitiesManager struct {
 }
 
 func (cm *CapabilitiesManager) FetchCapabilities(ctx context.Context) (*Capabilities, error) {
-	path := apiV1 + "/capabilities"
+	path := internal.PathApiV1 + "/capabilities"
 	res, err := cm.client.NewRequest(ctx, nil).SetResult(&Capabilities{}).SetError(&NuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {

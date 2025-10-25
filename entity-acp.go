@@ -1,9 +1,5 @@
 package nuxeo
 
-import (
-	"time"
-)
-
 type ACP struct {
 	entity
 
@@ -16,12 +12,12 @@ type ACL struct {
 }
 
 type ACE struct {
-	ID         string    `json:"id"`
-	Username   string    `json:"username"`
-	Permission string    `json:"permission"`
-	Granted    bool      `json:"granted"`
-	Creator    string    `json:"creator"`
-	Begin      time.Time `json:"begin"`
-	End        time.Time `json:"end"`
-	Status     string    `json:"status"`
+	ID         string       `json:"id"`
+	Username   string       `json:"username"`
+	Permission string       `json:"permission"`
+	Granted    bool         `json:"granted"`
+	Creator    string       `json:"creator"`
+	Begin      *ISO8601Time `json:"begin"`
+	End        *ISO8601Time `json:"end"`
+	Status     string       `json:"status"`
 }
