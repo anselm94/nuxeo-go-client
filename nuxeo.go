@@ -195,8 +195,8 @@ func (c *NuxeoClient) BatchUploadManager() *BatchUploadManager {
 	}
 }
 
-func (c *NuxeoClient) ConfigManager() *ConfigManager {
-	return &ConfigManager{
+func (c *NuxeoClient) DataModelManager() *DataModelManager {
+	return &DataModelManager{
 		client: c,
 		logger: c.logger,
 	}
