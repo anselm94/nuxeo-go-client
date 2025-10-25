@@ -21,6 +21,7 @@ type entityDocument struct {
 	ChangeToken                 string         `json:"changeToken"`
 	IsTrashed                   bool           `json:"isTrashed"`
 	Title                       string         `json:"title"`
+	Name                        string         `json:"name"`
 	VersionLabel                string         `json:"versionLabel"`
 	LockOwner                   string         `json:"lockOwner"`
 	LockCreated                 string         `json:"lockCreated"`
@@ -38,8 +39,8 @@ func NewDocument(documentType string, name string) *entityDocument {
 		entity: entity{
 			EntityType: EntityTypeDocument,
 		},
-		Type:  documentType,
-		Title: name,
+		Type: documentType,
+		Name: name,
 	}
 }
 
@@ -57,6 +58,17 @@ func (d *entityDocument) IsCollection() bool {
 
 func (d *entityDocument) IsCollectable() bool {
 	return d.HasFacet("NotCollectionMember")
+}
+
+func (d *entityDocument) Property(key string) any {
+	return d.Properties[key]
+}
+
+func (d *entityDocument) SetProperty(key string, value any) {
+	if d.Properties == nil {
+		d.Properties = make(map[string]any)
+	}
+	d.Properties[key] = value
 }
 
 type entityDocuments paginableEntities[entityDocument]

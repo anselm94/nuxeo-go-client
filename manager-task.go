@@ -31,7 +31,7 @@ func (t *taskManager) FetchTasks(ctx context.Context, userId, workflowInstanceId
 		path += "?" + encoded
 	}
 
-	res, err := t.client.NewRequest(ctx, options).SetResult(&entityTasks{}).SetError(&NuxeoError{}).Get(path)
+	res, err := t.client.NewRequest(ctx, options).SetResult(&entityTasks{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		t.logger.Error("Failed to fetch tasks", slog.String("error", err.Error()))
@@ -42,7 +42,7 @@ func (t *taskManager) FetchTasks(ctx context.Context, userId, workflowInstanceId
 
 func (t *taskManager) FetchTask(ctx context.Context, taskId string, options *nuxeoRequestOptions) (*entityTask, error) {
 	path := internal.PathApiV1 + "/task/" + url.PathEscape(taskId)
-	res, err := t.client.NewRequest(ctx, options).SetResult(&entityTask{}).SetError(&NuxeoError{}).Get(path)
+	res, err := t.client.NewRequest(ctx, options).SetResult(&entityTask{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		t.logger.Error("Failed to fetch task", slog.String("error", err.Error()))
@@ -64,7 +64,7 @@ func (t *taskManager) ReassignTask(ctx context.Context, taskId string, actors st
 		path += "?" + encoded
 	}
 
-	res, err := t.client.NewRequest(ctx, options).SetResult(&entityTask{}).SetError(&NuxeoError{}).Put(path)
+	res, err := t.client.NewRequest(ctx, options).SetResult(&entityTask{}).SetError(&nuxeoError{}).Put(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		t.logger.Error("Failed to reassign task", slog.String("error", err.Error()))
@@ -86,7 +86,7 @@ func (t *taskManager) DelegateTask(ctx context.Context, taskId string, actors st
 		path += "?" + encoded
 	}
 
-	res, err := t.client.NewRequest(ctx, options).SetResult(&entityTask{}).SetError(&NuxeoError{}).Put(path)
+	res, err := t.client.NewRequest(ctx, options).SetResult(&entityTask{}).SetError(&nuxeoError{}).Put(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		t.logger.Error("Failed to delegate task", slog.String("error", err.Error()))
@@ -103,7 +103,7 @@ type TaskCompletionRequest struct {
 
 func (t *taskManager) CompleteTask(ctx context.Context, taskId string, action string, request TaskCompletionRequest, options *nuxeoRequestOptions) (*entityTask, error) {
 	path := internal.PathApiV1 + "/task/" + url.PathEscape(taskId) + "/" + url.PathEscape(action)
-	res, err := t.client.NewRequest(ctx, options).SetBody(request).SetResult(&entityTask{}).SetError(&NuxeoError{}).Put(path)
+	res, err := t.client.NewRequest(ctx, options).SetBody(request).SetResult(&entityTask{}).SetError(&nuxeoError{}).Put(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		t.logger.Error("Failed to complete task", slog.String("error", err.Error()))

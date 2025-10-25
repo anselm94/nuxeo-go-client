@@ -77,8 +77,46 @@ const (
 	DocumentStateDeleted = "deleted"
 )
 
+// Properties: Dublincore
+
+const (
+	DocumentPropertyDCDescription     = "dc:description"
+	DocumentPropertyDCLanguage        = "dc:language"
+	DocumentPropertyDCCoverage        = "dc:coverage"
+	DocumentPropertyDCValid           = "dc:valid"
+	DocumentPropertyDCCreator         = "dc:creator"
+	DocumentPropertyDCModified        = "dc:modified"
+	DocumentPropertyDCLastContributor = "dc:lastContributor"
+	DocumentPropertyDCRights          = "dc:rights"
+	DocumentPropertyDCExpired         = "dc:expired"
+	DocumentPropertyDCFormat          = "dc:format"
+	DocumentPropertyDCCreated         = "dc:created"
+	DocumentPropertyDCTitle           = "dc:title"
+	DocumentPropertyDCIssued          = "dc:issued"
+	DocumentPropertyDCNature          = "dc:nature"
+	DocumentPropertyDCSubjects        = "dc:subjects"
+	DocumentPropertyDCContributors    = "dc:contributors"
+	DocumentPropertyDCSource          = "dc:source"
+	DocumentPropertyDCPublisher       = "dc:publisher"
+)
+
+// Properties: Common
+
+const (
+	DocumentPropertyCommonIcon         = "common:icon"
+	DocumentPropertyCommonIconExpanded = "common:icon-expanded"
+)
+
+// Properties: File
+
 const (
 	DocumentPropertyFileContent = "file:content"
+)
+
+// Properties: Thumb
+
+const (
+	DocumentPropertyThumbThumbnail = "thumb:thumbnail"
 )
 
 // Directory
@@ -108,36 +146,4 @@ const (
 	OperationDocumentUpdate             = "Document.Update"
 	OperationEsWaitForIndexing          = "Elasticsearch.WaitForIndexing"
 	OperationRepositoryGetDocument      = "Repository.GetDocument"
-)
-
-// Document Properties
-
-// Dublincore
-
-const (
-	DocumentPropertyDCDescription     = "dc:description"
-	DocumentPropertyDCLanguage        = "dc:language"
-	DocumentPropertyDCCoverage        = "dc:coverage"
-	DocumentPropertyDCValid           = "dc:valid"
-	DocumentPropertyDCCreator         = "dc:creator"
-	DocumentPropertyDCModified        = "dc:modified"
-	DocumentPropertyDCLastContributor = "dc:lastContributor"
-	DocumentPropertyDCRights          = "dc:rights"
-	DocumentPropertyDCExpired         = "dc:expired"
-	DocumentPropertyDCFormat          = "dc:format"
-	DocumentPropertyDCCreated         = "dc:created"
-	DocumentPropertyDCTitle           = "dc:title"
-	DocumentPropertyDCIssued          = "dc:issued"
-	DocumentPropertyDCNature          = "dc:nature"
-	DocumentPropertyDCSubjects        = "dc:subjects"
-	DocumentPropertyDCContributors    = "dc:contributors"
-	DocumentPropertyDCSource          = "dc:source"
-	DocumentPropertyDCPublisher       = "dc:publisher"
-)
-
-// Common
-
-const (
-	DocumentPropertyCommonIcon         = "common:icon"
-	DocumentPropertyCommonIconExpanded = "common:icon-expanded"
 )

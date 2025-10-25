@@ -22,7 +22,7 @@ type batchUpload struct {
 	BatchId          string `json:"batchId"`
 	FileIdx          string `json:"fileIdx"`
 	UploadType       string `json:"uploadType"`
-	UploadedSize     int64  `json:"uploadedSize"`
+	UploadedSize     string `json:"uploadedSize"`
 	UploadedChunkIds []int  `json:"uploadedChunkIds"`
 	ChunkCount       int    `json:"chunkCount"`
 }
@@ -30,7 +30,7 @@ type batchUpload struct {
 // CreateBatch initializes a new batch upload session with the default handler.
 func (bum *batchUploadManager) CreateBatch(ctx context.Context, options *nuxeoRequestOptions) (*batchUpload, error) {
 	path := internal.PathApiV1 + "/upload/new/default"
-	res, err := bum.client.NewRequest(ctx, options).SetResult(&batchUpload{}).SetError(&NuxeoError{}).Post(path)
+	res, err := bum.client.NewRequest(ctx, options).SetResult(&batchUpload{}).SetError(&nuxeoError{}).Post(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		bum.logger.Error("Failed to create batch", "error", err, "status", res.StatusCode())
@@ -42,7 +42,7 @@ func (bum *batchUploadManager) CreateBatch(ctx context.Context, options *nuxeoRe
 // FetchBatchUploads gets information about all files in a batch.
 func (bum *batchUploadManager) FetchBatchUploads(ctx context.Context, batchId string, options *nuxeoRequestOptions) (*[]batchUpload, error) {
 	path := internal.PathApiV1 + "/upload/" + batchId
-	res, err := bum.client.NewRequest(ctx, options).SetResult(&[]batchUpload{}).SetError(&NuxeoError{}).Get(path)
+	res, err := bum.client.NewRequest(ctx, options).SetResult(&[]batchUpload{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		bum.logger.Error("Failed to fetch batch uploads", "error", err, "status", res.StatusCode())
@@ -54,7 +54,7 @@ func (bum *batchUploadManager) FetchBatchUploads(ctx context.Context, batchId st
 // FetchBatchUpload gets information about a specific file in a batch.
 func (bum *batchUploadManager) FetchBatchUpload(ctx context.Context, batchId string, fileIdx string, options *nuxeoRequestOptions) (*batchUpload, error) {
 	path := internal.PathApiV1 + "/upload/" + batchId + "/" + fileIdx
-	res, err := bum.client.NewRequest(ctx, options).SetResult(&batchUpload{}).SetError(&NuxeoError{}).Get(path)
+	res, err := bum.client.NewRequest(ctx, options).SetResult(&batchUpload{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		bum.logger.Error("Failed to fetch batch upload", "error", err, "status", res.StatusCode())
@@ -66,7 +66,7 @@ func (bum *batchUploadManager) FetchBatchUpload(ctx context.Context, batchId str
 // CancelBatch drops (deletes) a batch.
 func (bum *batchUploadManager) CancelBatch(ctx context.Context, batchId string, options *nuxeoRequestOptions) error {
 	path := internal.PathApiV1 + "/upload/" + batchId
-	res, err := bum.client.NewRequest(ctx, options).SetError(&NuxeoError{}).Delete(path)
+	res, err := bum.client.NewRequest(ctx, options).SetError(&nuxeoError{}).Delete(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		bum.logger.Error("Failed to cancel batch", "error", err, "status", res.StatusCode())
@@ -76,9 +76,9 @@ func (bum *batchUploadManager) CancelBatch(ctx context.Context, batchId string, 
 }
 
 // ExecuteBatchUploads executes an Automation operation using all blobs in a batch as input.
-func (bum *batchUploadManager) ExecuteBatchUploads(ctx context.Context, batchId string, operationId string, operationPayload operationPayload, options *nuxeoRequestOptions) (any, error) {
-	path := internal.PathApiV1 + "/upload/" + batchId + "/execute/" + operationId
-	res, err := bum.client.NewRequest(ctx, options).SetBody(operationPayload).SetError(&NuxeoError{}).Post(path)
+func (bum *batchUploadManager) ExecuteBatchUploads(ctx context.Context, batchId string, operation operation, options *nuxeoRequestOptions) (any, error) {
+	path := internal.PathApiV1 + "/upload/" + batchId + "/execute/" + operation.operationId
+	res, err := bum.client.NewRequest(ctx, options).SetBody(operation.payload()).SetError(&nuxeoError{}).Post(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		bum.logger.Error("Failed to execute batch uploads", "error", err, "status", res.StatusCode())
@@ -88,9 +88,9 @@ func (bum *batchUploadManager) ExecuteBatchUploads(ctx context.Context, batchId 
 }
 
 // ExecuteBatchUpload executes an Automation operation using a specific file in a batch as input.
-func (bum *batchUploadManager) ExecuteBatchUpload(ctx context.Context, batchId string, fileIdx string, operationId string, operationPayload operationPayload, options *nuxeoRequestOptions) (any, error) {
-	path := internal.PathApiV1 + "/upload/" + batchId + "/" + fileIdx + "/execute/" + operationId
-	res, err := bum.client.NewRequest(ctx, options).SetBody(operationPayload).SetError(&NuxeoError{}).Post(path)
+func (bum *batchUploadManager) ExecuteBatchUpload(ctx context.Context, batchId string, fileIdx string, operation operation, options *nuxeoRequestOptions) (any, error) {
+	path := internal.PathApiV1 + "/upload/" + batchId + "/" + fileIdx + "/execute/" + operation.operationId
+	res, err := bum.client.NewRequest(ctx, options).SetBody(operation.payload()).SetError(&nuxeoError{}).Post(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		bum.logger.Error("Failed to execute batch upload", "error", err, "status", res.StatusCode())
@@ -150,7 +150,7 @@ func (bum *batchUploadManager) Upload(ctx context.Context, batchId string, fileI
 		SetHeader(internal.HeaderContentLength, fmt.Sprintf("%d", uploadOptions.fileSize)).
 		SetContentType(internal.HeaderValueOctetStream)
 
-	res, err := request.SetBody(blob).SetResult(&batchUpload{}).SetError(&NuxeoError{}).Post(path)
+	res, err := request.SetBody(blob).SetResult(&batchUpload{}).SetError(&nuxeoError{}).Post(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		bum.logger.Error("Failed to upload file to batch", "error", err, "status", res.StatusCode())
@@ -174,7 +174,7 @@ func (bum *batchUploadManager) UploadAsChunk(ctx context.Context, batchId string
 		SetHeader(internal.HeaderContentLength, fmt.Sprintf("%d", uploadOptions.fileSize)).
 		SetContentType(internal.HeaderValueOctetStream)
 
-	res, err := request.SetBody(blob).SetResult(&batchUpload{}).SetError(&NuxeoError{}).Post(path)
+	res, err := request.SetBody(blob).SetResult(&batchUpload{}).SetError(&nuxeoError{}).Post(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		bum.logger.Error("Failed to upload file to batch", "error", err, "status", res.StatusCode())

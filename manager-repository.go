@@ -29,7 +29,7 @@ func (r *repository) Name() string {
 
 func (r *repository) FetchDocumentRoot(ctx context.Context, options *nuxeoRequestOptions) (*entityDocument, error) {
 	path := internal.PathApiV1 + "/repo/" + url.PathEscape(r.name) + "/path/"
-	res, err := r.client.NewRequest(ctx, options).SetResult(&entityDocument{}).SetError(&NuxeoError{}).Get(path)
+	res, err := r.client.NewRequest(ctx, options).SetResult(&entityDocument{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to fetch document root", slog.String("error", err.Error()))
@@ -40,7 +40,7 @@ func (r *repository) FetchDocumentRoot(ctx context.Context, options *nuxeoReques
 
 func (r *repository) FetchDocumentById(ctx context.Context, documentID string, options *nuxeoRequestOptions) (*entityDocument, error) {
 	path := internal.PathApiV1 + "/repo/" + url.PathEscape(r.name) + "/id/" + url.PathEscape(documentID)
-	res, err := r.client.NewRequest(ctx, options).SetResult(&entityDocument{}).SetError(&NuxeoError{}).Get(path)
+	res, err := r.client.NewRequest(ctx, options).SetResult(&entityDocument{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to fetch document by ID", slog.String("error", err.Error()))
@@ -51,7 +51,7 @@ func (r *repository) FetchDocumentById(ctx context.Context, documentID string, o
 
 func (r *repository) FetchDocumentByPath(ctx context.Context, documentPath string, options *nuxeoRequestOptions) (*entityDocument, error) {
 	path := internal.PathApiV1 + "/repo/" + url.PathEscape(r.name) + "/path" + url.PathEscape(documentPath)
-	res, err := r.client.NewRequest(ctx, options).SetResult(&entityDocument{}).SetError(&NuxeoError{}).Get(path)
+	res, err := r.client.NewRequest(ctx, options).SetResult(&entityDocument{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to fetch document by path", slog.String("error", err.Error()))
@@ -62,7 +62,7 @@ func (r *repository) FetchDocumentByPath(ctx context.Context, documentPath strin
 
 func (r *repository) CreateDocumentById(ctx context.Context, parentId string, doc entityDocument, options *nuxeoRequestOptions) (*entityDocument, error) {
 	path := internal.PathApiV1 + "/repo/" + url.PathEscape(r.name) + "/id/" + url.PathEscape(parentId)
-	res, err := r.client.NewRequest(ctx, options).SetBody(doc).SetResult(&entityDocument{}).SetError(&NuxeoError{}).Post(path)
+	res, err := r.client.NewRequest(ctx, options).SetBody(doc).SetResult(&entityDocument{}).SetError(&nuxeoError{}).Post(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to create document by ID", slog.String("error", err.Error()))
@@ -73,7 +73,7 @@ func (r *repository) CreateDocumentById(ctx context.Context, parentId string, do
 
 func (r *repository) CreateDocumentByPath(ctx context.Context, parentPath string, document entityDocument, options *nuxeoRequestOptions) (*entityDocument, error) {
 	path := internal.PathApiV1 + "/repo/" + url.PathEscape(r.name) + "/path" + url.PathEscape(parentPath)
-	res, err := r.client.NewRequest(ctx, options).SetBody(document).SetResult(&entityDocument{}).SetError(&NuxeoError{}).Post(path)
+	res, err := r.client.NewRequest(ctx, options).SetBody(document).SetResult(&entityDocument{}).SetError(&nuxeoError{}).Post(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to create document by path", slog.String("error", err.Error()))
@@ -84,7 +84,7 @@ func (r *repository) CreateDocumentByPath(ctx context.Context, parentPath string
 
 func (r *repository) UpdateDocument(ctx context.Context, documentId string, document entityDocument, options *nuxeoRequestOptions) (*entityDocument, error) {
 	path := internal.PathApiV1 + "/repo/" + url.PathEscape(r.name) + "/id/" + url.PathEscape(documentId)
-	res, err := r.client.NewRequest(ctx, options).SetBody(document).SetResult(&entityDocument{}).SetError(&NuxeoError{}).Put(path)
+	res, err := r.client.NewRequest(ctx, options).SetBody(document).SetResult(&entityDocument{}).SetError(&nuxeoError{}).Put(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to update document", slog.String("error", err.Error()))
@@ -95,7 +95,7 @@ func (r *repository) UpdateDocument(ctx context.Context, documentId string, docu
 
 func (r *repository) DeleteDocument(ctx context.Context, documentId string) error {
 	path := internal.PathApiV1 + "/repo/" + url.PathEscape(r.name) + "/id/" + url.PathEscape(documentId)
-	res, err := r.client.NewRequest(ctx, nil).SetError(&NuxeoError{}).Delete(path)
+	res, err := r.client.NewRequest(ctx, nil).SetError(&nuxeoError{}).Delete(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to delete document", slog.String("error", err.Error()))
@@ -119,7 +119,7 @@ func (r *repository) Query(ctx context.Context, query string, queryParams []stri
 	params = internal.MergeUrlValues(params, paginationOptions.QueryParams())
 	path += "?" + params.Encode()
 
-	res, err := r.client.NewRequest(ctx, options).SetResult(&entityDocuments{}).SetError(&NuxeoError{}).Get(path)
+	res, err := r.client.NewRequest(ctx, options).SetResult(&entityDocuments{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to fetch documents", slog.String("error", err.Error()))
@@ -144,7 +144,7 @@ func (r *repository) QueryByProvider(ctx context.Context, providerName string, q
 		path += "?" + params.Encode()
 	}
 
-	res, err := r.client.NewRequest(ctx, options).SetResult(&entityDocuments{}).SetError(&NuxeoError{}).Get(path)
+	res, err := r.client.NewRequest(ctx, options).SetResult(&entityDocuments{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to fetch documents by provider", slog.String("error", err.Error()))
@@ -159,7 +159,7 @@ func (r *repository) QueryByProvider(ctx context.Context, providerName string, q
 
 func (r *repository) FetchAuditByPath(ctx context.Context, documentPath string, options *nuxeoRequestOptions) (*entityAudit, error) {
 	path := internal.PathApiV1 + "/repo/" + url.PathEscape(r.name) + "/path" + documentPath + "/@audit"
-	res, err := r.client.NewRequest(ctx, options).SetResult(&entityAudit{}).SetError(&NuxeoError{}).Get(path)
+	res, err := r.client.NewRequest(ctx, options).SetResult(&entityAudit{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to fetch audit by path", slog.String("error", err.Error()))
@@ -170,7 +170,7 @@ func (r *repository) FetchAuditByPath(ctx context.Context, documentPath string, 
 
 func (r *repository) FetchAuditById(ctx context.Context, documentId string, options *nuxeoRequestOptions) (*entityAudit, error) {
 	path := internal.PathApiV1 + "/repo/" + url.PathEscape(r.name) + "/id/" + url.PathEscape(documentId) + "/@audit"
-	res, err := r.client.NewRequest(ctx, options).SetResult(&entityAudit{}).SetError(&NuxeoError{}).Get(path)
+	res, err := r.client.NewRequest(ctx, options).SetResult(&entityAudit{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to fetch audit by ID", slog.String("error", err.Error()))
@@ -185,7 +185,7 @@ func (r *repository) FetchAuditById(ctx context.Context, documentId string, opti
 
 func (r *repository) FetchPermissionsByPath(ctx context.Context, documentPath string, options *nuxeoRequestOptions) (*entityACP, error) {
 	path := internal.PathApiV1 + "/repo/" + url.PathEscape(r.name) + "/path" + documentPath + "/@acl"
-	res, err := r.client.NewRequest(ctx, options).SetResult(&entityACP{}).SetError(&NuxeoError{}).Get(path)
+	res, err := r.client.NewRequest(ctx, options).SetResult(&entityACP{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to fetch permissions by path", slog.String("error", err.Error()))
@@ -196,7 +196,7 @@ func (r *repository) FetchPermissionsByPath(ctx context.Context, documentPath st
 
 func (r *repository) FetchPermissionsById(ctx context.Context, documentId string, options *nuxeoRequestOptions) (*entityACP, error) {
 	path := internal.PathApiV1 + "/repo/" + url.PathEscape(r.name) + "/id/" + url.PathEscape(documentId) + "/@acl"
-	res, err := r.client.NewRequest(ctx, options).SetResult(&entityACP{}).SetError(&NuxeoError{}).Get(path)
+	res, err := r.client.NewRequest(ctx, options).SetResult(&entityACP{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to fetch permissions by ID", slog.String("error", err.Error()))
@@ -211,7 +211,7 @@ func (r *repository) FetchPermissionsById(ctx context.Context, documentId string
 
 func (r *repository) FetchChildrenByPath(ctx context.Context, parentPath string, options *nuxeoRequestOptions) (*entityDocuments, error) {
 	path := internal.PathApiV1 + "/repo/" + url.PathEscape(r.name) + "/path" + parentPath + "/@children"
-	res, err := r.client.NewRequest(ctx, options).SetResult(&entityDocuments{}).SetError(&NuxeoError{}).Get(path)
+	res, err := r.client.NewRequest(ctx, options).SetResult(&entityDocuments{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to fetch children by path", slog.String("error", err.Error()))
@@ -222,7 +222,7 @@ func (r *repository) FetchChildrenByPath(ctx context.Context, parentPath string,
 
 func (r *repository) FetchChildrenById(ctx context.Context, parentId string, options *nuxeoRequestOptions) (*entityDocuments, error) {
 	path := internal.PathApiV1 + "/repo/" + url.PathEscape(r.name) + "/id/" + url.PathEscape(parentId) + "/@children"
-	res, err := r.client.NewRequest(ctx, options).SetResult(&entityDocuments{}).SetError(&NuxeoError{}).Get(path)
+	res, err := r.client.NewRequest(ctx, options).SetResult(&entityDocuments{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to fetch children by ID", slog.String("error", err.Error()))
@@ -237,7 +237,7 @@ func (r *repository) FetchChildrenById(ctx context.Context, parentId string, opt
 
 func (r *repository) StreamBlobByPath(ctx context.Context, documentPath string, blobXPath string, options *nuxeoRequestOptions) (*Blob, error) {
 	path := internal.PathApiV1 + "/repo/" + url.PathEscape(r.name) + "/path" + documentPath + "/@blob/" + url.PathEscape(blobXPath)
-	res, err := r.client.NewRequest(ctx, options).SetError(&NuxeoError{}).Get(path)
+	res, err := r.client.NewRequest(ctx, options).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to stream blob by path", slog.String("error", err.Error()))
@@ -253,7 +253,7 @@ func (r *repository) StreamBlobByPath(ctx context.Context, documentPath string, 
 
 func (r *repository) StreamBlobById(ctx context.Context, documentId string, blobXPath string, options *nuxeoRequestOptions) (*Blob, error) {
 	path := internal.PathApiV1 + "/repo/" + url.PathEscape(r.name) + "/id/" + url.PathEscape(documentId) + "/@blob/" + url.PathEscape(blobXPath)
-	res, err := r.client.NewRequest(ctx, options).SetError(&NuxeoError{}).Get(path)
+	res, err := r.client.NewRequest(ctx, options).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to stream blob by ID", slog.String("error", err.Error()))
@@ -273,7 +273,7 @@ func (r *repository) StreamBlobById(ctx context.Context, documentId string, blob
 
 func (r *repository) StartWorkflowInstanceWithDocId(ctx context.Context, documentId string, workflow entityWorkflow, options *nuxeoRequestOptions) (*entityWorkflow, error) {
 	path := internal.PathApiV1 + "/repo/" + url.PathEscape(r.name) + "/id/" + url.PathEscape(documentId) + "/@workflow"
-	res, err := r.client.NewRequest(ctx, options).SetBody(workflow).SetResult(&entityWorkflow{}).SetError(&NuxeoError{}).Post(path)
+	res, err := r.client.NewRequest(ctx, options).SetBody(workflow).SetResult(&entityWorkflow{}).SetError(&nuxeoError{}).Post(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to start workflow instance with document ID", slog.String("error", err.Error()))
@@ -284,7 +284,7 @@ func (r *repository) StartWorkflowInstanceWithDocId(ctx context.Context, documen
 
 func (r *repository) StartWorkflowInstanceWithDocPath(ctx context.Context, documentPath string, workflow entityWorkflow, options *nuxeoRequestOptions) (*entityWorkflow, error) {
 	path := internal.PathApiV1 + "/repo/" + url.PathEscape(r.name) + "/path" + documentPath + "/@workflow"
-	res, err := r.client.NewRequest(ctx, options).SetBody(workflow).SetResult(&entityWorkflow{}).SetError(&NuxeoError{}).Post(path)
+	res, err := r.client.NewRequest(ctx, options).SetBody(workflow).SetResult(&entityWorkflow{}).SetError(&nuxeoError{}).Post(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to start workflow instance with document path", slog.String("error", err.Error()))
@@ -295,7 +295,7 @@ func (r *repository) StartWorkflowInstanceWithDocPath(ctx context.Context, docum
 
 func (r *repository) FetchWorkflowInstancesByDocId(ctx context.Context, documentId string, options *nuxeoRequestOptions) (*entityWorkflows, error) {
 	path := internal.PathApiV1 + "/repo/" + url.PathEscape(r.name) + "/id/" + url.PathEscape(documentId) + "/@workflow"
-	res, err := r.client.NewRequest(ctx, options).SetResult(&entityWorkflows{}).SetError(&NuxeoError{}).Get(path)
+	res, err := r.client.NewRequest(ctx, options).SetResult(&entityWorkflows{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to fetch workflow instances by document ID", slog.String("error", err.Error()))
@@ -306,7 +306,7 @@ func (r *repository) FetchWorkflowInstancesByDocId(ctx context.Context, document
 
 func (r *repository) FetchWorkflowInstancesByDocPath(ctx context.Context, documentPath string, options *nuxeoRequestOptions) (*entityWorkflows, error) {
 	path := internal.PathApiV1 + "/repo/" + url.PathEscape(r.name) + "/path" + documentPath + "/@workflow"
-	res, err := r.client.NewRequest(ctx, options).SetResult(&entityWorkflows{}).SetError(&NuxeoError{}).Get(path)
+	res, err := r.client.NewRequest(ctx, options).SetResult(&entityWorkflows{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to fetch workflow instances by document path", slog.String("error", err.Error()))
@@ -317,7 +317,7 @@ func (r *repository) FetchWorkflowInstancesByDocPath(ctx context.Context, docume
 
 func (r *repository) FetchWorkflowInstance(ctx context.Context, workflowInstanceId string, options *nuxeoRequestOptions) (*entityWorkflow, error) {
 	path := internal.PathApiV1 + "/workflow/" + url.PathEscape(workflowInstanceId)
-	res, err := r.client.NewRequest(ctx, options).SetResult(&entityWorkflow{}).SetError(&NuxeoError{}).Get(path)
+	res, err := r.client.NewRequest(ctx, options).SetResult(&entityWorkflow{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to fetch workflow instance", slog.String("error", err.Error()))
@@ -328,7 +328,7 @@ func (r *repository) FetchWorkflowInstance(ctx context.Context, workflowInstance
 
 func (r *repository) CancelWorkflowInstance(ctx context.Context, workflowInstanceId string) error {
 	path := internal.PathApiV1 + "/workflow/" + url.PathEscape(workflowInstanceId)
-	res, err := r.client.NewRequest(ctx, nil).SetError(&NuxeoError{}).Delete(path)
+	res, err := r.client.NewRequest(ctx, nil).SetError(&nuxeoError{}).Delete(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to cancel workflow instance", slog.String("error", err.Error()))
@@ -339,7 +339,7 @@ func (r *repository) CancelWorkflowInstance(ctx context.Context, workflowInstanc
 
 func (r *repository) FetchWorkflowInstanceGraph(ctx context.Context, workflowInstanceId string, options *nuxeoRequestOptions) (*entityWorkflowGraph, error) {
 	path := internal.PathApiV1 + "/workflow/" + url.PathEscape(workflowInstanceId) + "/graph"
-	res, err := r.client.NewRequest(ctx, options).SetResult(&entityWorkflowGraph{}).SetError(&NuxeoError{}).Get(path)
+	res, err := r.client.NewRequest(ctx, options).SetResult(&entityWorkflowGraph{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to fetch workflow instance graph", slog.String("error", err.Error()))
@@ -350,7 +350,7 @@ func (r *repository) FetchWorkflowInstanceGraph(ctx context.Context, workflowIns
 
 func (r *repository) FetchWorkflowModel(ctx context.Context, workflowModelName string, options *nuxeoRequestOptions) (*entityWorkflow, error) {
 	path := internal.PathApiV1 + "/workflowModel/" + url.PathEscape(workflowModelName)
-	res, err := r.client.NewRequest(ctx, options).SetResult(&entityWorkflow{}).SetError(&NuxeoError{}).Get(path)
+	res, err := r.client.NewRequest(ctx, options).SetResult(&entityWorkflow{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to fetch workflow model", slog.String("error", err.Error()))
@@ -361,7 +361,7 @@ func (r *repository) FetchWorkflowModel(ctx context.Context, workflowModelName s
 
 func (r *repository) FetchWorkflowModelGraph(ctx context.Context, workflowModelName string, options *nuxeoRequestOptions) (*entityWorkflowGraph, error) {
 	path := internal.PathApiV1 + "/workflowModel/" + url.PathEscape(workflowModelName) + "/graph"
-	res, err := r.client.NewRequest(ctx, options).SetResult(&entityWorkflowGraph{}).SetError(&NuxeoError{}).Get(path)
+	res, err := r.client.NewRequest(ctx, options).SetResult(&entityWorkflowGraph{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to fetch workflow model graph", slog.String("error", err.Error()))
@@ -372,7 +372,7 @@ func (r *repository) FetchWorkflowModelGraph(ctx context.Context, workflowModelN
 
 func (r *repository) FetchWorkflowModels(ctx context.Context, options *nuxeoRequestOptions) (*entityWorkflows, error) {
 	path := internal.PathApiV1 + "/workflowModel"
-	res, err := r.client.NewRequest(ctx, options).SetResult(&entityWorkflows{}).SetError(&NuxeoError{}).Get(path)
+	res, err := r.client.NewRequest(ctx, options).SetResult(&entityWorkflows{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to fetch workflow models", slog.String("error", err.Error()))
@@ -396,7 +396,7 @@ func (r *repository) CreateForAdapter(ctx context.Context, documentId string, ad
 	}
 
 	var result any
-	res, err := r.client.NewRequest(ctx, options).SetBody(payload).SetResult(&result).SetError(&NuxeoError{}).Post(path)
+	res, err := r.client.NewRequest(ctx, options).SetBody(payload).SetResult(&result).SetError(&nuxeoError{}).Post(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to create for adapter", slog.String("error", err.Error()))
@@ -416,7 +416,7 @@ func (r *repository) FetchForAdapter(ctx context.Context, documentId string, ada
 	}
 
 	var result any
-	res, err := r.client.NewRequest(ctx, options).SetResult(&result).SetError(&NuxeoError{}).Get(path)
+	res, err := r.client.NewRequest(ctx, options).SetResult(&result).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to fetch for adapter", slog.String("error", err.Error()))
@@ -436,7 +436,7 @@ func (r *repository) UpdateForAdapter(ctx context.Context, documentId string, ad
 	}
 
 	var result any
-	res, err := r.client.NewRequest(ctx, options).SetBody(payload).SetResult(&result).SetError(&NuxeoError{}).Put(path)
+	res, err := r.client.NewRequest(ctx, options).SetBody(payload).SetResult(&result).SetError(&nuxeoError{}).Put(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to update for adapter", slog.String("error", err.Error()))
@@ -455,7 +455,7 @@ func (r *repository) DeleteForAdapter(ctx context.Context, documentId string, ad
 		path += "?" + params.Encode()
 	}
 
-	res, err := r.client.NewRequest(ctx, nil).SetError(&NuxeoError{}).Delete(path)
+	res, err := r.client.NewRequest(ctx, nil).SetError(&nuxeoError{}).Delete(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to delete for adapter", slog.String("error", err.Error()))

@@ -19,7 +19,7 @@ type userManager struct {
 
 func (um *userManager) FetchGroup(ctx context.Context, name string, options *nuxeoRequestOptions) (*entityGroup, error) {
 	path := internal.PathApiV1 + "/group/" + url.PathEscape(name)
-	res, err := um.client.NewRequest(ctx, options).SetResult(&entityGroup{}).SetError(&NuxeoError{}).Get(path)
+	res, err := um.client.NewRequest(ctx, options).SetResult(&entityGroup{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		um.logger.Error("Failed to fetch group", slog.String("error", err.Error()))
@@ -30,7 +30,7 @@ func (um *userManager) FetchGroup(ctx context.Context, name string, options *nux
 
 func (um *userManager) CreateGroup(ctx context.Context, group entityGroup, options *nuxeoRequestOptions) (*entityGroup, error) {
 	path := internal.PathApiV1 + "/group"
-	res, err := um.client.NewRequest(ctx, options).SetBody(group).SetResult(&entityGroup{}).SetError(&NuxeoError{}).Post(path)
+	res, err := um.client.NewRequest(ctx, options).SetBody(group).SetResult(&entityGroup{}).SetError(&nuxeoError{}).Post(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		um.logger.Error("Failed to create group", slog.String("error", err.Error()))
@@ -41,7 +41,7 @@ func (um *userManager) CreateGroup(ctx context.Context, group entityGroup, optio
 
 func (um *userManager) UpdateGroup(ctx context.Context, name string, group entityGroup, options *nuxeoRequestOptions) (*entityGroup, error) {
 	path := internal.PathApiV1 + "/group/" + url.PathEscape(name)
-	res, err := um.client.NewRequest(ctx, options).SetBody(group).SetResult(&entityGroup{}).SetError(&NuxeoError{}).Put(path)
+	res, err := um.client.NewRequest(ctx, options).SetBody(group).SetResult(&entityGroup{}).SetError(&nuxeoError{}).Put(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		um.logger.Error("Failed to update group", slog.String("error", err.Error()))
@@ -52,7 +52,7 @@ func (um *userManager) UpdateGroup(ctx context.Context, name string, group entit
 
 func (um *userManager) DeleteGroup(ctx context.Context, name string, options *nuxeoRequestOptions) error {
 	path := internal.PathApiV1 + "/group/" + url.PathEscape(name)
-	res, err := um.client.NewRequest(ctx, options).SetResult(&entityGroup{}).SetError(&NuxeoError{}).Delete(path)
+	res, err := um.client.NewRequest(ctx, options).SetResult(&entityGroup{}).SetError(&nuxeoError{}).Delete(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		um.logger.Error("Failed to delete group", slog.String("error", err.Error()))
@@ -69,7 +69,7 @@ func (um *userManager) SearchGroup(ctx context.Context, query string, pagination
 	params = internal.MergeUrlValues(params, paginationOptions.QueryParams())
 	path += "?" + params.Encode()
 
-	res, err := um.client.NewRequest(ctx, options).SetResult(&entityGroups{}).SetError(&NuxeoError{}).Get(path)
+	res, err := um.client.NewRequest(ctx, options).SetResult(&entityGroups{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		um.logger.Error("Failed to search group", slog.String("error", err.Error()))
@@ -80,7 +80,7 @@ func (um *userManager) SearchGroup(ctx context.Context, query string, pagination
 
 func (um *userManager) AttachGroupToUser(ctx context.Context, idOrGroupName string, idOrUsername string, options *nuxeoRequestOptions) (*entityGroup, error) {
 	path := internal.PathApiV1 + "/group/" + url.PathEscape(idOrGroupName) + "/user/" + url.PathEscape(idOrUsername)
-	res, err := um.client.NewRequest(ctx, options).SetResult(&entityGroup{}).SetError(&NuxeoError{}).Post(path)
+	res, err := um.client.NewRequest(ctx, options).SetResult(&entityGroup{}).SetError(&nuxeoError{}).Post(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		um.logger.Error("Failed to attach group to user", slog.String("error", err.Error()))
@@ -96,7 +96,7 @@ func (um *userManager) FetchGroupMemberUsers(ctx context.Context, idOrGroupName 
 		path += "?" + queryPagination.Encode()
 	}
 
-	res, err := um.client.NewRequest(ctx, options).SetResult(&entityUsers{}).SetError(&NuxeoError{}).Get(path)
+	res, err := um.client.NewRequest(ctx, options).SetResult(&entityUsers{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		um.logger.Error("Failed to fetch group member users", slog.String("error", err.Error()))
@@ -112,7 +112,7 @@ func (um *userManager) FetchGroupMemberGroups(ctx context.Context, idOrGroupName
 		path += "?" + queryPagination.Encode()
 	}
 
-	res, err := um.client.NewRequest(ctx, options).SetResult(&entityGroups{}).SetError(&NuxeoError{}).Get(path)
+	res, err := um.client.NewRequest(ctx, options).SetResult(&entityGroups{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		um.logger.Error("Failed to fetch group member groups", slog.String("error", err.Error()))
@@ -127,7 +127,7 @@ func (um *userManager) FetchGroupMemberGroups(ctx context.Context, idOrGroupName
 
 func (um *userManager) FetchUser(ctx context.Context, id string, options *nuxeoRequestOptions) (*entityUser, error) {
 	path := internal.PathApiV1 + "/user/" + url.PathEscape(id)
-	res, err := um.client.NewRequest(ctx, options).SetResult(&entityUser{}).SetError(&NuxeoError{}).Get(path)
+	res, err := um.client.NewRequest(ctx, options).SetResult(&entityUser{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		um.logger.Error("Failed to fetch user", slog.String("error", err.Error()))
@@ -138,7 +138,7 @@ func (um *userManager) FetchUser(ctx context.Context, id string, options *nuxeoR
 
 func (um *userManager) CreateUser(ctx context.Context, user entityUser, options *nuxeoRequestOptions) (*entityUser, error) {
 	path := internal.PathApiV1 + "/user"
-	res, err := um.client.NewRequest(ctx, options).SetBody(user).SetResult(&entityUser{}).SetError(&NuxeoError{}).Post(path)
+	res, err := um.client.NewRequest(ctx, options).SetBody(user).SetResult(&entityUser{}).SetError(&nuxeoError{}).Post(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		um.logger.Error("Failed to create user", slog.String("error", err.Error()))
@@ -149,7 +149,7 @@ func (um *userManager) CreateUser(ctx context.Context, user entityUser, options 
 
 func (um *userManager) UpdateUser(ctx context.Context, idOrUsername string, user entityUser, options *nuxeoRequestOptions) (*entityUser, error) {
 	path := internal.PathApiV1 + "/user/" + url.PathEscape(idOrUsername)
-	res, err := um.client.NewRequest(ctx, options).SetBody(user).SetResult(&entityUser{}).SetError(&NuxeoError{}).Put(path)
+	res, err := um.client.NewRequest(ctx, options).SetBody(user).SetResult(&entityUser{}).SetError(&nuxeoError{}).Put(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		um.logger.Error("Failed to update user", slog.String("error", err.Error()))
@@ -160,7 +160,7 @@ func (um *userManager) UpdateUser(ctx context.Context, idOrUsername string, user
 
 func (um *userManager) DeleteUser(ctx context.Context, idOrUsername string, options *nuxeoRequestOptions) error {
 	path := internal.PathApiV1 + "/user/" + url.PathEscape(idOrUsername)
-	res, err := um.client.NewRequest(ctx, options).SetError(&NuxeoError{}).Delete(path)
+	res, err := um.client.NewRequest(ctx, options).SetError(&nuxeoError{}).Delete(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		um.logger.Error("Failed to delete user", slog.String("error", err.Error()))
@@ -178,7 +178,7 @@ func (um *userManager) SearchUsers(ctx context.Context, query string, pagination
 
 	path += "?" + params.Encode()
 
-	res, err := um.client.NewRequest(ctx, options).SetResult(&entityUsers{}).SetError(&NuxeoError{}).Get(path)
+	res, err := um.client.NewRequest(ctx, options).SetResult(&entityUsers{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		um.logger.Error("Failed to search users", slog.String("error", err.Error()))
@@ -189,7 +189,7 @@ func (um *userManager) SearchUsers(ctx context.Context, query string, pagination
 
 func (um *userManager) AddUserToGroup(ctx context.Context, idOrUsername string, idOrGroupName string, options *nuxeoRequestOptions) (*entityUser, error) {
 	path := internal.PathApiV1 + "/user/" + url.PathEscape(idOrUsername) + "/group/" + url.PathEscape(idOrGroupName)
-	res, err := um.client.NewRequest(ctx, options).SetResult(&entityUser{}).SetError(&NuxeoError{}).Post(path)
+	res, err := um.client.NewRequest(ctx, options).SetResult(&entityUser{}).SetError(&nuxeoError{}).Post(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		um.logger.Error("Failed to add user to group", slog.String("error", err.Error()))
@@ -207,9 +207,9 @@ func (um *userManager) FetchCurrentUser(ctx context.Context) (*entityUser, error
 	loginInfo := &struct {
 		Username string `json:"username"`
 	}{}
-	operationMgr := um.client.OperationManager()
-	operationLogin := operationMgr.NewOperation("login")
-	if err := operationMgr.ExecuteInto(ctx, *operationLogin, nil, loginInfo); err != nil {
+
+	operationLogin := NewOperation("login")
+	if err := um.client.OperationManager().ExecuteInto(ctx, *operationLogin, nil, loginInfo); err != nil {
 		um.logger.Error("Failed to fetch current user login info", slog.String("error", err.Error()))
 		return nil, err
 	}
@@ -220,7 +220,7 @@ func (um *userManager) FetchCurrentUser(ctx context.Context) (*entityUser, error
 
 func (um *userManager) FetchWorkflowInstances(ctx context.Context, options *nuxeoRequestOptions) (*entityWorkflows, error) {
 	path := internal.PathApiV1 + "/workflow"
-	res, err := um.client.NewRequest(ctx, options).SetResult(&entityWorkflows{}).SetError(&NuxeoError{}).Get(path)
+	res, err := um.client.NewRequest(ctx, options).SetResult(&entityWorkflows{}).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		um.logger.Error("Failed to fetch workflow instances", slog.String("error", err.Error()))
@@ -231,7 +231,7 @@ func (um *userManager) FetchWorkflowInstances(ctx context.Context, options *nuxe
 
 func (um *userManager) StartWorkflowInstance(ctx context.Context, workflow entityWorkflow, options *nuxeoRequestOptions) (*entityWorkflow, error) {
 	path := internal.PathApiV1 + "/workflow"
-	res, err := um.client.NewRequest(ctx, options).SetBody(workflow).SetResult(&entityWorkflow{}).SetError(&NuxeoError{}).Post(path)
+	res, err := um.client.NewRequest(ctx, options).SetBody(workflow).SetResult(&entityWorkflow{}).SetError(&nuxeoError{}).Post(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		um.logger.Error("Failed to start workflow instance", slog.String("error", err.Error()))
