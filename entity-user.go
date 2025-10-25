@@ -1,61 +1,61 @@
 package nuxeo
 
-type ExtendedGroup struct {
+type entityExtendedGroup struct {
 	Name  string `json:"name"`
 	Label string `json:"label"`
 	Url   string `json:"url"`
 }
 
-// User represents a Nuxeo user.
-type User struct {
+// entityUser represents a Nuxeo user.
+type entityUser struct {
 	entity
-	Id              string          `json:"id"`
-	IsAdministrator bool            `json:"isAdministrator"`
-	IsAnonymous     bool            `json:"isAnonymous"`
-	Properties      map[string]any  `json:"properties"`
-	ExtendedGroups  []ExtendedGroup `json:"extendedGroups,omitempty"`
+	Id              string                `json:"id"`
+	IsAdministrator bool                  `json:"isAdministrator"`
+	IsAnonymous     bool                  `json:"isAnonymous"`
+	Properties      map[string]any        `json:"properties"`
+	ExtendedGroups  []entityExtendedGroup `json:"extendedGroups,omitempty"`
 }
 
-func NewUser(id string) *User {
+func NewUser(username string) *entityUser {
 	properties := make(map[string]any)
-	properties[UserPropertyUsername] = id // Set username by default
-	return &User{
+	properties[UserPropertyUsername] = username // Set username by default
+	return &entityUser{
 		entity: entity{
 			EntityType: EntityTypeUser,
 		},
-		Id:         id,
+		Id:         username,
 		Properties: properties,
 	}
 }
 
-func (u *User) IdOrUsername() string {
+func (u *entityUser) IdOrUsername() string {
 	if u.Id != "" {
 		return u.Id
 	}
 	return u.Username()
 }
 
-func (u *User) Username() string {
+func (u *entityUser) Username() string {
 	return u.Properties[UserPropertyUsername].(string)
 }
 
-func (u *User) Password() string {
+func (u *entityUser) Password() string {
 	return u.Properties[UserPropertyPassword].(string)
 }
 
-func (u *User) FirstName() string {
+func (u *entityUser) FirstName() string {
 	return u.Properties[UserPropertyFirstName].(string)
 }
 
-func (u *User) LastName() string {
+func (u *entityUser) LastName() string {
 	return u.Properties[UserPropertyLastName].(string)
 }
 
-func (u *User) Email() string {
+func (u *entityUser) Email() string {
 	return u.Properties[UserPropertyEmail].(string)
 }
 
-func (u *User) Groups() []string {
+func (u *entityUser) Groups() []string {
 	groups, ok := u.Properties[UserPropertyGroups].([]any)
 	if !ok {
 		return []string{}
@@ -67,20 +67,20 @@ func (u *User) Groups() []string {
 	return result
 }
 
-func (u *User) Company() string {
+func (u *entityUser) Company() string {
 	return u.Properties[UserPropertyCompany].(string)
 }
 
-func (u *User) TenantId() string {
+func (u *entityUser) TenantId() string {
 	return u.Properties[UserPropertyTenantId].(string)
 }
 
-func (u *User) Property(key string) any {
+func (u *entityUser) Property(key string) any {
 	return u.Properties[key]
 }
 
-func (u *User) SetProperty(key string, value any) {
+func (u *entityUser) SetProperty(key string, value any) {
 	u.Properties[key] = value
 }
 
-type Users paginableEntities[User]
+type entityUsers paginableEntities[entityUser]

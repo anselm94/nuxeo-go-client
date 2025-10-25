@@ -1,6 +1,6 @@
 package nuxeo
 
-type Capabilities struct {
+type entityCapabilities struct {
 	entity
 	Server struct {
 		DistributionName    string `json:"distributionName"`

@@ -8,73 +8,73 @@ import (
 	"github.com/anselm94/nuxeo/internal"
 )
 
-type DirectoryManager struct {
+type directoryManager struct {
 	// internal
 
 	client *NuxeoClient
 	logger *slog.Logger
 }
 
-func (dm *DirectoryManager) FetchDirectories(ctx context.Context, options *nuxeoRequestOptions) (*Directories, error) {
+func (dm *directoryManager) FetchDirectories(ctx context.Context, options *nuxeoRequestOptions) (*entityDirectories, error) {
 	path := internal.PathApiV1 + "/directory"
-	res, err := dm.client.NewRequest(ctx, options).SetResult(&Directories{}).SetError(&NuxeoError{}).Get(path)
+	res, err := dm.client.NewRequest(ctx, options).SetResult(&entityDirectories{}).SetError(&NuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		dm.logger.Error("Failed to fetch directories", slog.String("error", err.Error()))
 		return nil, err
 	}
-	return res.Result().(*Directories), nil
+	return res.Result().(*entityDirectories), nil
 }
 
-func (dm *DirectoryManager) FetchDirectoryEntries(ctx context.Context, directoryName string, paginationOptions *SortedPaginationOptions, options *nuxeoRequestOptions) (*DirectoryEntries, error) {
+func (dm *directoryManager) FetchDirectoryEntries(ctx context.Context, directoryName string, paginationOptions *SortedPaginationOptions, options *nuxeoRequestOptions) (*entityDirectoryEntries, error) {
 	path := internal.PathApiV1 + "/directory/" + url.PathEscape(directoryName)
 
 	if query := paginationOptions.QueryParams(); query != nil {
 		path += "?" + query.Encode()
 	}
 
-	res, err := dm.client.NewRequest(ctx, options).SetResult(&DirectoryEntries{}).SetError(&NuxeoError{}).Get(path)
+	res, err := dm.client.NewRequest(ctx, options).SetResult(&entityDirectoryEntries{}).SetError(&NuxeoError{}).Get(path)
 	if err := handleNuxeoError(err, res); err != nil {
 		dm.logger.Error("Failed to fetch directory entries", slog.String("error", err.Error()))
 		return nil, err
 	}
-	return res.Result().(*DirectoryEntries), nil
+	return res.Result().(*entityDirectoryEntries), nil
 }
 
-func (dm *DirectoryManager) CreateDirectoryEntry(ctx context.Context, directoryName string, entry DirectoryEntry, options *nuxeoRequestOptions) (*DirectoryEntry, error) {
+func (dm *directoryManager) CreateDirectoryEntry(ctx context.Context, directoryName string, entry entityDirectoryEntry, options *nuxeoRequestOptions) (*entityDirectoryEntry, error) {
 	path := internal.PathApiV1 + "/directory/" + url.PathEscape(directoryName)
-	res, err := dm.client.NewRequest(ctx, options).SetBody(entry).SetResult(&DirectoryEntry{}).SetError(&NuxeoError{}).Post(path)
+	res, err := dm.client.NewRequest(ctx, options).SetBody(entry).SetResult(&entityDirectoryEntry{}).SetError(&NuxeoError{}).Post(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		dm.logger.Error("Failed to create directory entry", slog.String("error", err.Error()))
 		return nil, err
 	}
-	return res.Result().(*DirectoryEntry), nil
+	return res.Result().(*entityDirectoryEntry), nil
 }
 
-func (dm *DirectoryManager) FetchDirectoryEntry(ctx context.Context, directoryName string, directoryEntryId string, options *nuxeoRequestOptions) (*DirectoryEntry, error) {
+func (dm *directoryManager) FetchDirectoryEntry(ctx context.Context, directoryName string, directoryEntryId string, options *nuxeoRequestOptions) (*entityDirectoryEntry, error) {
 	path := internal.PathApiV1 + "/directory/" + url.PathEscape(directoryName) + "/" + url.PathEscape(directoryEntryId)
-	res, err := dm.client.NewRequest(ctx, options).SetResult(&DirectoryEntry{}).SetError(&NuxeoError{}).Get(path)
+	res, err := dm.client.NewRequest(ctx, options).SetResult(&entityDirectoryEntry{}).SetError(&NuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		dm.logger.Error("Failed to fetch directory entry", slog.String("error", err.Error()))
 		return nil, err
 	}
-	return res.Result().(*DirectoryEntry), nil
+	return res.Result().(*entityDirectoryEntry), nil
 }
 
-func (dm *DirectoryManager) UpdateDirectoryEntry(ctx context.Context, directoryName string, directoryEntryId string, entry DirectoryEntry, options *nuxeoRequestOptions) (*DirectoryEntry, error) {
+func (dm *directoryManager) UpdateDirectoryEntry(ctx context.Context, directoryName string, directoryEntryId string, entry entityDirectoryEntry, options *nuxeoRequestOptions) (*entityDirectoryEntry, error) {
 	path := internal.PathApiV1 + "/directory/" + url.PathEscape(directoryName) + "/" + url.PathEscape(directoryEntryId)
-	res, err := dm.client.NewRequest(ctx, options).SetBody(entry).SetResult(&DirectoryEntry{}).SetError(&NuxeoError{}).Put(path)
+	res, err := dm.client.NewRequest(ctx, options).SetBody(entry).SetResult(&entityDirectoryEntry{}).SetError(&NuxeoError{}).Put(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		dm.logger.Error("Failed to update directory entry", slog.String("error", err.Error()))
 		return nil, err
 	}
-	return res.Result().(*DirectoryEntry), nil
+	return res.Result().(*entityDirectoryEntry), nil
 }
 
-func (dm *DirectoryManager) DeleteDirectoryEntry(ctx context.Context, directoryName string, directoryEntryId string, options *nuxeoRequestOptions) error {
+func (dm *directoryManager) DeleteDirectoryEntry(ctx context.Context, directoryName string, directoryEntryId string, options *nuxeoRequestOptions) error {
 	path := internal.PathApiV1 + "/directory/" + url.PathEscape(directoryName) + "/" + url.PathEscape(directoryEntryId)
 	res, err := dm.client.NewRequest(ctx, options).SetError(&NuxeoError{}).Delete(path)
 

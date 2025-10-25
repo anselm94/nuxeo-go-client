@@ -1,6 +1,6 @@
 package nuxeo
 
-type Directory struct {
+type entityDirectory struct {
 	entity
 	Name    string `json:"name"`
 	Schema  string `json:"schema"`
@@ -8,29 +8,46 @@ type Directory struct {
 	Parent  string `json:"parent"`
 }
 
-type Directories entities[Directory]
+type entityDirectories entities[entityDirectory]
 
-type DirectoryEntry struct {
+type entityDirectoryEntry struct {
 	entity
 	DirectoryName string         `json:"directoryName"`
-	Id            string         `json:"id"`
+	ID            string         `json:"id"`
 	Properties    map[string]any `json:"properties"`
 }
 
-func (d DirectoryEntry) Label() string {
+func NewDirectoryEntry(id string) entityDirectoryEntry {
+	return entityDirectoryEntry{
+		ID:         id,
+		Properties: make(map[string]any),
+	}
+}
+
+func (d *entityDirectoryEntry) Id() string {
+	if d.ID != "" {
+		return d.ID
+	}
+	if val, ok := d.Properties[DirectoryPropertyId]; ok {
+		return val.(string)
+	}
+	return ""
+}
+
+func (d entityDirectoryEntry) Label() string {
 	return d.Properties[DirectoryPropertyLabel].(string)
 }
 
-func (d DirectoryEntry) Ordering() float64 {
+func (d entityDirectoryEntry) Ordering() float64 {
 	return d.Properties[DirectoryPropertyOrdering].(float64)
 }
 
-func (d DirectoryEntry) Obsolete() float64 {
+func (d entityDirectoryEntry) Obsolete() float64 {
 	return d.Properties[DirectoryPropertyObsolete].(float64)
 }
 
-func (d DirectoryEntry) Property(key string) any {
+func (d entityDirectoryEntry) Property(key string) any {
 	return d.Properties[key]
 }
 
-type DirectoryEntries entities[DirectoryEntry]
+type entityDirectoryEntries entities[entityDirectoryEntry]

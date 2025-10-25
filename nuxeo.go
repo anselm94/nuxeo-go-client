@@ -138,65 +138,65 @@ func (c *NuxeoClient) NewRequest(ctx context.Context, options *nuxeoRequestOptio
 	return req.setNuxeoOption(options)
 }
 
-func (c *NuxeoClient) CapabilitiesManager(ctx context.Context) *CapabilitiesManager {
-	return &CapabilitiesManager{
+func (c *NuxeoClient) CapabilitiesManager(ctx context.Context) *capabilitiesManager {
+	return &capabilitiesManager{
 		client: c,
 		logger: c.logger,
 	}
 }
 
-func (c *NuxeoClient) Repository() *Repository {
-	return &Repository{
+func (c *NuxeoClient) Repository() *repository {
+	return &repository{
 		name:   RepositoryDefault,
 		client: c,
 		logger: c.logger,
 	}
 }
 
-func (c *NuxeoClient) RepositoryWithName(name string) *Repository {
-	return &Repository{
+func (c *NuxeoClient) RepositoryWithName(name string) *repository {
+	return &repository{
 		name:   name,
 		client: c,
 	}
 }
 
-func (c *NuxeoClient) OperationManager() *OperationManager {
-	return &OperationManager{
+func (c *NuxeoClient) OperationManager() *operationManager {
+	return &operationManager{
 		client: c,
 		logger: c.logger,
 	}
 }
 
-func (c *NuxeoClient) UserManager() *UserManager {
-	return &UserManager{
+func (c *NuxeoClient) UserManager() *userManager {
+	return &userManager{
 		client: c,
 		logger: c.logger,
 	}
 }
 
-func (c *NuxeoClient) DirectoryManager() *DirectoryManager {
-	return &DirectoryManager{
+func (c *NuxeoClient) DirectoryManager() *directoryManager {
+	return &directoryManager{
 		client: c,
 		logger: c.logger,
 	}
 }
 
-func (c *NuxeoClient) TaskManager() *TaskManager {
-	return &TaskManager{
+func (c *NuxeoClient) TaskManager() *taskManager {
+	return &taskManager{
 		client: c,
 		logger: c.logger,
 	}
 }
 
-func (c *NuxeoClient) BatchUploadManager() *BatchUploadManager {
-	return &BatchUploadManager{
+func (c *NuxeoClient) BatchUploadManager() *batchUploadManager {
+	return &batchUploadManager{
 		client: c,
 		logger: c.logger,
 	}
 }
 
-func (c *NuxeoClient) DataModelManager() *DataModelManager {
-	return &DataModelManager{
+func (c *NuxeoClient) DataModelManager() *dataModelManager {
+	return &dataModelManager{
 		client: c,
 		logger: c.logger,
 	}
@@ -206,7 +206,7 @@ func (c *NuxeoClient) DataModelManager() *DataModelManager {
 //// METHODS ////
 /////////////////
 
-func (c *NuxeoClient) CurrentUser(ctx context.Context) (*User, error) {
+func (c *NuxeoClient) CurrentUser(ctx context.Context) (*entityUser, error) {
 	return c.UserManager().FetchCurrentUser(ctx)
 }
 

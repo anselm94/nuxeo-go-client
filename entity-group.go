@@ -1,7 +1,7 @@
 package nuxeo
 
-// Group represents a Nuxeo group.
-type Group struct {
+// entityGroup represents a Nuxeo group.
+type entityGroup struct {
 	entity
 	Id           string         `json:"id"`
 	Properties   map[string]any `json:"properties"`
@@ -10,4 +10,13 @@ type Group struct {
 	ParentGroups []string       `json:"parentGroups"`
 }
 
-type Groups paginableEntities[Group]
+func NewGroup(groupId string) *entityGroup {
+	return &entityGroup{
+		entity: entity{
+			EntityType: EntityTypeGroup,
+		},
+		Id: groupId,
+	}
+}
+
+type entityGroups paginableEntities[entityGroup]

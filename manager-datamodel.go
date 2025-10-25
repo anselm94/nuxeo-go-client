@@ -7,75 +7,75 @@ import (
 	"github.com/anselm94/nuxeo/internal"
 )
 
-type DataModelManager struct {
+type dataModelManager struct {
 	// internal
 
 	client *NuxeoClient
 	logger *slog.Logger
 }
 
-func (dmm *DataModelManager) FetchTypes(ctx context.Context) (*DocTypes, error) {
+func (dmm *dataModelManager) FetchTypes(ctx context.Context) (*entityDocTypes, error) {
 	path := internal.PathApiV1 + "/config/types"
-	res, err := dmm.client.NewRequest(ctx, nil).SetResult(&DocTypes{}).SetError(&NuxeoError{}).Get(path)
+	res, err := dmm.client.NewRequest(ctx, nil).SetResult(&entityDocTypes{}).SetError(&NuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		dmm.logger.Error("Failed to fetch document types", slog.String("error", err.Error()))
 		return nil, err
 	}
-	return res.Result().(*DocTypes), nil
+	return res.Result().(*entityDocTypes), nil
 }
 
-func (dmm *DataModelManager) FetchType(ctx context.Context, name string) (*DocType, error) {
+func (dmm *dataModelManager) FetchType(ctx context.Context, name string) (*entityDocType, error) {
 	path := internal.PathApiV1 + "/config/types/" + name
-	res, err := dmm.client.NewRequest(ctx, nil).SetResult(&DocType{}).SetError(&NuxeoError{}).Get(path)
+	res, err := dmm.client.NewRequest(ctx, nil).SetResult(&entityDocType{}).SetError(&NuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		dmm.logger.Error("Failed to fetch document type", slog.String("error", err.Error()))
 		return nil, err
 	}
-	return res.Result().(*DocType), nil
+	return res.Result().(*entityDocType), nil
 }
 
-func (dmm *DataModelManager) FetchSchemas(ctx context.Context) (*Schemas, error) {
+func (dmm *dataModelManager) FetchSchemas(ctx context.Context) (*entitySchemas, error) {
 	path := internal.PathApiV1 + "/config/schemas"
-	res, err := dmm.client.NewRequest(ctx, nil).SetResult(&Schemas{}).SetError(&NuxeoError{}).Get(path)
+	res, err := dmm.client.NewRequest(ctx, nil).SetResult(&entitySchemas{}).SetError(&NuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		dmm.logger.Error("Failed to fetch schemas", slog.String("error", err.Error()))
 		return nil, err
 	}
-	return res.Result().(*Schemas), nil
+	return res.Result().(*entitySchemas), nil
 }
 
-func (dmm *DataModelManager) FetchSchema(ctx context.Context, name string) (*Schema, error) {
+func (dmm *dataModelManager) FetchSchema(ctx context.Context, name string) (*entitySchema, error) {
 	path := internal.PathApiV1 + "/config/schemas/" + name
-	res, err := dmm.client.NewRequest(ctx, nil).SetResult(&Schema{}).SetError(&NuxeoError{}).Get(path)
+	res, err := dmm.client.NewRequest(ctx, nil).SetResult(&entitySchema{}).SetError(&NuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		dmm.logger.Error("Failed to fetch schema", slog.String("error", err.Error()))
 		return nil, err
 	}
-	return res.Result().(*Schema), nil
+	return res.Result().(*entitySchema), nil
 }
 
-func (dmm *DataModelManager) FetchFacets(ctx context.Context) (*Facets, error) {
+func (dmm *dataModelManager) FetchFacets(ctx context.Context) (*entityFacets, error) {
 	path := internal.PathApiV1 + "/config/facets"
-	res, err := dmm.client.NewRequest(ctx, nil).SetResult(&Facets{}).SetError(&NuxeoError{}).Get(path)
+	res, err := dmm.client.NewRequest(ctx, nil).SetResult(&entityFacets{}).SetError(&NuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		dmm.logger.Error("Failed to fetch facets", slog.String("error", err.Error()))
 		return nil, err
 	}
-	return res.Result().(*Facets), nil
+	return res.Result().(*entityFacets), nil
 }
 
-func (dmm *DataModelManager) FetchFacet(ctx context.Context, name string) (*Facet, error) {
+func (dmm *dataModelManager) FetchFacet(ctx context.Context, name string) (*entityFacet, error) {
 	path := internal.PathApiV1 + "/config/facets/" + name
-	res, err := dmm.client.NewRequest(ctx, nil).SetResult(&Facet{}).SetError(&NuxeoError{}).Get(path)
+	res, err := dmm.client.NewRequest(ctx, nil).SetResult(&entityFacet{}).SetError(&NuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		dmm.logger.Error("Failed to fetch facet", slog.String("error", err.Error()))
 		return nil, err
 	}
-	return res.Result().(*Facet), nil
+	return res.Result().(*entityFacet), nil
 }

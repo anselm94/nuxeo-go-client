@@ -1,6 +1,6 @@
 package nuxeo
 
-type AuditLogEntry struct {
+type entityAuditLogEntry struct {
 	entity
 	ID            int            `json:"id"`
 	Category      string         `json:"category"`
@@ -17,4 +17,4 @@ type AuditLogEntry struct {
 	Extended      map[string]any `json:"extended"`
 }
 
-type Audit paginableEntities[AuditLogEntry]
+type entityAudit paginableEntities[entityAuditLogEntry]

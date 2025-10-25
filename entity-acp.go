@@ -1,17 +1,31 @@
 package nuxeo
 
-type ACP struct {
+type entityACP struct {
 	entity
 
-	ACLs []ACL `json:"acl"`
+	ACLs []entityACL `json:"acl"`
 }
 
-type ACL struct {
-	Name string `json:"name"`
-	ACEs []ACE  `json:"ace"`
+func NewACP() *entityACP {
+	return &entityACP{
+		entity: entity{
+			EntityType: EntityTypeACP,
+		},
+	}
 }
 
-type ACE struct {
+type entityACL struct {
+	Name string      `json:"name"`
+	ACEs []entityACE `json:"ace"`
+}
+
+func NewACL(name string) *entityACL {
+	return &entityACL{
+		Name: name,
+	}
+}
+
+type entityACE struct {
 	ID         string       `json:"id"`
 	Username   string       `json:"username"`
 	Permission string       `json:"permission"`
@@ -20,4 +34,12 @@ type ACE struct {
 	Begin      *ISO8601Time `json:"begin"`
 	End        *ISO8601Time `json:"end"`
 	Status     string       `json:"status"`
+}
+
+func NewACE(username, permission string, granted bool) *entityACE {
+	return &entityACE{
+		Username:   username,
+		Permission: permission,
+		Granted:    granted,
+	}
 }

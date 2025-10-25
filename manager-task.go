@@ -8,14 +8,14 @@ import (
 	"github.com/anselm94/nuxeo/internal"
 )
 
-type TaskManager struct {
+type taskManager struct {
 	// internal
 
 	client *NuxeoClient
 	logger *slog.Logger
 }
 
-func (t *TaskManager) FetchTasks(ctx context.Context, userId, workflowInstanceId, workflowModelName string, options *nuxeoRequestOptions) (*Tasks, error) {
+func (t *taskManager) FetchTasks(ctx context.Context, userId, workflowInstanceId, workflowModelName string, options *nuxeoRequestOptions) (*entityTasks, error) {
 	path := internal.PathApiV1 + "/task"
 	params := url.Values{}
 	if userId != "" {
@@ -31,27 +31,27 @@ func (t *TaskManager) FetchTasks(ctx context.Context, userId, workflowInstanceId
 		path += "?" + encoded
 	}
 
-	res, err := t.client.NewRequest(ctx, options).SetResult(&Tasks{}).SetError(&NuxeoError{}).Get(path)
+	res, err := t.client.NewRequest(ctx, options).SetResult(&entityTasks{}).SetError(&NuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		t.logger.Error("Failed to fetch tasks", slog.String("error", err.Error()))
 		return nil, err
 	}
-	return res.Result().(*Tasks), nil
+	return res.Result().(*entityTasks), nil
 }
 
-func (t *TaskManager) FetchTask(ctx context.Context, taskId string, options *nuxeoRequestOptions) (*Task, error) {
+func (t *taskManager) FetchTask(ctx context.Context, taskId string, options *nuxeoRequestOptions) (*entityTask, error) {
 	path := internal.PathApiV1 + "/task/" + url.PathEscape(taskId)
-	res, err := t.client.NewRequest(ctx, options).SetResult(&Task{}).SetError(&NuxeoError{}).Get(path)
+	res, err := t.client.NewRequest(ctx, options).SetResult(&entityTask{}).SetError(&NuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		t.logger.Error("Failed to fetch task", slog.String("error", err.Error()))
 		return nil, err
 	}
-	return res.Result().(*Task), nil
+	return res.Result().(*entityTask), nil
 }
 
-func (t *TaskManager) ReassignTask(ctx context.Context, taskId string, actors string, comment string, options *nuxeoRequestOptions) (*Task, error) {
+func (t *taskManager) ReassignTask(ctx context.Context, taskId string, actors string, comment string, options *nuxeoRequestOptions) (*entityTask, error) {
 	path := internal.PathApiV1 + "/task/" + url.PathEscape(taskId) + "/reassign"
 	params := url.Values{}
 	if actors != "" {
@@ -64,16 +64,16 @@ func (t *TaskManager) ReassignTask(ctx context.Context, taskId string, actors st
 		path += "?" + encoded
 	}
 
-	res, err := t.client.NewRequest(ctx, options).SetResult(&Task{}).SetError(&NuxeoError{}).Put(path)
+	res, err := t.client.NewRequest(ctx, options).SetResult(&entityTask{}).SetError(&NuxeoError{}).Put(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		t.logger.Error("Failed to reassign task", slog.String("error", err.Error()))
 		return nil, err
 	}
-	return res.Result().(*Task), nil
+	return res.Result().(*entityTask), nil
 }
 
-func (t *TaskManager) DelegateTask(ctx context.Context, taskId string, actors string, comment string, options *nuxeoRequestOptions) (*Task, error) {
+func (t *taskManager) DelegateTask(ctx context.Context, taskId string, actors string, comment string, options *nuxeoRequestOptions) (*entityTask, error) {
 	path := internal.PathApiV1 + "/task/" + url.PathEscape(taskId) + "/delegate"
 	params := url.Values{}
 	if actors != "" {
@@ -86,13 +86,13 @@ func (t *TaskManager) DelegateTask(ctx context.Context, taskId string, actors st
 		path += "?" + encoded
 	}
 
-	res, err := t.client.NewRequest(ctx, options).SetResult(&Task{}).SetError(&NuxeoError{}).Put(path)
+	res, err := t.client.NewRequest(ctx, options).SetResult(&entityTask{}).SetError(&NuxeoError{}).Put(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		t.logger.Error("Failed to delegate task", slog.String("error", err.Error()))
 		return nil, err
 	}
-	return res.Result().(*Task), nil
+	return res.Result().(*entityTask), nil
 }
 
 type TaskCompletionRequest struct {
@@ -101,13 +101,13 @@ type TaskCompletionRequest struct {
 	Variables map[string]any `json:"variables,omitempty"`
 }
 
-func (t *TaskManager) CompleteTask(ctx context.Context, taskId string, action string, request TaskCompletionRequest, options *nuxeoRequestOptions) (*Task, error) {
+func (t *taskManager) CompleteTask(ctx context.Context, taskId string, action string, request TaskCompletionRequest, options *nuxeoRequestOptions) (*entityTask, error) {
 	path := internal.PathApiV1 + "/task/" + url.PathEscape(taskId) + "/" + url.PathEscape(action)
-	res, err := t.client.NewRequest(ctx, options).SetBody(request).SetResult(&Task{}).SetError(&NuxeoError{}).Put(path)
+	res, err := t.client.NewRequest(ctx, options).SetBody(request).SetResult(&entityTask{}).SetError(&NuxeoError{}).Put(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		t.logger.Error("Failed to complete task", slog.String("error", err.Error()))
 		return nil, err
 	}
-	return res.Result().(*Task), nil
+	return res.Result().(*entityTask), nil
 }

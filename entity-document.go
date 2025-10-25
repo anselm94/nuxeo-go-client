@@ -4,8 +4,8 @@ import (
 	"slices"
 )
 
-// Document represents a Nuxeo document entity.
-type Document struct {
+// entityDocument represents a Nuxeo document entity.
+type entityDocument struct {
 	entity
 	Repository                  string         `json:"repository"`
 	ID                          string         `json:"uid"`
@@ -33,20 +33,30 @@ type Document struct {
 	Facets                      []string       `json:"facets"`
 }
 
-func (d *Document) HasFacet(facet string) bool {
+func NewDocument(documentType string, name string) *entityDocument {
+	return &entityDocument{
+		entity: entity{
+			EntityType: EntityTypeDocument,
+		},
+		Type:  documentType,
+		Title: name,
+	}
+}
+
+func (d *entityDocument) HasFacet(facet string) bool {
 	return slices.Contains(d.Facets, facet)
 }
 
-func (d *Document) IsFolder() bool {
+func (d *entityDocument) IsFolder() bool {
 	return d.HasFacet("Folderish")
 }
 
-func (d *Document) IsCollection() bool {
+func (d *entityDocument) IsCollection() bool {
 	return d.HasFacet("Collection")
 }
 
-func (d *Document) IsCollectable() bool {
+func (d *entityDocument) IsCollectable() bool {
 	return d.HasFacet("NotCollectionMember")
 }
 
-type Documents paginableEntities[Document]
+type entityDocuments paginableEntities[entityDocument]

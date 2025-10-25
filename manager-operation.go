@@ -14,12 +14,12 @@ import (
 	"github.com/anselm94/nuxeo/internal"
 )
 
-type OperationManager struct {
+type operationManager struct {
 	client *NuxeoClient
 	logger *slog.Logger
 }
 
-func (om *OperationManager) NewOperation(operationId string) *operation {
+func (om *operationManager) NewOperation(operationId string) *operation {
 	return &operation{
 		operationId:      operationId,
 		params:           make(map[string]string),
@@ -31,7 +31,7 @@ func (om *OperationManager) NewOperation(operationId string) *operation {
 }
 
 // ExecuteInto executes the operation and decodes the response into out.
-func (o *OperationManager) ExecuteInto(ctx context.Context, operation operation, requestOptions *nuxeoRequestOptions, out any) error {
+func (o *operationManager) ExecuteInto(ctx context.Context, operation operation, requestOptions *nuxeoRequestOptions, out any) error {
 	res, err := o.Execute(ctx, operation, requestOptions)
 	if err != nil {
 		return err
@@ -42,7 +42,7 @@ func (o *OperationManager) ExecuteInto(ctx context.Context, operation operation,
 }
 
 // Execute runs the operation using the client.
-func (o *OperationManager) Execute(ctx context.Context, operation operation, requestOptions *nuxeoRequestOptions) (io.ReadCloser, error) {
+func (o *operationManager) Execute(ctx context.Context, operation operation, requestOptions *nuxeoRequestOptions) (io.ReadCloser, error) {
 	// decide execution method based on presence of blobs
 	if len(operation.blobs()) > 0 {
 		return o.executeViaMultipart(ctx, operation, requestOptions)
@@ -51,7 +51,7 @@ func (o *OperationManager) Execute(ctx context.Context, operation operation, req
 	}
 }
 
-func (o *OperationManager) executeViaJson(ctx context.Context, operation operation, requestOptions *nuxeoRequestOptions) (io.ReadCloser, error) {
+func (o *operationManager) executeViaJson(ctx context.Context, operation operation, requestOptions *nuxeoRequestOptions) (io.ReadCloser, error) {
 	request := o.client.NewRequest(ctx, requestOptions)
 	request.SetDoNotParseResponse(true)
 
@@ -73,7 +73,7 @@ func (o *OperationManager) executeViaJson(ctx context.Context, operation operati
 	return res.Body, err
 }
 
-func (o *OperationManager) executeViaMultipart(ctx context.Context, operation operation, requestOptions *nuxeoRequestOptions) (io.ReadCloser, error) {
+func (o *operationManager) executeViaMultipart(ctx context.Context, operation operation, requestOptions *nuxeoRequestOptions) (io.ReadCloser, error) {
 	request := o.client.NewRequest(ctx, requestOptions)
 	request.SetDoNotParseResponse(true)
 
@@ -105,7 +105,7 @@ func (o *OperationManager) executeViaMultipart(ctx context.Context, operation op
 	return res.Body, nil
 }
 
-func (o *OperationManager) FetchOperation(ctx context.Context, operationId string) (*operationPayload, error) {
+func (o *operationManager) FetchOperation(ctx context.Context, operationId string) (*operationPayload, error) {
 	return nil, nil
 }
 
