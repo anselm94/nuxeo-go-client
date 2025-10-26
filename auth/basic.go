@@ -1,4 +1,4 @@
-package auth
+package nuxeoauth
 
 /**
 BasicAuthenticator implements basic username/password authentication.
@@ -6,21 +6,10 @@ BasicAuthenticator implements basic username/password authentication.
 Example:
 ```go
 import (
-	"context"
-	"github.com/anselm94/nuxeo-go-client"
 	"github.com/anselm94/nuxeo-go-client/auth"
 )
 
-ctx := context.Background()
-authenticator := auth.NewBasicAuthenticator("Administrator", "password")
-client, err := nuxeo.NewClient(ctx,
-	nuxeo.WithBaseURL("https://nuxeo.example.com/nuxeo"),
-	nuxeo.WithAuthenticator(authenticator),
-)
-if err != nil {
-	panic(err)
-}
-// Use client...
+authenticator := nuxeoauth.NewBasicAuthenticator("Administrator", "password")
 ```
 */
 

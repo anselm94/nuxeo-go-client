@@ -1,4 +1,4 @@
-package auth
+package nuxeoauth
 
 /**
 OAuth2Authenticator implements OAuth2 authentication with support for Authorization Grant Flow, Client Credentials Flow, and JWT.
@@ -6,9 +6,7 @@ OAuth2Authenticator implements OAuth2 authentication with support for Authorizat
 Example:
 ```go
 import (
-	"context"
 	"fmt"
-	"github.com/anselm94/nuxeo-go-client"
 	"github.com/anselm94/nuxeo-go-client/auth"
 )
 
@@ -16,12 +14,8 @@ ctx := context.Background()
 
 //// Using Authorization Grant Flow ////
 
-authInfo := auth.OAuth2Info{
-	ClientID:     "your-client-id",
-	ClientSecret: "your-client-secret",
-	RedirectURL:  "https://your-redirect-url.com/callback",
-}
-authenticator := auth.NewOAuth2Authenticator(authInfo, "https://nuxeo.example.com/nuxeo")
+oauth2Option := nuxeoauth.NewOAuth2AuthorizationGrantOptions("your-client-id", "your-client-secret", "https://your-redirect-url.com/callback")
+authenticator := nuxeoauth.NewOAuth2Authenticator(oauth2Option, "https://nuxeo.example.com/nuxeo")
 authURL := authenticator.AuthCodeUrl(ctx)
 fmt.Printf("Visit the URL for the auth dialog: %v", authURL)
 
@@ -34,28 +28,14 @@ if err != nil {
 
 //// Using Client Credentials Flow ////
 
-authInfo := auth.OAuth2Info{
-	ClientID:     "your-client-id",
-	ClientSecret: "your-client-secret",
-}
-authenticator := auth.NewOAuth2Authenticator(authInfo, "https://nuxeo.example.com/nuxeo")
+oauth2Option := nuxeoauth.NewOAuth2ClientCredentialsOptions("your-client-id", "your-client-secret")
+authenticator := nuxeoauth.NewOAuth2Authenticator(oauth2Option, "https://nuxeo.example.com/nuxeo")
 
 //// Using JWT Flow ////
 
-authInfo := auth.OAuth2Info{
-	JwtToken: "your-jwt-token",
-}
-authenticator := auth.NewOAuth2Authenticator(authInfo, "https://nuxeo.example.com/nuxeo")
+oauth2Option := nuxeoauth.NewOAuth2JwtOptions("your-jwt-token")
+authenticator := nuxeoauth.NewOAuth2Authenticator(oauth2Option, "https://nuxeo.example.com/nuxeo")
 
-//// Creating Nuxeo Client ////
-
-client, err := nuxeo.NewClient(ctx,
-	nuxeo.WithBaseURL("https://nuxeo.example.com/nuxeo"),
-	nuxeo.WithAuthenticator(authenticator),
-)
-if err != nil {
-	panic(err)
-}
 // Use client...
 */
 
@@ -75,42 +55,61 @@ const (
 	OAuth2AuthorizeState = "nuxeo-go-client-state"
 )
 
-type OAuth2Info struct {
-	// Authorization Grant Flow + Client Credentials
-
+type OAuth2Options struct {
 	// OAuth2 Client ID
-	ClientID string
+	clientId string
 	// OAuth2 Client Secret
-	ClientSecret string
-
-	// Authorization Grant Flow (only)
+	clientSecret string
 
 	// OAuth2 Redirect URL
-	RedirectURL string
-
-	// JWT Flow
+	redirectUrl string
 
 	// JWT Token
-	JwtToken string
+	jwtToken string
+}
+
+// Create OAuth2Info for Client Credentials Flow
+func NewOAuth2ClientCredentialsOptions(clientId string, clientSecret string) OAuth2Options {
+	return OAuth2Options{
+		clientId:     clientId,
+		clientSecret: clientSecret,
+	}
+}
+
+// Create OAuth2Info for Authorization Code Grant Flow
+func NewOAuth2AuthorizationCodeOptions(clientId string, clientSecret string, redirectUrl string) OAuth2Options {
+	return OAuth2Options{
+		clientId:     clientId,
+		clientSecret: clientSecret,
+		redirectUrl:  redirectUrl,
+	}
+}
+
+// Create OAuth2Info for JWT Flow
+func NewOAuth2JwtOptions(jwtToken string) OAuth2Options {
+	return OAuth2Options{
+		jwtToken: jwtToken,
+	}
 }
 
 // OAuth2Authenticator delegates to OAuth2Token and supports refresh.
 type OAuth2Authenticator struct {
-	authInfo OAuth2Info
-	baseUrl  string
+	options OAuth2Options
+	baseUrl string
 
 	tokenSource oauth2.TokenSource
 }
 
-func NewOAuth2Authenticator(authInfo OAuth2Info, baseUrl string) *OAuth2Authenticator {
+// NewOAuth2Authenticator creates a new OAuth2Authenticator with the given OAuth2Info and Nuxeo base URL (with `/nuxeo`).
+func NewOAuth2Authenticator(options OAuth2Options, baseUrl string) *OAuth2Authenticator {
 	// either token or client credentials should be provided
-	if authInfo.JwtToken == "" && (authInfo.ClientID == "" || authInfo.ClientSecret == "") {
+	if options.jwtToken == "" && (options.clientId == "" || options.clientSecret == "") {
 		return nil
 	}
 
 	return &OAuth2Authenticator{
-		authInfo: authInfo,
-		baseUrl:  baseUrl,
+		options: options,
+		baseUrl: baseUrl,
 	}
 }
 
@@ -127,7 +126,7 @@ func (a *OAuth2Authenticator) GetAuthHeaders(ctx context.Context, req *http.Requ
 func (a *OAuth2Authenticator) getAuthGrantFlowConfig() oauth2.Config {
 	return oauth2.Config{
 		Scopes:      []string{},
-		RedirectURL: a.authInfo.RedirectURL,
+		RedirectURL: a.options.redirectUrl,
 		Endpoint: oauth2.Endpoint{
 			TokenURL: a.baseUrl + oauth2TokenPath,
 			AuthURL:  a.baseUrl + oauth2AuthPath,
@@ -137,8 +136,8 @@ func (a *OAuth2Authenticator) getAuthGrantFlowConfig() oauth2.Config {
 
 func (a *OAuth2Authenticator) getClientCredentialsFlowConfig() clientcredentials.Config {
 	return clientcredentials.Config{
-		ClientID:     a.authInfo.ClientID,
-		ClientSecret: a.authInfo.ClientSecret,
+		ClientID:     a.options.clientId,
+		ClientSecret: a.options.clientSecret,
 		Scopes:       []string{},
 		TokenURL:     a.baseUrl + oauth2TokenPath,
 	}
@@ -151,14 +150,14 @@ func (a *OAuth2Authenticator) GetTokenSource(ctx context.Context) oauth2.TokenSo
 	}
 
 	// if JWT token is provided, return static token source
-	if a.authInfo.JwtToken != "" {
+	if a.options.jwtToken != "" {
 		staticSource := oauth2.StaticTokenSource(&oauth2.Token{
-			AccessToken: a.authInfo.JwtToken,
+			AccessToken: a.options.jwtToken,
 		})
 		a.tokenSource = staticSource
 	} else {
 		// if redirect URL is not provided, use client credentials flow
-		if a.authInfo.RedirectURL == "" {
+		if a.options.redirectUrl == "" {
 			config := a.getClientCredentialsFlowConfig()
 			a.tokenSource = config.TokenSource(ctx)
 		}

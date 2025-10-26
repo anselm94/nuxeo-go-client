@@ -1,4 +1,4 @@
-package auth
+package nuxeoauth
 
 /**
 TokenAuthenticator implements token-based authentication
@@ -6,21 +6,10 @@ TokenAuthenticator implements token-based authentication
 Example:
 ```go
 import (
-	"context"
-	"github.com/anselm94/nuxeo-go-client"
 	"github.com/anselm94/nuxeo-go-client/auth"
 )
 
-ctx := context.Background()
-authenticator := NewTokenAuthenticator("your-token")
-client, err := nuxeo.NewClient(ctx,
-	nuxeo.WithBaseURL("https://nuxeo.example.com/nuxeo"),
-	nuxeo.WithAuthenticator(authenticator),
-)
-if err != nil {
-	panic(err)
-}
-// Use client...
+authenticator := nuxeoauth.NewTokenAuthenticator("your-token")
 ```
 */
 import (

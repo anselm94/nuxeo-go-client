@@ -1,4 +1,4 @@
-package auth
+package nuxeoauth
 
 /**
 BearerAuthenticator implements Bearer token authentication.
@@ -6,21 +6,10 @@ BearerAuthenticator implements Bearer token authentication.
 Example:
 ```go
 import (
-	"context"
-	"github.com/anselm94/nuxeo-go-client"
 	"github.com/anselm94/nuxeo-go-client/auth"
 )
 
-ctx := context.Background()
-authenticator := NewBearerAuthenticator("your-bearer-token")
-client, err := nuxeo.NewClient(ctx,
-	nuxeo.WithBaseURL("https://nuxeo.example.com/nuxeo"),
-	nuxeo.WithAuthenticator(authenticator),
-)
-if err != nil {
-	panic(err)
-}
-// Use client...
+authenticator := nuxeoauth.NewBearerAuthenticator("your-bearer-token")
 ```
 */
 

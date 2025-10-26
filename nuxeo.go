@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/anselm94/nuxeo-go-client/auth"
+	nuxeoauth "github.com/anselm94/nuxeo-go-client/auth"
 	"resty.dev/v3"
 )
 
@@ -39,7 +39,7 @@ type nuxeoClientOptions struct {
 
 func DefaultNuxeoClientOptions() nuxeoClientOptions {
 	return nuxeoClientOptions{
-		Authenticator:           auth.NewNoOpAuthenticator(),
+		Authenticator:           nuxeoauth.NewNoOpAuthenticator(),
 		Logger:                  slog.Default(),
 		BeforeRequestMiddleware: nil,
 		AfterResponseMiddleware: nil,
@@ -101,7 +101,7 @@ func NewClient(baseUrl string, options *nuxeoClientOptions) *NuxeoClient {
 
 	// setup authenticator
 	if client.authenticator == nil {
-		client.authenticator = auth.NewNoOpAuthenticator()
+		client.authenticator = nuxeoauth.NewNoOpAuthenticator()
 	}
 	client.restClient.AddRequestMiddleware(func(c *resty.Client, r *resty.Request) error {
 		headers := client.authenticator.GetAuthHeaders(r.Context(), r.RawRequest)
