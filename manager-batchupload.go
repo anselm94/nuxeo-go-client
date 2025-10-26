@@ -6,7 +6,7 @@ import (
 	"io"
 	"log/slog"
 
-	"github.com/anselm94/nuxeo/internal"
+	"github.com/anselm94/nuxeo-go-client/internal"
 )
 
 type batchUploadManager struct {

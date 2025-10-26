@@ -9,7 +9,7 @@ import (
 	"log/slog"
 	"net/url"
 
-	"github.com/anselm94/nuxeo/internal"
+	"github.com/anselm94/nuxeo-go-client/internal"
 )
 
 type operationManager struct {

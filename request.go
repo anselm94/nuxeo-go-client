@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/anselm94/nuxeo/internal"
+	"github.com/anselm94/nuxeo-go-client/internal"
 	"resty.dev/v3"
 )
 

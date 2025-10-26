@@ -7,8 +7,8 @@ Example:
 ```go
 import (
 	"context"
-	"github.com/anselm94/nuxeo"
-	"github.com/anselm94/nuxeo/auth"
+	"github.com/anselm94/nuxeo-go-client"
+	"github.com/anselm94/nuxeo-go-client/auth"
 )
 
 ctx := context.Background()

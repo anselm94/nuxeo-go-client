@@ -18,7 +18,7 @@ Designed for composability, testability, and developer experience.
 ## Installation
 
 ```bash
-go get github.com/anselm94/nuxeo
+go get github.com/anselm94/nuxeo-go-client
 ```
 
 ## Quick Start
@@ -27,7 +27,7 @@ go get github.com/anselm94/nuxeo
 import (
     "context"
     "fmt"
-    "github.com/anselm94/nuxeo"
+    "github.com/anselm94/nuxeo-go-client"
 )
 
 // Example custom logger
@@ -156,7 +156,7 @@ Generate an authorization URL (using oauth2.Config):
 ```go
 import (
     "golang.org/x/oauth2"
-    "github.com/anselm94/nuxeo"
+    "github.com/anselm94/nuxeo-go-client"
 )
 
 config := &oauth2.Config{

@@ -1,4 +1,4 @@
-module github.com/anselm94/nuxeo
+module github.com/anselm94/nuxeo-go-client
 
 go 1.25.3
 

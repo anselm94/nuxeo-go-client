@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/anselm94/nuxeo/internal"
+	"github.com/anselm94/nuxeo-go-client/internal"
 )
 
 // repository represents a Nuxeo repository.

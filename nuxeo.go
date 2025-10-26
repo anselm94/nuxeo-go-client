@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/anselm94/nuxeo/auth"
+	"github.com/anselm94/nuxeo-go-client/auth"
 	"resty.dev/v3"
 )
 
