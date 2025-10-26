@@ -8,6 +8,8 @@ import (
 	"github.com/anselm94/nuxeo-go-client/internal"
 )
 
+// UserManager provides methods for managing Nuxeo users and groups via the REST API.
+// It supports CRUD operations, search, group membership management, and workflow operations.
 type userManager struct {
 	client *NuxeoClient
 	logger *slog.Logger
@@ -17,6 +19,8 @@ type userManager struct {
 //// GROUPS ////
 ////////////////
 
+// FetchGroup retrieves a group by name or ID using the Nuxeo REST API.
+// Maps to GET /group/{idOrGroupname}.
 func (um *userManager) FetchGroup(ctx context.Context, name string, options *nuxeoRequestOptions) (*entityGroup, error) {
 	path := internal.PathApiV1 + "/group/" + url.PathEscape(name)
 	res, err := um.client.NewRequest(ctx, options).SetResult(&entityGroup{}).SetError(&nuxeoError{}).Get(path)
@@ -28,6 +32,8 @@ func (um *userManager) FetchGroup(ctx context.Context, name string, options *nux
 	return res.Result().(*entityGroup), nil
 }
 
+// CreateGroup creates a new group with the given entityGroup payload.
+// Maps to POST /group.
 func (um *userManager) CreateGroup(ctx context.Context, group entityGroup, options *nuxeoRequestOptions) (*entityGroup, error) {
 	path := internal.PathApiV1 + "/group"
 	res, err := um.client.NewRequest(ctx, options).SetBody(group).SetResult(&entityGroup{}).SetError(&nuxeoError{}).Post(path)
@@ -39,6 +45,8 @@ func (um *userManager) CreateGroup(ctx context.Context, group entityGroup, optio
 	return res.Result().(*entityGroup), nil
 }
 
+// UpdateGroup updates an existing group by name or ID.
+// Maps to PUT /group/{idOrGroupname}.
 func (um *userManager) UpdateGroup(ctx context.Context, name string, group entityGroup, options *nuxeoRequestOptions) (*entityGroup, error) {
 	path := internal.PathApiV1 + "/group/" + url.PathEscape(name)
 	res, err := um.client.NewRequest(ctx, options).SetBody(group).SetResult(&entityGroup{}).SetError(&nuxeoError{}).Put(path)
@@ -50,6 +58,8 @@ func (um *userManager) UpdateGroup(ctx context.Context, name string, group entit
 	return res.Result().(*entityGroup), nil
 }
 
+// DeleteGroup deletes a group by name or ID.
+// Maps to DELETE /group/{idOrGroupname}.
 func (um *userManager) DeleteGroup(ctx context.Context, name string, options *nuxeoRequestOptions) error {
 	path := internal.PathApiV1 + "/group/" + url.PathEscape(name)
 	res, err := um.client.NewRequest(ctx, options).SetResult(&entityGroup{}).SetError(&nuxeoError{}).Delete(path)
@@ -61,6 +71,8 @@ func (um *userManager) DeleteGroup(ctx context.Context, name string, options *nu
 	return nil
 }
 
+// SearchGroup searches for groups matching the given query and pagination options.
+// Maps to GET /group/search?q=...&currentPageIndex=...&pageSize=...
 func (um *userManager) SearchGroup(ctx context.Context, query string, paginationOptions *PaginationOptions, options *nuxeoRequestOptions) (*entityGroups, error) {
 	path := internal.PathApiV1 + "/group/search"
 
@@ -78,6 +90,8 @@ func (um *userManager) SearchGroup(ctx context.Context, query string, pagination
 	return res.Result().(*entityGroups), nil
 }
 
+// AttachGroupToUser adds a user to a group by their respective IDs or names.
+// Maps to POST /group/{idOrGroupname}/user/{idOrUsername}.
 func (um *userManager) AttachGroupToUser(ctx context.Context, idOrGroupName string, idOrUsername string, options *nuxeoRequestOptions) (*entityGroup, error) {
 	path := internal.PathApiV1 + "/group/" + url.PathEscape(idOrGroupName) + "/user/" + url.PathEscape(idOrUsername)
 	res, err := um.client.NewRequest(ctx, options).SetResult(&entityGroup{}).SetError(&nuxeoError{}).Post(path)
@@ -89,6 +103,8 @@ func (um *userManager) AttachGroupToUser(ctx context.Context, idOrGroupName stri
 	return res.Result().(*entityGroup), nil
 }
 
+// FetchGroupMemberUsers retrieves users who are members of the specified group.
+// Maps to GET /group/{idOrGroupname}/@users.
 func (um *userManager) FetchGroupMemberUsers(ctx context.Context, idOrGroupName string, paginationOptions *PaginationOptions, options *nuxeoRequestOptions) (*entityUsers, error) {
 	path := internal.PathApiV1 + "/group/" + url.PathEscape(idOrGroupName) + "/@users"
 
@@ -105,6 +121,8 @@ func (um *userManager) FetchGroupMemberUsers(ctx context.Context, idOrGroupName 
 	return res.Result().(*entityUsers), nil
 }
 
+// FetchGroupMemberGroups retrieves groups that are members of the specified group.
+// Maps to GET /group/{idOrGroupname}/@groups.
 func (um *userManager) FetchGroupMemberGroups(ctx context.Context, idOrGroupName string, paginationOptions *PaginationOptions, options *nuxeoRequestOptions) (*entityGroups, error) {
 	path := internal.PathApiV1 + "/group/" + url.PathEscape(idOrGroupName) + "/@groups"
 
@@ -125,6 +143,8 @@ func (um *userManager) FetchGroupMemberGroups(ctx context.Context, idOrGroupName
 //// USERS ////
 ///////////////
 
+// FetchUser retrieves a user by ID or username using the Nuxeo REST API.
+// Maps to GET /user/{idOrUsername}.
 func (um *userManager) FetchUser(ctx context.Context, id string, options *nuxeoRequestOptions) (*entityUser, error) {
 	path := internal.PathApiV1 + "/user/" + url.PathEscape(id)
 	res, err := um.client.NewRequest(ctx, options).SetResult(&entityUser{}).SetError(&nuxeoError{}).Get(path)
@@ -136,6 +156,8 @@ func (um *userManager) FetchUser(ctx context.Context, id string, options *nuxeoR
 	return res.Result().(*entityUser), nil
 }
 
+// CreateUser creates a new user with the given EntityUser payload.
+// Maps to POST /user.
 func (um *userManager) CreateUser(ctx context.Context, user entityUser, options *nuxeoRequestOptions) (*entityUser, error) {
 	path := internal.PathApiV1 + "/user"
 	res, err := um.client.NewRequest(ctx, options).SetBody(user).SetResult(&entityUser{}).SetError(&nuxeoError{}).Post(path)
@@ -147,6 +169,8 @@ func (um *userManager) CreateUser(ctx context.Context, user entityUser, options 
 	return res.Result().(*entityUser), nil
 }
 
+// UpdateUser updates an existing user by ID or username.
+// Maps to PUT /user/{idOrUsername}.
 func (um *userManager) UpdateUser(ctx context.Context, idOrUsername string, user entityUser, options *nuxeoRequestOptions) (*entityUser, error) {
 	path := internal.PathApiV1 + "/user/" + url.PathEscape(idOrUsername)
 	res, err := um.client.NewRequest(ctx, options).SetBody(user).SetResult(&entityUser{}).SetError(&nuxeoError{}).Put(path)
@@ -158,6 +182,8 @@ func (um *userManager) UpdateUser(ctx context.Context, idOrUsername string, user
 	return res.Result().(*entityUser), nil
 }
 
+// DeleteUser deletes a user by ID or username.
+// Maps to DELETE /user/{idOrUsername}.
 func (um *userManager) DeleteUser(ctx context.Context, idOrUsername string, options *nuxeoRequestOptions) error {
 	path := internal.PathApiV1 + "/user/" + url.PathEscape(idOrUsername)
 	res, err := um.client.NewRequest(ctx, options).SetError(&nuxeoError{}).Delete(path)
@@ -169,6 +195,8 @@ func (um *userManager) DeleteUser(ctx context.Context, idOrUsername string, opti
 	return nil
 }
 
+// SearchUsers searches for users matching the given query and pagination options.
+// Maps to GET /user/search?q=...&currentPageIndex=...&pageSize=...
 func (um *userManager) SearchUsers(ctx context.Context, query string, paginationOptions *PaginationOptions, options *nuxeoRequestOptions) (*entityUsers, error) {
 	path := internal.PathApiV1 + "/user/search"
 
@@ -187,6 +215,8 @@ func (um *userManager) SearchUsers(ctx context.Context, query string, pagination
 	return res.Result().(*entityUsers), nil
 }
 
+// AddUserToGroup adds a user to a group by their respective IDs or names.
+// Maps to POST /user/{idOrUsername}/group/{idOrGroupname}.
 func (um *userManager) AddUserToGroup(ctx context.Context, idOrUsername string, idOrGroupName string, options *nuxeoRequestOptions) (*entityUser, error) {
 	path := internal.PathApiV1 + "/user/" + url.PathEscape(idOrUsername) + "/group/" + url.PathEscape(idOrGroupName)
 	res, err := um.client.NewRequest(ctx, options).SetResult(&entityUser{}).SetError(&nuxeoError{}).Post(path)
@@ -202,6 +232,8 @@ func (um *userManager) AddUserToGroup(ctx context.Context, idOrUsername string, 
 //// CURRENT USER ////
 //////////////////////
 
+// FetchCurrentUser retrieves the currently authenticated user.
+// Uses the automation login operation and then fetches user details.
 func (um *userManager) FetchCurrentUser(ctx context.Context) (*entityUser, error) {
 	// first get the username via the login operation
 	loginInfo := &struct {
@@ -218,6 +250,8 @@ func (um *userManager) FetchCurrentUser(ctx context.Context) (*entityUser, error
 	return um.FetchUser(ctx, loginInfo.Username, nil)
 }
 
+// FetchWorkflowInstances retrieves workflow instances for the current user.
+// Maps to GET /workflow.
 func (um *userManager) FetchWorkflowInstances(ctx context.Context, options *nuxeoRequestOptions) (*entityWorkflows, error) {
 	path := internal.PathApiV1 + "/workflow"
 	res, err := um.client.NewRequest(ctx, options).SetResult(&entityWorkflows{}).SetError(&nuxeoError{}).Get(path)
@@ -229,6 +263,8 @@ func (um *userManager) FetchWorkflowInstances(ctx context.Context, options *nuxe
 	return res.Result().(*entityWorkflows), nil
 }
 
+// StartWorkflowInstance starts a new workflow instance with the given EntityWorkflow payload.
+// Maps to POST /workflow.
 func (um *userManager) StartWorkflowInstance(ctx context.Context, workflow entityWorkflow, options *nuxeoRequestOptions) (*entityWorkflow, error) {
 	path := internal.PathApiV1 + "/workflow"
 	res, err := um.client.NewRequest(ctx, options).SetBody(workflow).SetResult(&entityWorkflow{}).SetError(&nuxeoError{}).Post(path)

@@ -14,55 +14,50 @@ import (
 	"resty.dev/v3"
 )
 
-// NuxeoClientOption configures the NuxeoClient.
-type NuxeoClientOption func(*NuxeoClient)
+///////////////////////
+//// Authenticator ////
+///////////////////////
 
 // Authenticator defines the interface for authentication strategies.
 type Authenticator interface {
+	// GetAuthHeaders returns authentication headers for the request context.
 	GetAuthHeaders(ctx context.Context, req *http.Request) map[string]string
 }
 
-func WithLogger(logger slog.Logger) NuxeoClientOption {
-	return func(c *NuxeoClient) {
-		c.logger = &logger
+//////////////////////////////
+//// Nuxeo Client Options ////
+//////////////////////////////
+
+type nuxeoClientOptions struct {
+	Authenticator           Authenticator
+	Logger                  *slog.Logger
+	BeforeRequestMiddleware resty.RequestMiddleware
+	AfterResponseMiddleware resty.ResponseMiddleware
+	Timeout                 time.Duration
+	CustomHeaders           map[string]string
+}
+
+func DefaultNuxeoClientOptions() nuxeoClientOptions {
+	return nuxeoClientOptions{
+		Authenticator:           auth.NewNoOpAuthenticator(),
+		Logger:                  slog.Default(),
+		BeforeRequestMiddleware: nil,
+		AfterResponseMiddleware: nil,
+		Timeout:                 30 * time.Second,
+		CustomHeaders:           make(map[string]string),
 	}
 }
 
-func WithBeforeRequestMiddleware(middleware resty.RequestMiddleware) NuxeoClientOption {
-	return func(c *NuxeoClient) {
-		c.middlewareBeforeRequest = &middleware
-	}
-}
+//////////////////////
+//// Nuxeo Client ////
+//////////////////////
 
-func WithAfterResponseMiddleware(middleware resty.ResponseMiddleware) NuxeoClientOption {
-	return func(c *NuxeoClient) {
-		c.middlewareAfterResponse = &middleware
-	}
-}
-
-func WithAuthenticator(authenticator Authenticator) NuxeoClientOption {
-	return func(c *NuxeoClient) {
-		c.authenticator = authenticator
-	}
-}
-
-func WithTimeOut(timeout time.Duration) NuxeoClientOption {
-	return func(c *NuxeoClient) {
-		c.timeout = timeout
-	}
-}
-
-func WithHeader(key string, value string) NuxeoClientOption {
-	return func(c *NuxeoClient) {
-		c.headers[key] = value
-	}
-}
-
+// NuxeoClient is the main client for interacting with the Nuxeo API.
 type NuxeoClient struct {
+	authenticator           Authenticator
 	logger                  *slog.Logger
 	middlewareBeforeRequest *resty.RequestMiddleware
 	middlewareAfterResponse *resty.ResponseMiddleware
-	authenticator           Authenticator
 
 	// config
 
@@ -74,13 +69,30 @@ type NuxeoClient struct {
 	restClient *resty.Client
 }
 
-func NewClient(baseUrl string, opts ...NuxeoClientOption) *NuxeoClient {
+// NewClient creates a new NuxeoClient for the given base URL and options.
+func NewClient(baseUrl string, options *nuxeoClientOptions) *NuxeoClient {
 	client := &NuxeoClient{
 		headers: make(map[string]string),
 	}
 
-	for _, opt := range opts {
-		opt(client)
+	// default options if nil
+	if options == nil {
+		defaultOptions := DefaultNuxeoClientOptions()
+		options = &defaultOptions
+	}
+
+	// apply options
+	client.authenticator = options.Authenticator
+	client.logger = options.Logger
+	if options.BeforeRequestMiddleware != nil {
+		client.middlewareBeforeRequest = &options.BeforeRequestMiddleware
+	}
+	if options.AfterResponseMiddleware != nil {
+		client.middlewareAfterResponse = &options.AfterResponseMiddleware
+	}
+	client.timeout = options.Timeout
+	for k, v := range options.CustomHeaders {
+		client.headers[k] = v
 	}
 
 	// setup resty client
@@ -107,11 +119,6 @@ func NewClient(baseUrl string, opts ...NuxeoClientOption) *NuxeoClient {
 		client.restClient.AddResponseMiddleware(*client.middlewareAfterResponse)
 	}
 
-	// setup logger
-	if client.logger == nil {
-		client.logger = slog.Default()
-	}
-
 	// setup connection config
 	if client.timeout == 0 {
 		client.timeout = 30 * time.Second // default timeout
@@ -121,10 +128,12 @@ func NewClient(baseUrl string, opts ...NuxeoClientOption) *NuxeoClient {
 	return client
 }
 
+// Close releases resources held by the NuxeoClient.
 func (c *NuxeoClient) Close() error {
 	return c.restClient.Close()
 }
 
+// NewRequest creates a new Nuxeo API request with the given context and options.
 func (c *NuxeoClient) NewRequest(ctx context.Context, options *nuxeoRequestOptions) *nuxeoRequest {
 	req := &nuxeoRequest{
 		Request: c.restClient.R().SetContext(ctx),
@@ -138,6 +147,7 @@ func (c *NuxeoClient) NewRequest(ctx context.Context, options *nuxeoRequestOptio
 	return req.setNuxeoOption(options)
 }
 
+// CapabilitiesManager returns a manager for Nuxeo server capabilities.
 func (c *NuxeoClient) CapabilitiesManager(ctx context.Context) *capabilitiesManager {
 	return &capabilitiesManager{
 		client: c,
@@ -145,6 +155,7 @@ func (c *NuxeoClient) CapabilitiesManager(ctx context.Context) *capabilitiesMana
 	}
 }
 
+// Repository returns a manager for the default Nuxeo repository.
 func (c *NuxeoClient) Repository() *repository {
 	return &repository{
 		name:   RepositoryDefault,
@@ -153,6 +164,7 @@ func (c *NuxeoClient) Repository() *repository {
 	}
 }
 
+// RepositoryWithName returns a manager for the specified Nuxeo repository.
 func (c *NuxeoClient) RepositoryWithName(name string) *repository {
 	return &repository{
 		name:   name,
@@ -160,6 +172,7 @@ func (c *NuxeoClient) RepositoryWithName(name string) *repository {
 	}
 }
 
+// OperationManager returns a manager for Nuxeo automation operations.
 func (c *NuxeoClient) OperationManager() *operationManager {
 	return &operationManager{
 		client: c,
@@ -167,6 +180,7 @@ func (c *NuxeoClient) OperationManager() *operationManager {
 	}
 }
 
+// UserManager returns a manager for Nuxeo users.
 func (c *NuxeoClient) UserManager() *userManager {
 	return &userManager{
 		client: c,
@@ -174,6 +188,7 @@ func (c *NuxeoClient) UserManager() *userManager {
 	}
 }
 
+// DirectoryManager returns a manager for Nuxeo directories.
 func (c *NuxeoClient) DirectoryManager() *directoryManager {
 	return &directoryManager{
 		client: c,
@@ -181,6 +196,7 @@ func (c *NuxeoClient) DirectoryManager() *directoryManager {
 	}
 }
 
+// TaskManager returns a manager for Nuxeo tasks.
 func (c *NuxeoClient) TaskManager() *taskManager {
 	return &taskManager{
 		client: c,
@@ -188,6 +204,7 @@ func (c *NuxeoClient) TaskManager() *taskManager {
 	}
 }
 
+// BatchUploadManager returns a manager for Nuxeo batch uploads.
 func (c *NuxeoClient) BatchUploadManager() *batchUploadManager {
 	return &batchUploadManager{
 		client: c,
@@ -195,6 +212,7 @@ func (c *NuxeoClient) BatchUploadManager() *batchUploadManager {
 	}
 }
 
+// DataModelManager returns a manager for Nuxeo data models.
 func (c *NuxeoClient) DataModelManager() *dataModelManager {
 	return &dataModelManager{
 		client: c,
@@ -206,17 +224,19 @@ func (c *NuxeoClient) DataModelManager() *dataModelManager {
 //// METHODS ////
 /////////////////
 
+// CurrentUser returns the current authenticated Nuxeo user.
 func (c *NuxeoClient) CurrentUser(ctx context.Context) (*entityUser, error) {
 	return c.UserManager().FetchCurrentUser(ctx)
 }
 
 // ServerVersion represents the Nuxeo server version.
 type ServerVersion struct {
-	Major int
-	Minor int
-	Patch int
+	Major int // Major version number
+	Minor int // Minor version number
+	Patch int // Patch version number
 }
 
+// ServerVersion returns the Nuxeo server version as a struct.
 func (c *NuxeoClient) ServerVersion(ctx context.Context) (*ServerVersion, error) {
 	version := &ServerVersion{}
 

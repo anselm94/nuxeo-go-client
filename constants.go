@@ -1,6 +1,10 @@
 package nuxeo
 
-// Pagination
+//////////////
+//// Base ////
+//////////////
+
+// Sort Orders
 
 const (
 	SortOrderAsc  = "ASC"
@@ -45,13 +49,17 @@ const (
 	EntityTypeWorkflows        = "workflows"
 )
 
-// Repository
+////////////////////
+//// Repository ////
+////////////////////
 
 const (
 	RepositoryDefault = "default"
 )
 
-// User
+//////////////
+//// User ////
+//////////////
 
 const (
 	UserPropertyFirstName = "firstName"
@@ -64,14 +72,18 @@ const (
 	UserPropertyTenantId  = "tenantId"
 )
 
-// ACL
+/////////////
+//// ACL ////
+/////////////
 
 const (
 	AclLocal   = "local"
 	AclInherit = "inherited"
 )
 
-// Document
+//////////////////
+//// Document ////
+//////////////////
 
 const (
 	DocumentStateDeleted = "deleted"
@@ -119,7 +131,9 @@ const (
 	DocumentPropertyThumbThumbnail = "thumb:thumbnail"
 )
 
-// Directory
+///////////////////
+//// Directory ////
+///////////////////
 
 const (
 	DirectoryPropertyId       = "id"
@@ -128,7 +142,9 @@ const (
 	DirectoryPropertyObsolete = "obsolete"
 )
 
-// Operations
+////////////////////
+//// Operations ////
+////////////////////
 
 const (
 	OperationBlobAttachOnDocument       = "Blob.AttachOnDocument"

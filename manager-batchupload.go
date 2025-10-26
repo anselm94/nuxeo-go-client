@@ -17,6 +17,9 @@ type batchUploadManager struct {
 	logger *slog.Logger
 }
 
+// batchUpload represents a file in a Nuxeo batch upload session.
+// It contains metadata about the file, chunking status, and upload progress.
+// See: https://doc.nuxeo.com/nxdoc/batch-upload-endpoint/
 type batchUpload struct {
 	Name             string `json:"name"`
 	BatchId          string `json:"batchId"`
@@ -63,7 +66,9 @@ func (bum *batchUploadManager) FetchBatchUpload(ctx context.Context, batchId str
 	return res.Result().(*batchUpload), nil
 }
 
-// CancelBatch drops (deletes) a batch.
+// CancelBatch deletes a batch upload session and all associated files.
+// Maps to DELETE /upload/{batchId}. Returns error if deletion fails.
+// See: https://doc.nuxeo.com/nxdoc/batch-upload-endpoint/#delete-a-batch-upload-session
 func (bum *batchUploadManager) CancelBatch(ctx context.Context, batchId string, options *nuxeoRequestOptions) error {
 	path := internal.PathApiV1 + "/upload/" + batchId
 	res, err := bum.client.NewRequest(ctx, options).SetError(&nuxeoError{}).Delete(path)
@@ -75,7 +80,9 @@ func (bum *batchUploadManager) CancelBatch(ctx context.Context, batchId string, 
 	return nil
 }
 
-// ExecuteBatchUploads executes an Automation operation using all blobs in a batch as input.
+// ExecuteBatchUploads runs a Nuxeo Automation operation using all blobs in a batch as input.
+// Maps to POST /upload/{batchId}/execute/{operationId}. The operation is applied to all files in the batch.
+// See: https://doc.nuxeo.com/nxdoc/batch-upload-endpoint/#execute-an-operation-on-batch-blobs
 func (bum *batchUploadManager) ExecuteBatchUploads(ctx context.Context, batchId string, operation operation, out any, options *nuxeoRequestOptions) (any, error) {
 	path := internal.PathApiV1 + "/upload/" + batchId + "/execute/" + operation.operationId
 	res, err := bum.client.NewRequest(ctx, options).SetBody(operation.payload()).SetResult(out).SetError(&nuxeoError{}).Post(path)
@@ -99,6 +106,8 @@ func (bum *batchUploadManager) ExecuteBatchUpload(ctx context.Context, batchId s
 	return res.Result(), nil
 }
 
+// uploadOptions specifies parameters for file uploads (normal or chunked) in a batch.
+// Includes file metadata and chunking info for multipart uploads.
 type uploadOptions struct {
 	fileName         string
 	fileSize         int64
@@ -120,7 +129,9 @@ func NewUploadOptions(fileName string, fileSize int64, fileType string) *uploadO
 	}
 }
 
-// NewChunkUploadOptions creates upload options for chunked uploads.
+// NewChunkUploadOptions creates uploadOptions for a chunked (multipart) file upload.
+// Sets file name, size, MIME type, chunk index, and total chunk count headers for the upload request.
+// See: https://doc.nuxeo.com/nxdoc/batch-upload-endpoint/#upload-a-file-in-chunks
 //
 // fileName: Name of the file being uploaded with extension. (E.g., "document.pdf")
 // fileSize: Total size of the file being uploaded in bytes.

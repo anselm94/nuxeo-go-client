@@ -2,7 +2,16 @@ package nuxeo
 
 import "io"
 
-// Blob represents a binary object in Nuxeo.
+// Blob represents a binary object in Nuxeo, typically used for file uploads and document properties.
+// Fields map to Nuxeo's Blob JSON structure.
+//
+// - Filename: Name of the file
+// - MimeType: MIME type of the file
+// - Length: Size of the file in bytes
+// - Stream: File data as io.ReadCloser (not serialized)
+// - Encoding, DigestAlgorithm, Digest, Data, BlobUrl: Only present when Blob is a document property
+//
+// Used for uploading files, retrieving blobs from documents, and batch upload operations.
 type Blob struct {
 	Filename string        `json:"name"`
 	MimeType string        `json:"mime-type"`
@@ -21,4 +30,5 @@ type Blob struct {
 	BlobUrl string `json:"blobUrl"`
 }
 
+// Blobs is a slice of Blob objects, used for representing multiple blobs in Nuxeo responses.
 type Blobs entities[Blob]

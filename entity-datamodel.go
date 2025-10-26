@@ -5,6 +5,13 @@ import (
 	"strings"
 )
 
+// entitySchema represents a Nuxeo schema entity as returned by the Data Model API.
+// See: https://doc.nuxeo.com/rest-api/1/data-model-endpoint/#get-a-schema
+// Fields:
+//   - Name: schema name
+//   - Prefix: schema prefix (for property names)
+//   - PrefixAliased: alternative prefix field (from Nuxeo API)
+//   - Fields: map of field names to schema field definitions
 type entitySchema struct {
 	entity
 	Name          string                       `json:"name"`
@@ -20,6 +27,10 @@ func (s entitySchema) GetPrefix() string {
 	return s.PrefixAliased
 }
 
+// entitySchemaField describes a field in a Nuxeo schema.
+// DataType: type of the field (e.g. string, boolean, date, blob, complex)
+// IsArray: true if the field is an array
+// Fields: for complex types, nested fields
 type entitySchemaField struct {
 	DataType string
 	IsArray  bool
@@ -80,16 +91,30 @@ func (sf *entitySchemaField) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// entitySchemas is a slice of entitySchema, representing a collection of schemas.
 type entitySchemas []entitySchema
 
+// entityFacet represents a Nuxeo facet entity as returned by the Data Model API.
+// See: https://doc.nuxeo.com/rest-api/1/data-model-endpoint/#get-a-facet
+// Fields:
+//   - Name: facet name
+//   - Schemas: schemas associated with the facet
 type entityFacet struct {
 	entity
 	Name    string         `json:"name,omitempty"`
 	Schemas []entitySchema `json:"schemas"`
 }
 
+// entityFacets is a slice of entityFacet, representing a collection of facets.
 type entityFacets []entityFacet
 
+// entityDocType represents a Nuxeo document type entity as returned by the Data Model API.
+// See: https://doc.nuxeo.com/rest-api/1/data-model-endpoint/#get-a-document-type
+// Fields:
+//   - Name: document type name
+//   - Parent: parent document type
+//   - Facets: list of facet names
+//   - Schemas: schemas associated with the document type
 type entityDocType struct {
 	entity
 	Name    string         `json:"name,omitempty"`
@@ -98,6 +123,9 @@ type entityDocType struct {
 	Schemas []entitySchema `json:"schemas"` // can be []string or "Schema" based on get all doc types vs get single doc type
 }
 
+// entityDocTypes represents the response from GET /config/types.
+// Contains all document types and their associated schemas.
+// See: https://doc.nuxeo.com/rest-api/1/data-model-endpoint/#get-all-document-types
 type entityDocTypes struct {
 	DocTypes map[string]entityDocType `json:"docTypes"`
 	Schemas  map[string]entitySchema  `json:"schemas"`

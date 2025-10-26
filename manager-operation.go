@@ -12,12 +12,20 @@ import (
 	"github.com/anselm94/nuxeo-go-client/internal"
 )
 
+// operationManager provides methods to execute Nuxeo Automation operations via the REST API.
+//
+// See: https://doc.nuxeo.com/rest-api/1/automation-endpoint/
 type operationManager struct {
 	client *NuxeoClient
 	logger *slog.Logger
 }
 
-// ExecuteInto executes the operation and decodes the response into out.
+// ExecuteInto executes a Nuxeo Automation operation and decodes the response into the provided output variable.
+//
+// The operation is executed via the REST endpoint `/site/automation/{operationId}`.
+// If the operation returns a JSON response, it is decoded into 'out'.
+// For blob responses, use Execute and handle the stream directly.
+// See: https://doc.nuxeo.com/rest-api/1/automation-endpoint/#operation-execution-response
 func (o *operationManager) ExecuteInto(ctx context.Context, operation operation, out any, requestOptions *nuxeoRequestOptions) error {
 	res, err := o.Execute(ctx, operation, requestOptions)
 	if err != nil {
@@ -28,7 +36,12 @@ func (o *operationManager) ExecuteInto(ctx context.Context, operation operation,
 	return json.NewDecoder(res).Decode(out)
 }
 
-// Execute runs the operation using the client.
+// Execute runs a Nuxeo Automation operation and returns the raw response stream.
+//
+// The operation is executed via the REST endpoint `/site/automation/{operationId}`.
+// If the operation includes blobs, the request is sent as multipart/related; otherwise, as JSON.
+// Caller is responsible for closing the returned stream.
+// See: https://doc.nuxeo.com/rest-api/1/automation-endpoint/#executing-operations
 func (o *operationManager) Execute(ctx context.Context, operation operation, requestOptions *nuxeoRequestOptions) (io.ReadCloser, error) {
 	// decide execution method based on presence of blobs
 	if len(operation.blobs()) > 0 {
@@ -38,6 +51,10 @@ func (o *operationManager) Execute(ctx context.Context, operation operation, req
 	}
 }
 
+// executeViaJson sends the operation request as JSON to the Automation endpoint.
+//
+// Used when the operation does not include blob input. Handles void operations and error responses.
+// See: https://doc.nuxeo.com/rest-api/1/automation-endpoint/#executing-operations
 func (o *operationManager) executeViaJson(ctx context.Context, operation operation, requestOptions *nuxeoRequestOptions) (io.ReadCloser, error) {
 	request := o.client.NewRequest(ctx, requestOptions)
 	request.SetDoNotParseResponse(true)
@@ -60,6 +77,10 @@ func (o *operationManager) executeViaJson(ctx context.Context, operation operati
 	return res.Body, err
 }
 
+// executeViaMultipart sends the operation request as multipart/related to the Automation endpoint.
+//
+// Used when the operation includes blob input. The JSON payload is sent as the first part, followed by each blob.
+// See: https://doc.nuxeo.com/rest-api/1/automation-endpoint/#taking-a-blob-as-input
 func (o *operationManager) executeViaMultipart(ctx context.Context, operation operation, requestOptions *nuxeoRequestOptions) (io.ReadCloser, error) {
 	request := o.client.NewRequest(ctx, requestOptions)
 	request.SetDoNotParseResponse(true)
@@ -92,6 +113,10 @@ func (o *operationManager) executeViaMultipart(ctx context.Context, operation op
 	return res.Body, nil
 }
 
+// FetchOperation retrieves the description of an Automation operation from the server.
+//
+// This performs a GET request to `/site/automation/{operationId}` and returns the operation metadata.
+// See: https://doc.nuxeo.com/rest-api/1/automation-endpoint/#getting-the-automation-service
 func (o *operationManager) FetchOperation(ctx context.Context, operationId string) (*operationPayload, error) {
 	return nil, nil
 }

@@ -1,5 +1,7 @@
 package nuxeo
 
+// entityDirectory represents a Nuxeo Directory entity.
+// See: https://doc.nuxeo.com/rest-api/1/directory-entity-type/
 type entityDirectory struct {
 	entity
 	Name    string `json:"name"`
@@ -8,8 +10,12 @@ type entityDirectory struct {
 	Parent  string `json:"parent"`
 }
 
+// entityDirectories is a collection of Directory entities returned by GET /directory.
+// See: https://doc.nuxeo.com/rest-api/1/directory-endpoint/
 type entityDirectories entities[entityDirectory]
 
+// entityDirectoryEntry represents a Nuxeo Directory Entry entity.
+// See: https://doc.nuxeo.com/rest-api/1/directory-entry-entity-type/
 type entityDirectoryEntry struct {
 	entity
 	DirectoryName string           `json:"directoryName"`
@@ -17,6 +23,8 @@ type entityDirectoryEntry struct {
 	Properties    map[string]Field `json:"properties"`
 }
 
+// NewDirectoryEntry creates a new Directory Entry with the given id.
+// The Properties map is initialized empty.
 func NewDirectoryEntry(id string) entityDirectoryEntry {
 	return entityDirectoryEntry{
 		ID:         id,
@@ -24,6 +32,7 @@ func NewDirectoryEntry(id string) entityDirectoryEntry {
 	}
 }
 
+// Id returns the entry's id, falling back to the 'id' property if not set.
 func (d *entityDirectoryEntry) Id() string {
 	if d.ID != "" {
 		return d.ID
@@ -36,6 +45,7 @@ func (d *entityDirectoryEntry) Id() string {
 	return ""
 }
 
+// Label returns the entry's label property, if present.
 func (d entityDirectoryEntry) Label() string {
 	if val, ok := d.Properties[DirectoryPropertyLabel]; ok {
 		if labelStr, err := val.String(); err == nil && labelStr != nil {
@@ -45,6 +55,7 @@ func (d entityDirectoryEntry) Label() string {
 	return ""
 }
 
+// Ordering returns the entry's ordering property, if present.
 func (d entityDirectoryEntry) Ordering() float64 {
 	if val, ok := d.Properties[DirectoryPropertyOrdering]; ok {
 		if orderingFloat, err := val.Float(); err == nil && orderingFloat != nil {
@@ -54,6 +65,7 @@ func (d entityDirectoryEntry) Ordering() float64 {
 	return 0
 }
 
+// Obsolete returns the entry's obsolete property, if present.
 func (d entityDirectoryEntry) Obsolete() float64 {
 	if val, ok := d.Properties[DirectoryPropertyObsolete]; ok {
 		if obsoleteFloat, err := val.Float(); err == nil && obsoleteFloat != nil {
@@ -63,13 +75,17 @@ func (d entityDirectoryEntry) Obsolete() float64 {
 	return 0
 }
 
+// Property returns the value of the given property key for the entry.
 func (d entityDirectoryEntry) Property(key string) Field {
 	return d.Properties[key]
 }
 
+// SetProperty sets the value of the given property key for the entry.
 func (d *entityDirectoryEntry) SetProperty(key string, value any) {
 	fieldVal, _ := NewField(value)
 	d.Properties[key] = fieldVal
 }
 
+// entityDirectoryEntries is a collection of Directory Entry entities returned by GET /directory/{directoryName}.
+// See: https://doc.nuxeo.com/rest-api/1/directory-endpoint/
 type entityDirectoryEntries entities[entityDirectoryEntry]

@@ -1,6 +1,11 @@
 package nuxeo
 
-// entityWorkflow represents a Nuxeo workflow.
+// entityWorkflow represents a Nuxeo workflow instance or model.
+//
+// A workflow tracks the state, initiator, attached documents, variables, and graph for a business process.
+// See: https://doc.nuxeo.com/rest-api/1/workflow-entity-type/
+// entityWorkflow models the REST API 'workflow' entity-type.
+// Fields map directly to Nuxeo's JSON representation.
 type entityWorkflow struct {
 	entity
 	Id                  string           `json:"id"`
@@ -14,6 +19,7 @@ type entityWorkflow struct {
 	GraphResource       string           `json:"graphResource"`
 }
 
+// NewWorkflow creates a new entityWorkflow with the given ID and sets the EntityType to 'workflow'.
 func NewWorkflow(id string) *entityWorkflow {
 	return &entityWorkflow{
 		entity: entity{
@@ -23,8 +29,10 @@ func NewWorkflow(id string) *entityWorkflow {
 	}
 }
 
+// entityWorkflows is a slice wrapper for multiple entityWorkflow objects, as returned by Nuxeo workflow queries.
 type entityWorkflows entities[entityWorkflow]
 
+// entityWorkflowGraph represents the graph structure of a workflow instance or model, including nodes and transitions.
 type entityWorkflowGraph struct {
 	entity
 	Nodes       map[string]Field `json:"nodes"`

@@ -8,6 +8,9 @@ import (
 	"github.com/anselm94/nuxeo-go-client/internal"
 )
 
+// taskManager provides methods to interact with Nuxeo workflow tasks via the REST API.
+//
+// Supports querying, fetching, reassigning, delegating, and completing tasks.
 type taskManager struct {
 	// internal
 
@@ -15,6 +18,9 @@ type taskManager struct {
 	logger *slog.Logger
 }
 
+// FetchTasks queries workflow tasks for a user, workflow instance, or workflow model.
+//
+// Returns all matching tasks. See https://doc.nuxeo.com/nxdoc/workflow-task-endpoints/#task
 func (t *taskManager) FetchTasks(ctx context.Context, userId, workflowInstanceId, workflowModelName string, options *nuxeoRequestOptions) (*entityTasks, error) {
 	path := internal.PathApiV1 + "/task"
 	params := url.Values{}
@@ -40,6 +46,9 @@ func (t *taskManager) FetchTasks(ctx context.Context, userId, workflowInstanceId
 	return res.Result().(*entityTasks), nil
 }
 
+// FetchTask retrieves a workflow task by its ID.
+//
+// Returns the task if found. See https://doc.nuxeo.com/nxdoc/workflow-task-endpoints/#task
 func (t *taskManager) FetchTask(ctx context.Context, taskId string, options *nuxeoRequestOptions) (*entityTask, error) {
 	path := internal.PathApiV1 + "/task/" + url.PathEscape(taskId)
 	res, err := t.client.NewRequest(ctx, options).SetResult(&entityTask{}).SetError(&nuxeoError{}).Get(path)
@@ -51,6 +60,9 @@ func (t *taskManager) FetchTask(ctx context.Context, taskId string, options *nux
 	return res.Result().(*entityTask), nil
 }
 
+// ReassignTask reassigns a workflow task to new actors, optionally with a comment.
+//
+// Returns the updated task. See https://doc.nuxeo.com/nxdoc/workflow-task-endpoints/#task
 func (t *taskManager) ReassignTask(ctx context.Context, taskId string, actors string, comment string, options *nuxeoRequestOptions) (*entityTask, error) {
 	path := internal.PathApiV1 + "/task/" + url.PathEscape(taskId) + "/reassign"
 	params := url.Values{}
@@ -73,6 +85,9 @@ func (t *taskManager) ReassignTask(ctx context.Context, taskId string, actors st
 	return res.Result().(*entityTask), nil
 }
 
+// DelegateTask delegates a workflow task to other actors, optionally with a comment.
+//
+// Returns the updated task. See https://doc.nuxeo.com/nxdoc/workflow-task-endpoints/#task
 func (t *taskManager) DelegateTask(ctx context.Context, taskId string, actors string, comment string, options *nuxeoRequestOptions) (*entityTask, error) {
 	path := internal.PathApiV1 + "/task/" + url.PathEscape(taskId) + "/delegate"
 	params := url.Values{}
@@ -95,12 +110,16 @@ func (t *taskManager) DelegateTask(ctx context.Context, taskId string, actors st
 	return res.Result().(*entityTask), nil
 }
 
+// TaskCompletionRequest represents the payload to complete a workflow task, including variables and comments.
 type TaskCompletionRequest struct {
 	Id        string           `json:"id"`
 	Comment   string           `json:"comment,omitempty"`
 	Variables map[string]Field `json:"variables,omitempty"`
 }
 
+// CompleteTask completes a workflow task with the specified action and payload.
+//
+// Returns the updated task. See https://doc.nuxeo.com/nxdoc/workflow-task-endpoints/#task
 func (t *taskManager) CompleteTask(ctx context.Context, taskId string, action string, request TaskCompletionRequest, options *nuxeoRequestOptions) (*entityTask, error) {
 	path := internal.PathApiV1 + "/task/" + url.PathEscape(taskId) + "/" + url.PathEscape(action)
 	res, err := t.client.NewRequest(ctx, options).SetBody(request).SetResult(&entityTask{}).SetError(&nuxeoError{}).Put(path)

@@ -4,7 +4,8 @@ import (
 	"slices"
 )
 
-// entityDocument represents a Nuxeo document entity.
+// EntityDocument represents a Nuxeo document entity, including metadata, properties, facets, and file content.
+// It maps to the Nuxeo REST API document model.
 type entityDocument struct {
 	entity
 	Repository                  string           `json:"repository"`
@@ -34,6 +35,8 @@ type entityDocument struct {
 	Facets                      []string         `json:"facets"`
 }
 
+// NewDocument creates a new EntityDocument with the specified type and name.
+// Sets EntityType to "document" and initializes properties.
 func NewDocument(documentType string, name string) *entityDocument {
 	return &entityDocument{
 		entity: entity{
@@ -45,31 +48,38 @@ func NewDocument(documentType string, name string) *entityDocument {
 	}
 }
 
+// HasFacet returns true if the document has the specified facet.
 func (d *entityDocument) HasFacet(facet string) bool {
 	return slices.Contains(d.Facets, facet)
 }
 
+// IsFolder returns true if the document is folderish (can contain children).
 func (d *entityDocument) IsFolder() bool {
 	return d.HasFacet("Folderish")
 }
 
+// IsCollection returns true if the document is a collection.
 func (d *entityDocument) IsCollection() bool {
 	return d.HasFacet("Collection")
 }
 
+// IsCollectable returns true if the document can be collected (not a collection member).
 func (d *entityDocument) IsCollectable() bool {
 	return d.HasFacet("NotCollectionMember")
 }
 
+// Property returns the value of the specified property key.
 func (d *entityDocument) Property(key string) Field {
 	return d.Properties[key]
 }
 
+// SetProperty sets the value of the specified property key.
 func (d *entityDocument) SetProperty(key string, value any) {
 	fieldVal, _ := NewField(value)
 	d.Properties[key] = fieldVal
 }
 
+// FileContent returns the main file Blob of the document, if present.
 func (d *entityDocument) FileContent() *Blob {
 	if fieldBlob, ok := d.Properties[DocumentPropertyFileContent]; ok {
 		var blob Blob
@@ -80,6 +90,7 @@ func (d *entityDocument) FileContent() *Blob {
 	return nil
 }
 
+// Thumbnail returns the thumbnail Blob of the document, if present.
 func (d *entityDocument) Thumbnail() *Blob {
 	if fieldBlob, ok := d.Properties[DocumentPropertyThumbThumbnail]; ok {
 		var blob Blob
@@ -90,4 +101,5 @@ func (d *entityDocument) Thumbnail() *Blob {
 	return nil
 }
 
+// EntityDocuments is a paginated collection of EntityDocument objects.
 type entityDocuments paginableEntities[entityDocument]
