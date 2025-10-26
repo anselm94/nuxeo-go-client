@@ -18,7 +18,7 @@ type operationManager struct {
 }
 
 // ExecuteInto executes the operation and decodes the response into out.
-func (o *operationManager) ExecuteInto(ctx context.Context, operation operation, requestOptions *nuxeoRequestOptions, out any) error {
+func (o *operationManager) ExecuteInto(ctx context.Context, operation operation, out any, requestOptions *nuxeoRequestOptions) error {
 	res, err := o.Execute(ctx, operation, requestOptions)
 	if err != nil {
 		return err

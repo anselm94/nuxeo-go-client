@@ -76,9 +76,9 @@ func (bum *batchUploadManager) CancelBatch(ctx context.Context, batchId string, 
 }
 
 // ExecuteBatchUploads executes an Automation operation using all blobs in a batch as input.
-func (bum *batchUploadManager) ExecuteBatchUploads(ctx context.Context, batchId string, operation operation, options *nuxeoRequestOptions) (any, error) {
+func (bum *batchUploadManager) ExecuteBatchUploads(ctx context.Context, batchId string, operation operation, out any, options *nuxeoRequestOptions) (any, error) {
 	path := internal.PathApiV1 + "/upload/" + batchId + "/execute/" + operation.operationId
-	res, err := bum.client.NewRequest(ctx, options).SetBody(operation.payload()).SetError(&nuxeoError{}).Post(path)
+	res, err := bum.client.NewRequest(ctx, options).SetBody(operation.payload()).SetResult(out).SetError(&nuxeoError{}).Post(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		bum.logger.Error("Failed to execute batch uploads", "error", err, "status", res.StatusCode())
@@ -88,9 +88,9 @@ func (bum *batchUploadManager) ExecuteBatchUploads(ctx context.Context, batchId 
 }
 
 // ExecuteBatchUpload executes an Automation operation using a specific file in a batch as input.
-func (bum *batchUploadManager) ExecuteBatchUpload(ctx context.Context, batchId string, fileIdx string, operation operation, options *nuxeoRequestOptions) (any, error) {
+func (bum *batchUploadManager) ExecuteBatchUpload(ctx context.Context, batchId string, fileIdx string, operation operation, out any, options *nuxeoRequestOptions) (any, error) {
 	path := internal.PathApiV1 + "/upload/" + batchId + "/" + fileIdx + "/execute/" + operation.operationId
-	res, err := bum.client.NewRequest(ctx, options).SetBody(operation.payload()).SetError(&nuxeoError{}).Post(path)
+	res, err := bum.client.NewRequest(ctx, options).SetBody(operation.payload()).SetResult(out).SetError(&nuxeoError{}).Post(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		bum.logger.Error("Failed to execute batch upload", "error", err, "status", res.StatusCode())

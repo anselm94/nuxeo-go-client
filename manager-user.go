@@ -209,7 +209,7 @@ func (um *userManager) FetchCurrentUser(ctx context.Context) (*entityUser, error
 	}{}
 
 	operationLogin := NewOperation("login")
-	if err := um.client.OperationManager().ExecuteInto(ctx, *operationLogin, nil, loginInfo); err != nil {
+	if err := um.client.OperationManager().ExecuteInto(ctx, *operationLogin, loginInfo, nil); err != nil {
 		um.logger.Error("Failed to fetch current user login info", slog.String("error", err.Error()))
 		return nil, err
 	}

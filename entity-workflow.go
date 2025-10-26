@@ -10,7 +10,7 @@ type entityWorkflow struct {
 	WorkflowModelName   string           `json:"workflowModelName"`
 	Initiator           entityUser       `json:"initiator"`           // TODO: JSON unmarshal string to user
 	AttachedDocumentIds []entityDocument `json:"attachedDocumentIds"` // TODO: JSON unmarshal string to document
-	Variables           map[string]any   `json:"variables"`
+	Variables           map[string]Field `json:"variables"`
 	GraphResource       string           `json:"graphResource"`
 }
 
@@ -27,6 +27,6 @@ type entityWorkflows entities[entityWorkflow]
 
 type entityWorkflowGraph struct {
 	entity
-	Nodes       map[string]any `json:"nodes"`
-	Transitions map[string]any `json:"transitions"`
+	Nodes       map[string]Field `json:"nodes"`
+	Transitions map[string]Field `json:"transitions"`
 }

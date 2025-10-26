@@ -32,9 +32,9 @@ func MergeUrlValues(paramA, paramB url.Values) url.Values {
 	return merged
 }
 
-func GetStreamContentLengthFrom(res *resty.Response) int64 {
+func GetStreamContentLengthFrom(res *resty.Response) int {
 	contentLength := res.Header().Get(HeaderContentLength)
-	if valContentLength, err := strconv.ParseInt(contentLength, 10, 64); err == nil {
+	if valContentLength, err := strconv.Atoi(contentLength); err == nil {
 		return valContentLength
 	}
 	return -1

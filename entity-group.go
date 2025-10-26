@@ -3,11 +3,11 @@ package nuxeo
 // entityGroup represents a Nuxeo group.
 type entityGroup struct {
 	entity
-	Id           string         `json:"id"`
-	Properties   map[string]any `json:"properties"`
-	MemberUsers  []string       `json:"memberUsers"`
-	MemberGroups []string       `json:"memberGroups"`
-	ParentGroups []string       `json:"parentGroups"`
+	Id           string           `json:"id"`
+	Properties   map[string]Field `json:"properties"`
+	MemberUsers  []string         `json:"memberUsers"`
+	MemberGroups []string         `json:"memberGroups"`
+	ParentGroups []string         `json:"parentGroups"`
 }
 
 func NewGroup(groupId string) *entityGroup {

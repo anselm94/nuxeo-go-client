@@ -96,9 +96,9 @@ func (t *taskManager) DelegateTask(ctx context.Context, taskId string, actors st
 }
 
 type TaskCompletionRequest struct {
-	Id        string         `json:"id"`
-	Comment   string         `json:"comment,omitempty"`
-	Variables map[string]any `json:"variables,omitempty"`
+	Id        string           `json:"id"`
+	Comment   string           `json:"comment,omitempty"`
+	Variables map[string]Field `json:"variables,omitempty"`
 }
 
 func (t *taskManager) CompleteTask(ctx context.Context, taskId string, action string, request TaskCompletionRequest, options *nuxeoRequestOptions) (*entityTask, error) {

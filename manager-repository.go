@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 	"net/url"
+	"strconv"
 
 	"github.com/anselm94/nuxeo-go-client/internal"
 )
@@ -247,7 +248,7 @@ func (r *repository) StreamBlobByPath(ctx context.Context, documentPath string, 
 		Filename: internal.GetStreamFilenameFrom(res),
 		MimeType: internal.GetStreamContentTypeFrom(res),
 		Stream:   res.Body,
-		Length:   internal.GetStreamContentLengthFrom(res),
+		Length:   strconv.Itoa(internal.GetStreamContentLengthFrom(res)),
 	}, nil
 }
 
@@ -263,7 +264,7 @@ func (r *repository) StreamBlobById(ctx context.Context, documentId string, blob
 		Filename: internal.GetStreamFilenameFrom(res),
 		MimeType: internal.GetStreamContentTypeFrom(res),
 		Stream:   res.Body,
-		Length:   internal.GetStreamContentLengthFrom(res),
+		Length:   strconv.Itoa(internal.GetStreamContentLengthFrom(res)),
 	}, nil
 }
 
@@ -387,6 +388,7 @@ func (r *repository) FetchWorkflowModels(ctx context.Context, options *nuxeoRequ
 
 func (r *repository) CreateForAdapter(ctx context.Context, documentId string, adapter string, pathSuffix string, queryParams []string, payload any, options *nuxeoRequestOptions) (*http.Response, error) {
 	path := internal.PathApiV1 + "/repo/" + url.PathEscape(r.name) + "/id/" + url.PathEscape(documentId) + "/@" + url.PathEscape(adapter) + "/" + pathSuffix
+
 	params := url.Values{}
 	for _, qp := range queryParams {
 		params.Add("queryParams", qp)
@@ -395,8 +397,7 @@ func (r *repository) CreateForAdapter(ctx context.Context, documentId string, ad
 		path += "?" + params.Encode()
 	}
 
-	var result any
-	res, err := r.client.NewRequest(ctx, options).SetBody(payload).SetResult(&result).SetError(&nuxeoError{}).Post(path)
+	res, err := r.client.NewRequest(ctx, options).SetBody(payload).SetError(&nuxeoError{}).Post(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to create for adapter", slog.String("error", err.Error()))
@@ -407,6 +408,7 @@ func (r *repository) CreateForAdapter(ctx context.Context, documentId string, ad
 
 func (r *repository) FetchForAdapter(ctx context.Context, documentId string, adapter string, pathSuffix string, queryParams []string, options *nuxeoRequestOptions) (*http.Response, error) {
 	path := internal.PathApiV1 + "/repo/" + url.PathEscape(r.name) + "/id/" + url.PathEscape(documentId) + "/@" + url.PathEscape(adapter) + "/" + pathSuffix
+
 	params := url.Values{}
 	for _, qp := range queryParams {
 		params.Add("queryParams", qp)
@@ -415,8 +417,7 @@ func (r *repository) FetchForAdapter(ctx context.Context, documentId string, ada
 		path += "?" + params.Encode()
 	}
 
-	var result any
-	res, err := r.client.NewRequest(ctx, options).SetResult(&result).SetError(&nuxeoError{}).Get(path)
+	res, err := r.client.NewRequest(ctx, options).SetError(&nuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to fetch for adapter", slog.String("error", err.Error()))
@@ -427,6 +428,7 @@ func (r *repository) FetchForAdapter(ctx context.Context, documentId string, ada
 
 func (r *repository) UpdateForAdapter(ctx context.Context, documentId string, adapter string, pathSuffix string, queryParams []string, payload any, options *nuxeoRequestOptions) (*http.Response, error) {
 	path := internal.PathApiV1 + "/repo/" + url.PathEscape(r.name) + "/id/" + url.PathEscape(documentId) + "/@" + url.PathEscape(adapter) + "/" + pathSuffix
+
 	params := url.Values{}
 	for _, qp := range queryParams {
 		params.Add("queryParams", qp)
@@ -435,8 +437,7 @@ func (r *repository) UpdateForAdapter(ctx context.Context, documentId string, ad
 		path += "?" + params.Encode()
 	}
 
-	var result any
-	res, err := r.client.NewRequest(ctx, options).SetBody(payload).SetResult(&result).SetError(&nuxeoError{}).Put(path)
+	res, err := r.client.NewRequest(ctx, options).SetBody(payload).SetError(&nuxeoError{}).Put(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		r.logger.Error("Failed to update for adapter", slog.String("error", err.Error()))
@@ -447,6 +448,7 @@ func (r *repository) UpdateForAdapter(ctx context.Context, documentId string, ad
 
 func (r *repository) DeleteForAdapter(ctx context.Context, documentId string, adapter string, pathSuffix string, queryParams []string) (*http.Response, error) {
 	path := internal.PathApiV1 + "/repo/" + url.PathEscape(r.name) + "/id/" + url.PathEscape(documentId) + "/@" + url.PathEscape(adapter) + "/" + pathSuffix
+
 	params := url.Values{}
 	for _, qp := range queryParams {
 		params.Add("queryParams", qp)

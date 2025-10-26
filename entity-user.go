@@ -1,5 +1,7 @@
 package nuxeo
 
+import "encoding/json"
+
 type entityExtendedGroup struct {
 	Name  string `json:"name"`
 	Label string `json:"label"`
@@ -12,13 +14,16 @@ type entityUser struct {
 	Id              string                `json:"id"`
 	IsAdministrator bool                  `json:"isAdministrator"`
 	IsAnonymous     bool                  `json:"isAnonymous"`
-	Properties      map[string]any        `json:"properties"`
+	Properties      map[string]Field      `json:"properties"`
 	ExtendedGroups  []entityExtendedGroup `json:"extendedGroups,omitempty"`
 }
 
 func NewUser(username string) *entityUser {
-	properties := make(map[string]any)
-	properties[UserPropertyUsername] = username // Set username by default
+	properties := make(map[string]Field)
+	// Set username property
+	if fieldUsername, err := NewField(username); err == nil {
+		properties[UserPropertyUsername] = fieldUsername
+	}
 	return &entityUser{
 		entity: entity{
 			EntityType: EntityTypeUser,
@@ -36,51 +41,69 @@ func (u *entityUser) IdOrUsername() string {
 }
 
 func (u *entityUser) Username() string {
-	return u.Properties[UserPropertyUsername].(string)
+	if val, err := u.Properties[UserPropertyUsername].String(); err == nil && val != nil {
+		return *val
+	}
+	return ""
 }
 
 func (u *entityUser) Password() string {
-	return u.Properties[UserPropertyPassword].(string)
+	if val, err := u.Properties[UserPropertyPassword].String(); err == nil && val != nil {
+		return *val
+	}
+	return ""
 }
 
 func (u *entityUser) FirstName() string {
-	return u.Properties[UserPropertyFirstName].(string)
+	if val, err := u.Properties[UserPropertyFirstName].String(); err == nil && val != nil {
+		return *val
+	}
+	return ""
 }
 
 func (u *entityUser) LastName() string {
-	return u.Properties[UserPropertyLastName].(string)
+	if val, err := u.Properties[UserPropertyLastName].String(); err == nil && val != nil {
+		return *val
+	}
+	return ""
 }
 
 func (u *entityUser) Email() string {
-	return u.Properties[UserPropertyEmail].(string)
+	if val, err := u.Properties[UserPropertyEmail].String(); err == nil && val != nil {
+		return *val
+	}
+	return ""
 }
 
 func (u *entityUser) Groups() []string {
-	groups, ok := u.Properties[UserPropertyGroups].([]any)
-	if !ok {
-		return []string{}
+	if val, err := u.Properties[UserPropertyGroups].StringList(); err == nil {
+		return val
 	}
-	result := make([]string, len(groups))
-	for i, g := range groups {
-		result[i] = g.(string)
-	}
-	return result
+	return nil
 }
 
 func (u *entityUser) Company() string {
-	return u.Properties[UserPropertyCompany].(string)
+	if val, err := u.Properties[UserPropertyCompany].String(); err == nil && val != nil {
+		return *val
+	}
+	return ""
 }
 
 func (u *entityUser) TenantId() string {
-	return u.Properties[UserPropertyTenantId].(string)
+	if val, err := u.Properties[UserPropertyTenantId].String(); err == nil && val != nil {
+		return *val
+	}
+	return ""
 }
 
-func (u *entityUser) Property(key string) any {
+func (u *entityUser) Property(key string) Field {
 	return u.Properties[key]
 }
 
 func (u *entityUser) SetProperty(key string, value any) {
-	u.Properties[key] = value
+	if fieldValue, err := json.Marshal(value); err == nil {
+		u.Properties[key] = fieldValue
+	}
 }
 
 type entityUsers paginableEntities[entityUser]
