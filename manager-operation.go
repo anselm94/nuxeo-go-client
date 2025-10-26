@@ -56,18 +56,18 @@ func (o *operationManager) Execute(ctx context.Context, operation operation, req
 // Used when the operation does not include blob input. Handles void operations and error responses.
 // See: https://doc.nuxeo.com/rest-api/1/automation-endpoint/#executing-operations
 func (o *operationManager) executeViaJson(ctx context.Context, operation operation, requestOptions *nuxeoRequestOptions) (io.ReadCloser, error) {
-	request := o.client.NewRequest(ctx, requestOptions)
+	path := "/site/automation/" + url.PathEscape(operation.operationId)
+
+	request := o.client.NewRequest(ctx, requestOptions).SetError(&nuxeoError{})
 	request.SetDoNotParseResponse(true)
+	request.SetBody(operation.payload())
 
 	if operation.isVoid {
 		request.SetHeader(internal.HeaderXVoidOperation, "true")
 	}
 
-	request.SetBody(operation.payload())
-
-	path := "/site/automation/" + url.PathEscape(operation.operationId)
 	res, err := request.Post(path)
-	if err != nil || res.StatusCode() != 200 {
+	if err := handleNuxeoError(err, res); err != nil {
 		o.logger.Error("Failed to execute operation", "error", err, "status", res.StatusCode())
 		return nil, fmt.Errorf("failed to execute operation: %d %w", res.StatusCode(), err)
 	} else if res.StatusCode() == 204 {
@@ -82,28 +82,41 @@ func (o *operationManager) executeViaJson(ctx context.Context, operation operati
 // Used when the operation includes blob input. The JSON payload is sent as the first part, followed by each blob.
 // See: https://doc.nuxeo.com/rest-api/1/automation-endpoint/#taking-a-blob-as-input
 func (o *operationManager) executeViaMultipart(ctx context.Context, operation operation, requestOptions *nuxeoRequestOptions) (io.ReadCloser, error) {
-	request := o.client.NewRequest(ctx, requestOptions)
+	path := "/site/automation/" + url.PathEscape(operation.operationId)
+
+	request := o.client.NewRequest(ctx, requestOptions).SetError(&nuxeoError{})
 	request.SetDoNotParseResponse(true)
+	request.SetHeader("Accept", "application/json, */*")
 
 	if operation.isVoid {
 		request.SetHeader(internal.HeaderXVoidOperation, "true")
 	}
 
-	request.SetContentType("multipart/related")
+	// request.SetContentType("multipart/related")
 
-	// add json payload as `application/json+nxrequest` part
+	// add json payload as `application/json` part
 	payloadBytes, _ := json.Marshal(operation.payload())
-	request.SetMultipartField("root", "", "application/json+nxrequest", bytes.NewReader(payloadBytes))
+	request.SetMultipartField("request", "", "application/json", bytes.NewReader(payloadBytes))
 
-	// add input documents one by one
-	for i, blob := range operation.blobs() {
-		fieldName := fmt.Sprintf("input-%d", i+1)
-		request.SetMultipartField(fieldName, fmt.Sprintf("blob%d", i+1), "application/octet-stream", blob.Stream)
+	// add blobs as subsequent parts
+	switch len(operation.blobs()) {
+	case 0:
+		return nil, fmt.Errorf("no blobs to send in multipart request")
+	case 1:
+		// single blob input
+		blob := operation.blobs()[0]
+		request.SetMultipartField("input", blob.Filename, blob.MimeType, blob.Stream)
+	default:
+		// multiple blob inputs
+		for i, blob := range operation.blobs() {
+			fieldName := fmt.Sprintf("input-%d", i+1)
+			request.SetMultipartField(fieldName, blob.Filename, blob.MimeType, blob.Stream)
+		}
 	}
 
-	path := "/site/automation/" + url.PathEscape(operation.operationId)
 	res, err := request.Post(path)
-	if err != nil || res.StatusCode() != 200 {
+
+	if err := handleNuxeoError(err, res); err != nil {
 		o.logger.Error("Failed to execute operation with blobs", "error", err, "status", res.StatusCode())
 		return nil, fmt.Errorf("failed to execute operation with blobs: %d %w", res.StatusCode(), err)
 	} else if res.StatusCode() == 204 {

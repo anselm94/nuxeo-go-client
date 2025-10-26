@@ -1,34 +1,47 @@
 package nuxeo
 
-import "io"
+import (
+	"io"
+	"strconv"
+)
 
-// Blob represents a binary object in Nuxeo, typically used for file uploads and document properties.
-// Fields map to Nuxeo's Blob JSON structure.
+// blob represents a binary object in Nuxeo, typically used for file uploads and document properties.
+// Fields map to Nuxeo's blob JSON structure.
 //
 // - Filename: Name of the file
 // - MimeType: MIME type of the file
 // - Length: Size of the file in bytes
 // - Stream: File data as io.ReadCloser (not serialized)
-// - Encoding, DigestAlgorithm, Digest, Data, BlobUrl: Only present when Blob is a document property
+// - Encoding, DigestAlgorithm, Digest, Data, BlobUrl: Only present when blob is a document property
 //
 // Used for uploading files, retrieving blobs from documents, and batch upload operations.
-type Blob struct {
+type blob struct {
 	Filename string        `json:"name"`
 	MimeType string        `json:"mime-type"`
 	Length   string        `json:"length"`
 	Stream   io.ReadCloser `json:"-"`
 
-	// (Present only as Document property blob) Encoding
+	// (Readonly) Encoding
 	Encoding string `json:"encoding,omitempty"`
-	// (Present only as Document property blob) Digest Algorithm
+	// (Readonly) Digest Algorithm
 	DigestAlgorithm string `json:"digestAlgorithm"`
-	// (Present only as Document property blob) Digest
+	// (Readonly) Digest
 	Digest string `json:"digest"`
-	// (Present only as Document property blob) Data URL
+	// (Readonly) Data URL
 	Data string `json:"data"`
-	// (Present only as Document property blob) Blob URL
+	// (Readonly) Blob URL
 	BlobUrl string `json:"blobUrl"`
 }
 
+// NewBlob creates a new Blob instance with the specified filename, MIME type, length, and data stream.
+func NewBlob(filename, mimeType string, length int64, stream io.ReadCloser) *blob {
+	return &blob{
+		Filename: filename,
+		MimeType: mimeType,
+		Length:   strconv.FormatInt(length, 10),
+		Stream:   stream,
+	}
+}
+
 // Blobs is a slice of Blob objects, used for representing multiple blobs in Nuxeo responses.
-type Blobs entities[Blob]
+type Blobs entities[blob]

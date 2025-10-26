@@ -40,7 +40,7 @@ func NewOperation(operationId string) *operation {
 		params:           make(map[string]string),
 		context:          make(map[string]string),
 		inputDocumentIds: make([]string, 0),
-		inputBlobs:       make([]Blob, 0),
+		inputBlobs:       make([]blob, 0),
 	}
 }
 
@@ -61,7 +61,7 @@ func NewOperation(operationId string) *operation {
 type operation struct {
 	operationId      string
 	inputDocumentIds []string
-	inputBlobs       []Blob
+	inputBlobs       []blob
 	params           map[string]string
 	context          map[string]string
 	isVoid           bool
@@ -92,9 +92,9 @@ func (o *operation) SetInputDocumentIds(docIdsOrPaths []string) *operation {
 //
 // For blob input, the request will be sent as multipart/related with the JSON payload as the first part and the blob as the second part.
 // See: https://doc.nuxeo.com/rest-api/1/automation-endpoint/#request-input
-func (o *operation) SetInputBlob(blob Blob) *operation {
-	o.inputBlobs = []Blob{
-		blob,
+func (o *operation) SetInputBlob(inputBlob blob) *operation {
+	o.inputBlobs = []blob{
+		inputBlob,
 	}
 	return o
 }
@@ -103,8 +103,8 @@ func (o *operation) SetInputBlob(blob Blob) *operation {
 //
 // For blob list input, the request will be sent as multipart/related with the JSON payload as the first part and each blob as a subsequent part.
 // See: https://doc.nuxeo.com/rest-api/1/automation-endpoint/#request-input
-func (o *operation) SetInputBlobs(blobs []Blob) *operation {
-	o.inputBlobs = blobs
+func (o *operation) SetInputBlobs(inputBlobs []blob) *operation {
+	o.inputBlobs = inputBlobs
 	return o
 }
 
@@ -180,6 +180,6 @@ func (o *operation) payload() *operationPayload {
 // blobs returns the input blobs for the operation, if any.
 //
 // Used to determine if the request should be sent as multipart/related.
-func (o *operation) blobs() []Blob {
+func (o *operation) blobs() []blob {
 	return o.inputBlobs
 }

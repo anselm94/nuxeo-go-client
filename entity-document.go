@@ -80,9 +80,9 @@ func (d *entityDocument) SetProperty(key string, value any) {
 }
 
 // FileContent returns the main file Blob of the document, if present.
-func (d *entityDocument) FileContent() *Blob {
+func (d *entityDocument) FileContent() *blob {
 	if fieldBlob, ok := d.Properties[DocumentPropertyFileContent]; ok {
-		var blob Blob
+		var blob blob
 		if err := fieldBlob.Complex(&blob); err == nil {
 			return &blob
 		}
@@ -91,9 +91,9 @@ func (d *entityDocument) FileContent() *Blob {
 }
 
 // Thumbnail returns the thumbnail Blob of the document, if present.
-func (d *entityDocument) Thumbnail() *Blob {
+func (d *entityDocument) Thumbnail() *blob {
 	if fieldBlob, ok := d.Properties[DocumentPropertyThumbThumbnail]; ok {
-		var blob Blob
+		var blob blob
 		if err := fieldBlob.Complex(&blob); err == nil {
 			return &blob
 		}

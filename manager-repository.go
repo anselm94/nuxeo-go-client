@@ -292,7 +292,7 @@ func (r *repository) FetchChildrenById(ctx context.Context, parentId string, opt
 // StreamBlobByPath streams a blob from a document specified by repository path and blob XPath.
 // Maps to GET /api/v1/repo/{repo}/path/{path}/@blob/{xpath}
 // Returns Blob (stream, filename, mimetype, length) or error.
-func (r *repository) StreamBlobByPath(ctx context.Context, documentPath string, blobXPath string, options *nuxeoRequestOptions) (*Blob, error) {
+func (r *repository) StreamBlobByPath(ctx context.Context, documentPath string, blobXPath string, options *nuxeoRequestOptions) (*blob, error) {
 	path := internal.PathApiV1 + "/repo/" + url.PathEscape(r.name) + "/path" + documentPath + "/@blob/" + url.PathEscape(blobXPath)
 	res, err := r.client.NewRequest(ctx, options).SetError(&nuxeoError{}).Get(path)
 
@@ -300,7 +300,7 @@ func (r *repository) StreamBlobByPath(ctx context.Context, documentPath string, 
 		r.logger.Error("Failed to stream blob by path", slog.String("error", err.Error()))
 		return nil, err
 	}
-	return &Blob{
+	return &blob{
 		Filename: internal.GetStreamFilenameFrom(res),
 		MimeType: internal.GetStreamContentTypeFrom(res),
 		Stream:   res.Body,
@@ -311,7 +311,7 @@ func (r *repository) StreamBlobByPath(ctx context.Context, documentPath string, 
 // StreamBlobById streams a blob from a document specified by ID and blob XPath.
 // Maps to GET /api/v1/repo/{repo}/id/{id}/@blob/{xpath}
 // Returns Blob (stream, filename, mimetype, length) or error.
-func (r *repository) StreamBlobById(ctx context.Context, documentId string, blobXPath string, options *nuxeoRequestOptions) (*Blob, error) {
+func (r *repository) StreamBlobById(ctx context.Context, documentId string, blobXPath string, options *nuxeoRequestOptions) (*blob, error) {
 	path := internal.PathApiV1 + "/repo/" + url.PathEscape(r.name) + "/id/" + url.PathEscape(documentId) + "/@blob/" + url.PathEscape(blobXPath)
 	res, err := r.client.NewRequest(ctx, options).SetError(&nuxeoError{}).Get(path)
 
@@ -319,7 +319,7 @@ func (r *repository) StreamBlobById(ctx context.Context, documentId string, blob
 		r.logger.Error("Failed to stream blob by ID", slog.String("error", err.Error()))
 		return nil, err
 	}
-	return &Blob{
+	return &blob{
 		Filename: internal.GetStreamFilenameFrom(res),
 		MimeType: internal.GetStreamContentTypeFrom(res),
 		Stream:   res.Body,
