@@ -111,8 +111,9 @@ func (u *entityUser) TenantId() string {
 }
 
 // Property returns the Field value for the given property key.
-func (u *entityUser) Property(key string) Field {
-	return u.Properties[key]
+func (u *entityUser) Property(key string) (Field, bool) {
+	value, found := u.Properties[key]
+	return value, found
 }
 
 // SetProperty sets the value for the given property key.

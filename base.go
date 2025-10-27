@@ -22,8 +22,9 @@ type entity struct {
 }
 
 // ContextParameter returns the context parameter value for the given key.
-func (e entity) ContextParameter(key string) Field {
-	return e.ContextParameters[key]
+func (e entity) ContextParameter(key string) (Field, bool) {
+	value, found := e.ContextParameters[key]
+	return value, found
 }
 
 // entities is a generic container for a list of Nuxeo entities of type T.
@@ -100,9 +101,11 @@ func (f Field) String() (*string, error) {
 	if f.IsNull() {
 		return nil, nil
 	}
-
-	strValue := string(f)
-	return &strValue, nil
+	var s string
+	if err := json.Unmarshal(f, &s); err != nil {
+		return nil, err
+	}
+	return &s, nil
 }
 
 // StringList returns the Field value as a slice of strings.

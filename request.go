@@ -29,6 +29,7 @@ type nuxeoRequestOptions struct {
 // NewNuxeoRequestOptions creates a new nuxeoRequestOptions with initialized maps.
 func NewNuxeoRequestOptions() *nuxeoRequestOptions {
 	return &nuxeoRequestOptions{
+		customHeaders:       make(map[string]string),
 		enrichers:           make(map[string][]string),
 		fetchProperties:     make(map[string][]string),
 		translateProperties: make(map[string][]string),

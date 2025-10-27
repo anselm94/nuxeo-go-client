@@ -26,8 +26,17 @@ func handleNuxeoError(err error, res *resty.Response) error {
 	if err != nil {
 		return err
 	}
+	if res == nil {
+		return nil
+	}
 	if res.IsError() {
-		return res.Error().(*nuxeoError)
+		if nuxeoErr, ok := res.Error().(*nuxeoError); ok {
+			return nuxeoErr
+		}
+		if err, ok := res.Error().(error); ok {
+			return err
+		}
+		return fmt.Errorf("unknown error type: %T", res.Error())
 	}
 	return nil
 }

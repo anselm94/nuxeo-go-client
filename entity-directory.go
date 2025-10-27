@@ -76,8 +76,9 @@ func (d entityDirectoryEntry) Obsolete() float64 {
 }
 
 // Property returns the value of the given property key for the entry.
-func (d entityDirectoryEntry) Property(key string) Field {
-	return d.Properties[key]
+func (d entityDirectoryEntry) Property(key string) (Field, bool) {
+	value, found := d.Properties[key]
+	return value, found
 }
 
 // SetProperty sets the value of the given property key for the entry.

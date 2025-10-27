@@ -62,8 +62,13 @@ func (sf entitySchemaField) IsString() bool {
 }
 
 func (sf *entitySchemaField) UnmarshalJSON(data []byte) error {
+	strLength := len(data)
+	if strLength == 0 {
+		return json.Unmarshal(data, sf) // let json handle empty input
+	}
+
 	// if value is a string
-	if n := len(data); data[0] == '"' && data[n-1] == '"' {
+	if data[0] == '"' && data[strLength-1] == '"' {
 		strVal := strings.Trim(string(data), "\"")
 		isMultiValued := strings.HasSuffix(strVal, "[]")
 		strVal = strings.TrimSuffix(strVal, "[]")
@@ -72,21 +77,24 @@ func (sf *entitySchemaField) UnmarshalJSON(data []byte) error {
 			IsArray:  isMultiValued,
 			Fields:   nil,
 		}
+		return nil
 	}
 
-	// if value is an object
+	// if value is a complex object
 	var complexSchemaField struct {
 		DataType string                       `json:"type"`
 		Fields   map[string]entitySchemaField `json:"fields"`
 	}
-	if err := json.Unmarshal(data, &complexSchemaField); err == nil {
-		isMultiValued := strings.HasSuffix(complexSchemaField.DataType, "[]")
-		complexSchemaField.DataType = strings.TrimSuffix(complexSchemaField.DataType, "[]")
-		*sf = entitySchemaField{
-			DataType: complexSchemaField.DataType,
-			IsArray:  isMultiValued,
-			Fields:   complexSchemaField.Fields,
-		}
+	if err := json.Unmarshal(data, &complexSchemaField); err != nil {
+		return err
+	}
+
+	isMultiValued := strings.HasSuffix(complexSchemaField.DataType, "[]")
+	complexSchemaField.DataType = strings.TrimSuffix(complexSchemaField.DataType, "[]")
+	*sf = entitySchemaField{
+		DataType: complexSchemaField.DataType,
+		IsArray:  isMultiValued,
+		Fields:   complexSchemaField.Fields,
 	}
 	return nil
 }

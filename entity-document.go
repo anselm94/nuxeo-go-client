@@ -69,8 +69,9 @@ func (d *entityDocument) IsCollectable() bool {
 }
 
 // Property returns the value of the specified property key.
-func (d *entityDocument) Property(key string) Field {
-	return d.Properties[key]
+func (d *entityDocument) Property(key string) (Field, bool) {
+	value, found := d.Properties[key]
+	return value, found
 }
 
 // SetProperty sets the value of the specified property key.

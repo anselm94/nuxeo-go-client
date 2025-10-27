@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"maps"
 	"net/http"
 	"strings"
 	"time"
@@ -91,9 +92,7 @@ func NewClient(baseUrl string, options *nuxeoClientOptions) *NuxeoClient {
 		client.middlewareAfterResponse = &options.AfterResponseMiddleware
 	}
 	client.timeout = options.Timeout
-	for k, v := range options.CustomHeaders {
-		client.headers[k] = v
-	}
+	maps.Copy(client.headers, options.CustomHeaders)
 
 	// setup resty client
 	client.restClient = resty.New()
@@ -106,7 +105,7 @@ func NewClient(baseUrl string, options *nuxeoClientOptions) *NuxeoClient {
 	client.restClient.AddRequestMiddleware(func(c *resty.Client, r *resty.Request) error {
 		headers := client.authenticator.GetAuthHeaders(r.Context(), r.RawRequest)
 		for k, v := range headers {
-			client.restClient.SetHeader(k, v)
+			r.SetHeader(k, v)
 		}
 		return nil
 	})
