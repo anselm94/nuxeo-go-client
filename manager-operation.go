@@ -100,8 +100,6 @@ func (o *operationManager) executeViaMultipart(ctx context.Context, operation op
 
 	// add blobs as subsequent parts
 	switch len(operation.blobs()) {
-	case 0:
-		return nil, fmt.Errorf("no blobs to send in multipart request")
 	case 1:
 		// single blob input
 		blob := operation.blobs()[0]

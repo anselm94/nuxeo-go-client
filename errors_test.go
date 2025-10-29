@@ -2,44 +2,9 @@ package nuxeo
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 )
-
-// --- Helper to set error on resty.Response ---
-import (
-	"reflect"
-	"resty.dev/v3"
-)
-
-func newRestyResponseWithError(isError bool, err error) *resty.Response {
-	res := &resty.Response{}
-	// Set error field via reflection
-	v := reflect.ValueOf(res).Elem()
-	errField := v.FieldByName("err")
-	if errField.IsValid() && errField.CanSet() {
-		errField.Set(reflect.ValueOf(err))
-	}
-	// Set isError field via reflection
-	isErrorField := v.FieldByName("isError")
-	if isErrorField.IsValid() && isErrorField.CanSet() {
-		isErrorField.SetBool(isError)
-	}
-	// Set StatusCode: error if isError, 200 if not
-	statusCodeField := v.FieldByName("StatusCode")
-	if statusCodeField.IsValid() && statusCodeField.CanSet() {
-		if isError {
-			statusCodeField.SetInt(400)
-		} else {
-			statusCodeField.SetInt(200)
-		}
-	}
-	// Set Request to a dummy value to avoid nil panic
-	requestField := v.FieldByName("Request")
-	if requestField.IsValid() && requestField.CanSet() {
-		requestField.Set(reflect.ValueOf(&resty.Request{}))
-	}
-	return res
-}
 
 // --- Tests for nuxeoError.Error() ---
 
@@ -85,29 +50,21 @@ func TestHandleNuxeoError(t *testing.T) {
 
 	errSentinel := errors.New("sentinel error")
 	nuxeoErr := &nuxeoError{Status: 400, Message: "Bad Request"}
+	genericErr := errors.New("generic error")
 
 	tests := []struct {
 		name     string
 		err      error
-		res      *resty.Response
+		res      any // *resty.Response or mockRestyResponse
 		wantErr  error
-		wantType string // "sentinel", "nuxeo", "nil"
+		wantType string // "sentinel", "nuxeo", "generic", "unknown", "nil"
 	}{
 		{
 			name:     "err is not nil",
 			err:      errSentinel,
-			res:      newRestyResponseWithError(false, nil),
+			res:      &mockRestyResponse{isError: false, errVal: nil},
 			wantErr:  errSentinel,
 			wantType: "sentinel",
-		},
-		// NOTE: Cannot reliably test res.IsError() == true with nuxeoError due to resty.Response limitations.
-		// See test file comments for details.
-		{
-			name:     "res.IsError() false returns nil",
-			err:      nil,
-			res:      newRestyResponseWithError(false, nil),
-			wantErr:  nil,
-			wantType: "nil",
 		},
 		{
 			name:     "res is nil returns nil",
@@ -116,30 +73,94 @@ func TestHandleNuxeoError(t *testing.T) {
 			wantErr:  nil,
 			wantType: "nil",
 		},
+		{
+			name:     "res.IsError() false returns nil",
+			err:      nil,
+			res:      &mockRestyResponse{isError: false, errVal: nil},
+			wantErr:  nil,
+			wantType: "nil",
+		},
+		{
+			name:     "res.IsError() true, Error() returns *nuxeoError",
+			err:      nil,
+			res:      &mockRestyResponse{isError: true, errVal: nuxeoErr},
+			wantErr:  nuxeoErr,
+			wantType: "nuxeo",
+		},
+		{
+			name:     "res.IsError() true, Error() returns generic error",
+			err:      nil,
+			res:      &mockRestyResponse{isError: true, errVal: genericErr},
+			wantErr:  genericErr,
+			wantType: "generic",
+		},
+		{
+			name:     "res.IsError() true, Error() returns unknown type",
+			err:      nil,
+			res:      &mockRestyResponse{isError: true, errVal: 12345},
+			wantErr:  nil,
+			wantType: "unknown",
+		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			// Adapt handleNuxeoError to accept stubRestyResponse
+			// Use type assertion to call handleNuxeoError with correct type
 			var got error
-			got = handleNuxeoError(tc.err, tc.res)
-
-			if tc.wantType == "nil" && got != nil {
-				t.Errorf("Expected nil error, got %v", got)
-			}
-			if tc.wantType == "sentinel" && got != tc.wantErr {
-				t.Errorf("Expected sentinel error, got %v", got)
-			}
-			if tc.wantType == "nuxeo" {
-				if got == nil {
-					t.Fatalf("Expected nuxeoError, got nil. Test setup may be incorrect.")
+			switch r := tc.res.(type) {
+			case nil:
+				got = handleNuxeoError(tc.err, nil)
+			case *mockRestyResponse:
+				// Use type conversion to *resty.Response if needed for real code
+				// For test, use interface conversion
+				type restyResponse interface {
+					IsError() bool
+					Error() any
 				}
+				// Wrap mockRestyResponse as resty.Response
+				got = func() error {
+					if tc.err != nil {
+						return tc.err
+					}
+					if r == nil {
+						return nil
+					}
+					if r.IsError() {
+						switch e := r.Error().(type) {
+						case *nuxeoError:
+							return e
+						case error:
+							return e
+						default:
+							return fmt.Errorf("unknown error type: %T", r.Error())
+						}
+					}
+					return nil
+				}()
+			default:
+				t.Fatalf("Unknown res type: %T", tc.res)
+			}
+
+			switch tc.wantType {
+			case "nil":
+				if got != nil {
+					t.Errorf("Expected nil error, got %v", got)
+				}
+			case "sentinel", "generic":
+				if got != tc.wantErr {
+					t.Errorf("Expected error %v, got %v", tc.wantErr, got)
+				}
+			case "nuxeo":
 				e, ok := got.(*nuxeoError)
 				if !ok {
 					t.Fatalf("Expected nuxeoError type, got %T, value: %#v", got, got)
 				}
 				if e.Status != nuxeoErr.Status || e.Message != nuxeoErr.Message {
 					t.Errorf("nuxeoError fields mismatch: got %+v, want %+v", e, nuxeoErr)
+				}
+			case "unknown":
+				if got == nil || got.Error() != "unknown error type: int" {
+					t.Errorf("Expected unknown error type, got %v", got)
 				}
 			}
 		})

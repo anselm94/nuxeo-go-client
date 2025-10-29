@@ -83,7 +83,7 @@ func (o *operation) SetInputDocumentId(docIdOrPath string) *operation {
 //
 // Each entry can be a document UID or absolute path. The value is encoded as "docs:{idOrPath1},{idOrPath2},..." in the request payload.
 // See: https://doc.nuxeo.com/rest-api/1/automation-endpoint/#request-input
-func (o *operation) SetInputDocumentIds(docIdsOrPaths []string) *operation {
+func (o *operation) SetInputDocumentIds(docIdsOrPaths ...string) *operation {
 	o.inputDocumentIds = docIdsOrPaths
 	return o
 }
@@ -103,7 +103,7 @@ func (o *operation) SetInputBlob(inputBlob blob) *operation {
 //
 // For blob list input, the request will be sent as multipart/related with the JSON payload as the first part and each blob as a subsequent part.
 // See: https://doc.nuxeo.com/rest-api/1/automation-endpoint/#request-input
-func (o *operation) SetInputBlobs(inputBlobs []blob) *operation {
+func (o *operation) SetInputBlobs(inputBlobs ...blob) *operation {
 	o.inputBlobs = inputBlobs
 	return o
 }

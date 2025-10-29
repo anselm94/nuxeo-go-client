@@ -11,8 +11,9 @@ import (
 // UserManager provides methods for managing Nuxeo users and groups via the REST API.
 // It supports CRUD operations, search, group membership management, and workflow operations.
 type userManager struct {
-	client *NuxeoClient
-	logger *slog.Logger
+	client           *NuxeoClient
+	logger           *slog.Logger
+	operationManager *operationManager
 }
 
 ////////////////

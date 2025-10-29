@@ -182,8 +182,9 @@ func (c *NuxeoClient) OperationManager() *operationManager {
 // UserManager returns a manager for Nuxeo users.
 func (c *NuxeoClient) UserManager() *userManager {
 	return &userManager{
-		client: c,
-		logger: c.logger,
+		client:           c,
+		logger:           c.logger,
+		operationManager: c.OperationManager(),
 	}
 }
 

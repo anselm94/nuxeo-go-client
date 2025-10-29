@@ -41,7 +41,7 @@ func TestSetInputDocumentId(t *testing.T) {
 func TestSetInputDocumentIds(t *testing.T) {
 	op := NewOperation("op")
 	ids := []string{"doc1", "doc2"}
-	op.SetInputDocumentIds(ids)
+	op.SetInputDocumentIds(ids...)
 	if !reflect.DeepEqual(op.inputDocumentIds, ids) {
 		t.Errorf("inputDocumentIds = %v, want %v", op.inputDocumentIds, ids)
 	}
@@ -59,7 +59,7 @@ func TestSetInputBlob(t *testing.T) {
 func TestSetInputBlobs(t *testing.T) {
 	op := NewOperation("op")
 	blobs := []blob{{Filename: "a"}, {Filename: "b"}}
-	op.SetInputBlobs(blobs)
+	op.SetInputBlobs(blobs...)
 	if !reflect.DeepEqual(op.inputBlobs, blobs) {
 		t.Errorf("inputBlobs = %v, want %v", op.inputBlobs, blobs)
 	}
@@ -161,7 +161,7 @@ func TestBlobs(t *testing.T) {
 	op := NewOperation("op")
 	b1 := blob{Filename: "a"}
 	b2 := blob{Filename: "b"}
-	op.SetInputBlobs([]blob{b1, b2})
+	op.SetInputBlobs(b1, b2)
 	blobs := op.blobs()
 	if !reflect.DeepEqual(blobs, []blob{b1, b2}) {
 		t.Errorf("blobs() = %v, want %v", blobs, []blob{b1, b2})
