@@ -4,7 +4,7 @@ The Nuxeo Go Client is an _unofficial_ modern, idiomatic Go SDK for the Nuxeo Au
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/anselm94/nuxeo-go-client.svg)](https://pkg.go.dev/github.com/anselm94/nuxeo-go-client)
 [![Go Report Card](https://goreportcard.com/badge/github.com/anselm94/nuxeo-go-client)](https://goreportcard.com/report/github.com/anselm94/nuxeo-go-client)
-[![Tests](https://github.com/anselm94/nuxeo-go-client/actions/workflows/test.yml/badge.svg)](https://github.com/anselm94/nuxeo-go-client/actions/workflows/test.yml)
+[![Tests](https://github.com/anselm94/nuxeo-go-client/actions/workflows/go.yml/badge.svg)](https://github.com/anselm94/nuxeo-go-client/actions/workflows/go.yml)
 
 ## Features
 
