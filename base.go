@@ -297,7 +297,6 @@ func (f Field) TimeList() ([]ISO8601Time, error) {
 // Complex decodes the Field into the provided output struct (Nuxeo Complex Property).
 func (f Field) Complex(out any) error {
 	if f.IsNull() {
-		out = nil // Set output to nil if field is null
 		return nil
 	}
 
@@ -307,7 +306,6 @@ func (f Field) Complex(out any) error {
 // ComplexList decodes the Field into the provided output slice (Nuxeo Complex Property List).
 func (f Field) ComplexList(out any) error {
 	if f.IsNull() {
-		out = nil // Set output to nil if field is null
 		return nil
 	}
 

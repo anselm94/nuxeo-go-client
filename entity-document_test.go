@@ -66,7 +66,7 @@ func TestPropertyMethods(t *testing.T) {
 	}
 	// Update property
 	doc.SetProperty("dc:title", NewStringField("New Title"))
-	field, found = doc.Property("dc:title")
+	field, _ = doc.Property("dc:title")
 	str, err = field.String()
 	if err != nil || str == nil || *str != "New Title" {
 		t.Errorf("expected updated property value 'New Title', got '%v', err: %v", str, err)
