@@ -1,37 +1,37 @@
 package nuxeo
 
-// entityTask represents a Nuxeo workflow task instance.
+// Task represents a Nuxeo workflow task instance.
 //
 // A task is a step in a workflow assigned to one or more users, with metadata describing its state, actors, related documents, comments, and variables.
 // See: https://doc.nuxeo.com/rest-api/1/task-entity-type/
-// entityTask models the REST API 'task' entity-type.
+// Task models the REST API 'task' entity-type.
 // Fields map directly to Nuxeo's JSON representation.
-type entityTask struct {
+type Task struct {
 	entity
-	Id                     string              `json:"id"`
-	Name                   string              `json:"name"`
-	WorkflowInstanceId     string              `json:"workflowInstanceId"`
-	WorkflowModelName      string              `json:"workflowModelName"`
-	WorkflowInitiator      entityUser          `json:"workflowInitiator"` // TODO: json unmarshal user from string
-	WorkflowTitle          string              `json:"workflowTitle"`
-	WorkflowLifeCycleState string              `json:"workflowLifeCycleState"`
-	GraphResource          string              `json:"graphResource"`
-	State                  string              `json:"state"`
-	Directive              string              `json:"directive"`
-	Created                *ISO8601Time        `json:"created"`
-	DueDate                *ISO8601Time        `json:"dueDate"`
-	NodeName               string              `json:"nodeName"`
-	TargetDocumentIds      []entityDocument    `json:"targetDocumentIds"` // TODO: json unmarshal documents from strings
-	Actors                 []entityUser        `json:"actors"`            // TODO: json unmarshal users from { "id": "username" }
-	DelegatedActors        []entityUser        `json:"delegatedActors"`   // TODO: json unmarshal users from { "id": "username" }
-	Comments               []entityTaskComment `json:"comments"`
-	Variables              entityTaskVariables `json:"variables"`
-	TaskInfo               entityTaskInfo      `json:"taskInfo"`
+	Id                     string        `json:"id"`
+	Name                   string        `json:"name"`
+	WorkflowInstanceId     string        `json:"workflowInstanceId"`
+	WorkflowModelName      string        `json:"workflowModelName"`
+	WorkflowInitiator      User          `json:"workflowInitiator"` // TODO: json unmarshal user from string
+	WorkflowTitle          string        `json:"workflowTitle"`
+	WorkflowLifeCycleState string        `json:"workflowLifeCycleState"`
+	GraphResource          string        `json:"graphResource"`
+	State                  string        `json:"state"`
+	Directive              string        `json:"directive"`
+	Created                *ISO8601Time  `json:"created"`
+	DueDate                *ISO8601Time  `json:"dueDate"`
+	NodeName               string        `json:"nodeName"`
+	TargetDocumentIds      []Document    `json:"targetDocumentIds"` // TODO: json unmarshal documents from strings
+	Actors                 []User        `json:"actors"`            // TODO: json unmarshal users from { "id": "username" }
+	DelegatedActors        []User        `json:"delegatedActors"`   // TODO: json unmarshal users from { "id": "username" }
+	Comments               []TaskComment `json:"comments"`
+	Variables              TaskVariables `json:"variables"`
+	TaskInfo               TaskInfo      `json:"taskInfo"`
 }
 
 // NewTask creates a new entityTask with the given ID and sets the EntityType to 'task'.
-func NewTask(id string) *entityTask {
-	return &entityTask{
+func NewTask(id string) *Task {
+	return &Task{
 		entity: entity{
 			EntityType: EntityTypeTask,
 		},
@@ -39,34 +39,34 @@ func NewTask(id string) *entityTask {
 	}
 }
 
-// entityTasks is a slice wrapper for multiple entityTask objects, as returned by Nuxeo task queries.
-type entityTasks entities[entityTask]
+// Tasks is a slice wrapper for multiple entityTask objects, as returned by Nuxeo task queries.
+type Tasks entities[Task]
 
-// entityTaskComment represents a comment on a workflow task, including author, text, and date.
-type entityTaskComment struct {
+// TaskComment represents a comment on a workflow task, including author, text, and date.
+type TaskComment struct {
 	Author string       `json:"author"`
 	Text   string       `json:"text"`
 	Date   *ISO8601Time `json:"date"`
 }
 
-// entityTaskVariables holds custom variables for a workflow task, such as comment, assignees, end date, and participants.
-type entityTaskVariables struct {
+// TaskVariables holds custom variables for a workflow task, such as comment, assignees, end date, and participants.
+type TaskVariables struct {
 	Comment      string       `json:"comment"`
 	Assignees    []string     `json:"assignees"`
 	EndDate      *ISO8601Time `json:"end_date"`
 	Participants []string     `json:"participants"`
 }
 
-// entityTaskInfo provides metadata about a workflow task, including allowed actions, reassignment, layout, and schemas.
-type entityTaskInfo struct {
-	AllowTaskReassignment bool                 `json:"allowTaskReassignment"`
-	TaskActions           []entityTaskInfoItem `json:"taskActions"`
-	LayoutResource        entityTaskInfoItem   `json:"layoutResource"`
-	Schemas               []entityTaskInfoItem `json:"schemas"`
+// TaskInfo provides metadata about a workflow task, including allowed actions, reassignment, layout, and schemas.
+type TaskInfo struct {
+	AllowTaskReassignment bool           `json:"allowTaskReassignment"`
+	TaskActions           []TaskInfoItem `json:"taskActions"`
+	LayoutResource        TaskInfoItem   `json:"layoutResource"`
+	Schemas               []TaskInfoItem `json:"schemas"`
 }
 
-// entityTaskInfoItem describes an actionable item or resource for a workflow task, such as an action, layout, or schema.
-type entityTaskInfoItem struct {
+// TaskInfoItem describes an actionable item or resource for a workflow task, such as an action, layout, or schema.
+type TaskInfoItem struct {
 	Name  string `json:"name"`
 	Url   string `json:"url"`
 	Label string `json:"label"`

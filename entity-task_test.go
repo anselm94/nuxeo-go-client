@@ -44,7 +44,7 @@ func TestEntityTaskComment(t *testing.T) {
 	t.Parallel()
 
 	date := (*ISO8601Time)(nil)
-	comment := entityTaskComment{Author: "bob", Text: "review", Date: date}
+	comment := TaskComment{Author: "bob", Text: "review", Date: date}
 	if comment.Author != "bob" {
 		t.Errorf("Author mismatch")
 	}
@@ -60,7 +60,7 @@ func TestEntityTaskVariables(t *testing.T) {
 	t.Parallel()
 
 	endDate := (*ISO8601Time)(nil)
-	vars := entityTaskVariables{
+	vars := TaskVariables{
 		Comment:      "needs work",
 		Assignees:    []string{"alice", "bob"},
 		EndDate:      endDate,
@@ -83,10 +83,10 @@ func TestEntityTaskVariables(t *testing.T) {
 func TestEntityTaskInfoAndItem(t *testing.T) {
 	t.Parallel()
 
-	actions := []entityTaskInfoItem{{Name: "approve", Url: "/approve", Label: "Approve"}}
-	layout := entityTaskInfoItem{Name: "main", Url: "/layout", Label: "Main"}
-	schemas := []entityTaskInfoItem{{Name: "schema1", Url: "/s1", Label: "Schema1"}}
-	info := entityTaskInfo{
+	actions := []TaskInfoItem{{Name: "approve", Url: "/approve", Label: "Approve"}}
+	layout := TaskInfoItem{Name: "main", Url: "/layout", Label: "Main"}
+	schemas := []TaskInfoItem{{Name: "schema1", Url: "/s1", Label: "Schema1"}}
+	info := TaskInfo{
 		AllowTaskReassignment: true,
 		TaskActions:           actions,
 		LayoutResource:        layout,
@@ -105,7 +105,7 @@ func TestEntityTaskInfoAndItem(t *testing.T) {
 		t.Errorf("Schemas mismatch")
 	}
 	// Edge case: empty slices
-	infoEmpty := entityTaskInfo{}
+	infoEmpty := TaskInfo{}
 	if len(infoEmpty.TaskActions) != 0 || len(infoEmpty.Schemas) != 0 {
 		t.Errorf("Expected empty slices in zero value info")
 	}

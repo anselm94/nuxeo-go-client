@@ -27,13 +27,13 @@ func TestDirectoryManager_FetchDirectories(t *testing.T) {
 	}{
 		{
 			name:    "success",
-			resp:    entityDirectories{Entries: []entityDirectory{{Name: "foo"}}},
+			resp:    Directories{Entries: []Directory{{Name: "foo"}}},
 			status:  http.StatusOK,
 			wantErr: false,
 		},
 		{
 			name:    "error response",
-			resp:    nuxeoError{Message: "fail"},
+			resp:    NuxeoError{Message: "fail"},
 			status:  http.StatusBadRequest,
 			wantErr: true,
 		},
@@ -74,13 +74,13 @@ func TestDirectoryManager_FetchDirectoryEntries(t *testing.T) {
 	}{
 		{
 			name:    "success",
-			resp:    entityDirectoryEntries{Entries: []entityDirectoryEntry{{ID: "id1"}}},
+			resp:    DirectoryEntries{Entries: []DirectoryEntry{{ID: "id1"}}},
 			status:  http.StatusOK,
 			wantErr: false,
 		},
 		{
 			name:    "error response",
-			resp:    nuxeoError{Message: "fail"},
+			resp:    NuxeoError{Message: "fail"},
 			status:  http.StatusBadRequest,
 			wantErr: true,
 		},
@@ -121,13 +121,13 @@ func TestDirectoryManager_CreateDirectoryEntry(t *testing.T) {
 	}{
 		{
 			name:    "success",
-			resp:    entityDirectoryEntry{ID: "id1"},
+			resp:    DirectoryEntry{ID: "id1"},
 			status:  http.StatusCreated,
 			wantErr: false,
 		},
 		{
 			name:    "error response",
-			resp:    nuxeoError{Message: "fail"},
+			resp:    NuxeoError{Message: "fail"},
 			status:  http.StatusBadRequest,
 			wantErr: true,
 		},
@@ -144,7 +144,7 @@ func TestDirectoryManager_CreateDirectoryEntry(t *testing.T) {
 					Header:     make(http.Header),
 				}, nil
 			})
-			entry := entityDirectoryEntry{ID: "id1"}
+			entry := DirectoryEntry{ID: "id1"}
 			got, err := dm.CreateDirectoryEntry(context.Background(), "foo", entry, nil)
 			if tc.wantErr && err == nil {
 				t.Errorf("expected error, got nil")
@@ -169,13 +169,13 @@ func TestDirectoryManager_FetchDirectoryEntry(t *testing.T) {
 	}{
 		{
 			name:    "success",
-			resp:    entityDirectoryEntry{ID: "id1"},
+			resp:    DirectoryEntry{ID: "id1"},
 			status:  http.StatusOK,
 			wantErr: false,
 		},
 		{
 			name:    "error response",
-			resp:    nuxeoError{Message: "fail"},
+			resp:    NuxeoError{Message: "fail"},
 			status:  http.StatusNotFound,
 			wantErr: true,
 		},
@@ -216,13 +216,13 @@ func TestDirectoryManager_UpdateDirectoryEntry(t *testing.T) {
 	}{
 		{
 			name:    "success",
-			resp:    entityDirectoryEntry{ID: "id1"},
+			resp:    DirectoryEntry{ID: "id1"},
 			status:  http.StatusOK,
 			wantErr: false,
 		},
 		{
 			name:    "error response",
-			resp:    nuxeoError{Message: "fail"},
+			resp:    NuxeoError{Message: "fail"},
 			status:  http.StatusBadRequest,
 			wantErr: true,
 		},
@@ -239,7 +239,7 @@ func TestDirectoryManager_UpdateDirectoryEntry(t *testing.T) {
 					Header:     make(http.Header),
 				}, nil
 			})
-			entry := entityDirectoryEntry{ID: "id1"}
+			entry := DirectoryEntry{ID: "id1"}
 			got, err := dm.UpdateDirectoryEntry(context.Background(), "foo", "id1", entry, nil)
 			if tc.wantErr && err == nil {
 				t.Errorf("expected error, got nil")
@@ -287,7 +287,7 @@ func TestDirectoryManager_DeleteDirectoryEntry(t *testing.T) {
 				if tc.respErr != nil {
 					return nil, tc.respErr
 				}
-				body := testMarshalBody(t, nuxeoError{Message: "fail"})
+				body := testMarshalBody(t, NuxeoError{Message: "fail"})
 				return &http.Response{
 					StatusCode: tc.status,
 					Body:       body,

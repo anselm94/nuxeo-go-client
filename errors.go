@@ -6,9 +6,9 @@ import (
 	"resty.dev/v3"
 )
 
-// nuxeoError represents an error returned by the Nuxeo API.
+// NuxeoError represents an error returned by the Nuxeo API.
 // It includes status code, message, and stack trace from the server response.
-type nuxeoError struct {
+type NuxeoError struct {
 	entity
 	Status     int    `json:"status"`
 	Message    string `json:"message"`
@@ -16,7 +16,7 @@ type nuxeoError struct {
 }
 
 // Error returns a formatted string describing the Nuxeo error.
-func (e *nuxeoError) Error() string {
+func (e *NuxeoError) Error() string {
 	return fmt.Sprintf("Nuxeo Exception: %d - %s", e.Status, e.Message)
 }
 
@@ -30,7 +30,7 @@ func handleNuxeoError(err error, res *resty.Response) error {
 		return nil
 	}
 	if res.IsError() {
-		if nuxeoErr, ok := res.Error().(*nuxeoError); ok {
+		if nuxeoErr, ok := res.Error().(*NuxeoError); ok {
 			return nuxeoErr
 		}
 		if err, ok := res.Error().(error); ok {

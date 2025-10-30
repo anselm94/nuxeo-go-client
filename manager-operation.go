@@ -58,7 +58,7 @@ func (o *operationManager) Execute(ctx context.Context, operation operation, req
 func (o *operationManager) executeViaJson(ctx context.Context, operation operation, requestOptions *nuxeoRequestOptions) (io.ReadCloser, error) {
 	path := "/site/automation/" + url.PathEscape(operation.operationId)
 
-	request := o.client.NewRequest(ctx, requestOptions).SetError(&nuxeoError{})
+	request := o.client.NewRequest(ctx, requestOptions).SetError(&NuxeoError{})
 	request.SetDoNotParseResponse(true)
 	request.SetBody(operation.payload())
 
@@ -84,7 +84,7 @@ func (o *operationManager) executeViaJson(ctx context.Context, operation operati
 func (o *operationManager) executeViaMultipart(ctx context.Context, operation operation, requestOptions *nuxeoRequestOptions) (io.ReadCloser, error) {
 	path := "/site/automation/" + url.PathEscape(operation.operationId)
 
-	request := o.client.NewRequest(ctx, requestOptions).SetError(&nuxeoError{})
+	request := o.client.NewRequest(ctx, requestOptions).SetError(&NuxeoError{})
 	request.SetDoNotParseResponse(true)
 	request.SetHeader("Accept", "application/json, */*")
 
@@ -103,12 +103,12 @@ func (o *operationManager) executeViaMultipart(ctx context.Context, operation op
 	case 1:
 		// single blob input
 		blob := operation.blobs()[0]
-		request.SetMultipartField("input", blob.Filename, blob.MimeType, blob.Stream)
+		request.SetMultipartField("input", blob.Filename, blob.MimeType, blob)
 	default:
 		// multiple blob inputs
 		for i, blob := range operation.blobs() {
 			fieldName := fmt.Sprintf("input-%d", i+1)
-			request.SetMultipartField(fieldName, blob.Filename, blob.MimeType, blob.Stream)
+			request.SetMultipartField(fieldName, blob.Filename, blob.MimeType, blob)
 		}
 	}
 

@@ -16,10 +16,10 @@ import (
 //
 // Used for uploading files, retrieving blobs from documents, and batch upload operations.
 type blob struct {
-	Filename string        `json:"name"`
-	MimeType string        `json:"mime-type"`
-	Length   string        `json:"length"`
-	Stream   io.ReadCloser `json:"-"`
+	io.ReadCloser
+	Filename string `json:"name"`
+	MimeType string `json:"mime-type"`
+	Length   string `json:"length"`
 
 	// (Readonly) Encoding
 	Encoding string `json:"encoding,omitempty"`
@@ -36,12 +36,17 @@ type blob struct {
 // NewBlob creates a new Blob instance with the specified filename, MIME type, length, and data stream.
 func NewBlob(filename, mimeType string, length int64, stream io.ReadCloser) *blob {
 	return &blob{
-		Filename: filename,
-		MimeType: mimeType,
-		Length:   strconv.FormatInt(length, 10),
-		Stream:   stream,
+		ReadCloser: stream,
+		Filename:   filename,
+		MimeType:   mimeType,
+		Length:     strconv.FormatInt(length, 10),
 	}
 }
 
-// Blobs is a slice of Blob objects, used for representing multiple blobs in Nuxeo responses.
-type Blobs entities[blob]
+func (b *blob) Size() int64 {
+	size, err := strconv.ParseInt(b.Length, 10, 64)
+	if err != nil {
+		return 0
+	}
+	return size
+}

@@ -45,7 +45,7 @@ func TestEntityWorkflowGraph(t *testing.T) {
 
 	nodes := map[string]Field{"n1": Field("1"), "n2": Field("2")}
 	transitions := map[string]Field{"t1": Field("A"), "t2": Field("B")}
-	graph := entityWorkflowGraph{
+	graph := WorkflowGraph{
 		entity:      entity{EntityType: EntityTypeGraph},
 		Nodes:       nodes,
 		Transitions: transitions,
@@ -60,7 +60,7 @@ func TestEntityWorkflowGraph(t *testing.T) {
 		t.Errorf("Transitions mismatch")
 	}
 	// Edge case: empty maps
-	emptyGraph := entityWorkflowGraph{}
+	emptyGraph := WorkflowGraph{}
 	if len(emptyGraph.Nodes) != 0 || len(emptyGraph.Transitions) != 0 {
 		t.Errorf("Expected empty maps in zero value graph")
 	}

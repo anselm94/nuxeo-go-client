@@ -32,10 +32,10 @@ func TestNewBlob(t *testing.T) {
 			length:   123,
 			stream:   &dummyReadCloser{strings.NewReader("data")},
 			want: blob{
-				Filename: "file.txt",
-				MimeType: "text/plain",
-				Length:   "123",
-				Stream:   &dummyReadCloser{strings.NewReader("data")},
+				Filename:   "file.txt",
+				MimeType:   "text/plain",
+				Length:     "123",
+				ReadCloser: &dummyReadCloser{strings.NewReader("data")},
 			},
 		},
 		{
@@ -45,10 +45,10 @@ func TestNewBlob(t *testing.T) {
 			length:   0,
 			stream:   nil,
 			want: blob{
-				Filename: "empty.bin",
-				MimeType: "application/octet-stream",
-				Length:   "0",
-				Stream:   nil,
+				Filename:   "empty.bin",
+				MimeType:   "application/octet-stream",
+				Length:     "0",
+				ReadCloser: nil,
 			},
 		},
 		{
@@ -58,10 +58,10 @@ func TestNewBlob(t *testing.T) {
 			length:   -42,
 			stream:   nil,
 			want: blob{
-				Filename: "bad.bin",
-				MimeType: "application/octet-stream",
-				Length:   "-42",
-				Stream:   nil,
+				Filename:   "bad.bin",
+				MimeType:   "application/octet-stream",
+				Length:     "-42",
+				ReadCloser: nil,
 			},
 		},
 	}
@@ -78,8 +78,8 @@ func TestNewBlob(t *testing.T) {
 			if b.Length != tc.want.Length {
 				t.Errorf("Length: got %q, want %q", b.Length, tc.want.Length)
 			}
-			if (b.Stream == nil) != (tc.want.Stream == nil) {
-				t.Errorf("Stream: got %v, want %v", b.Stream, tc.want.Stream)
+			if (b.ReadCloser == nil) != (tc.want.ReadCloser == nil) {
+				t.Errorf("Stream: got %v, want %v", b.ReadCloser, tc.want.ReadCloser)
 			}
 		})
 	}

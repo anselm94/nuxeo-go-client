@@ -225,7 +225,7 @@ func (c *NuxeoClient) DataModelManager() *dataModelManager {
 /////////////////
 
 // CurrentUser returns the current authenticated Nuxeo user.
-func (c *NuxeoClient) CurrentUser(ctx context.Context) (*entityUser, error) {
+func (c *NuxeoClient) CurrentUser(ctx context.Context) (*User, error) {
 	return c.UserManager().FetchCurrentUser(ctx)
 }
 

@@ -163,3 +163,77 @@ const (
 	OperationEsWaitForIndexing          = "Elasticsearch.WaitForIndexing"
 	OperationRepositoryGetDocument      = "Repository.GetDocument"
 )
+
+/////////////////////////
+//// Special Headers ////
+/////////////////////////
+
+// Fetch Properties
+
+const (
+	FetchPropertyDirectoryEntryParent = "parent"
+)
+
+const (
+	FetchPropertyDocumentProperties        = "properties"
+	FetchPropertyDocumentDCCreator         = "dc:creator"
+	FetchPropertyDocumentDCLastContributor = "dc:lastContributor"
+	FetchPropertyDocumentDCContributors    = "dc:contributors"
+	FetchPropertyDocumentDCSubjects        = "dc:subjects"
+	FetchPropertyDocumentDCCoverage        = "dc:coverage"
+	FetchPropertyDocumentDCNature          = "dc:nature"
+)
+
+const (
+	FetchPropertyGroupMemberUsers  = "memberUsers"
+	FetchPropertyGroupMemberGroups = "memberGroups"
+	FetchPropertyGroupParentGroups = "parentGroups"
+)
+
+const (
+	FetchPropertyTaskWorkflowInitiator = "workflowInitiator"
+	FetchPropertyTaskTargetDocumentIds = "targetDocumentIds"
+	FetchPropertyTaskActors            = "actors"
+)
+
+const (
+	FetchPropertyWorkflowInitiator           = "initiator"
+	FetchPropertyWorkflowAttachedDocumentIds = "attachedDocumentIds"
+)
+
+// Translated Properties
+
+const (
+	TranslatedPropertyDirectoryEntryLabel = "label"
+)
+
+// Enrichers
+const (
+	EnricherDocumentACLs                    = "acls"
+	EnricherDocumentAudit                   = "audit"
+	EnricherDocumentBreadcrumb              = "breadcrumb"
+	EnricherDocumentChildren                = "children"
+	EnricherDocumentCollections             = "collections"
+	EnricherDocumentURL                     = "documentURL"
+	EnricherDocumentFavorites               = "favorites"
+	EnricherDocumentFirstAccessibleAncestor = "firstAccessibleAncestor"
+	EnricherDocumentHasContent              = "hasContent"
+	EnricherDocumentHasFolderishChild       = "hasFolderishChild"
+	EnricherDocumentHighlight               = "highlight"
+	EnricherDocumentPendingTasks            = "pendingTasks"
+	EnricherDocumentPermissions             = "permissions"
+	EnricherDocumentPreview                 = "preview"
+	EnricherDocumentPublications            = "publications"
+	EnricherDocumentRenditions              = "renditions"
+	EnricherDocumentRunnableWorkflows       = "runnableWorkflows"
+	EnricherDocumentRunningWorkflows        = "runningWorkflows"
+	EnricherDocumentSubscribedNotifications = "subscribedNotifications"
+	EnricherDocumentSubTypes                = "subtypes"
+	EnricherDocumentTags                    = "tags"
+	EnricherDocumentThumbnail               = "thumbnail"
+	EnricherDocumentUserVisiblePermissions  = "userVisiblePermissions"
+)
+
+const (
+	EnricherUserProfile = "userProfile"
+)

@@ -35,14 +35,14 @@ func TestUserManager_FetchUser(t *testing.T) {
 		{
 			name:       "success",
 			args:       args{id: "john"},
-			mockResp:   &entityUser{Id: "john"},
+			mockResp:   &User{Id: "john"},
 			mockStatus: 200,
 			wantId:     "john",
 		},
 		{
 			name:       "not found",
 			args:       args{id: "missing"},
-			mockResp:   &nuxeoError{Message: "not found"},
+			mockResp:   &NuxeoError{Message: "not found"},
 			mockStatus: 404,
 			wantErr:    true,
 		},
@@ -83,7 +83,7 @@ func TestUserManager_FetchUser(t *testing.T) {
 func TestUserManager_CreateUser(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		t.Parallel()
-		user := entityUser{Id: "alice"}
+		user := User{Id: "alice"}
 		um := newTestUserManager(func(req *http.Request) (*http.Response, error) {
 			body, _ := json.Marshal(&user)
 			return &http.Response{
@@ -106,7 +106,7 @@ func TestUserManager_CreateUser(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
 		t.Parallel()
 		um := newTestUserManager(func(req *http.Request) (*http.Response, error) {
-			body, _ := json.Marshal(&nuxeoError{Message: "bad request"})
+			body, _ := json.Marshal(&NuxeoError{Message: "bad request"})
 			return &http.Response{
 				StatusCode: 400,
 				Body:       io.NopCloser(bytes.NewReader(body)),
@@ -115,7 +115,7 @@ func TestUserManager_CreateUser(t *testing.T) {
 				},
 			}, nil
 		})
-		_, err := um.CreateUser(context.Background(), entityUser{Id: "bob"}, nil)
+		_, err := um.CreateUser(context.Background(), User{Id: "bob"}, nil)
 		if err == nil {
 			t.Errorf("CreateUser() error = nil, want error")
 		}
@@ -125,7 +125,7 @@ func TestUserManager_CreateUser(t *testing.T) {
 func TestUserManager_UpdateUser(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		t.Parallel()
-		user := entityUser{Id: "eve"}
+		user := User{Id: "eve"}
 		um := newTestUserManager(func(req *http.Request) (*http.Response, error) {
 			body, _ := json.Marshal(&user)
 			return &http.Response{
@@ -148,7 +148,7 @@ func TestUserManager_UpdateUser(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
 		t.Parallel()
 		um := newTestUserManager(func(req *http.Request) (*http.Response, error) {
-			body, _ := json.Marshal(&nuxeoError{Message: "not found"})
+			body, _ := json.Marshal(&NuxeoError{Message: "not found"})
 			return &http.Response{
 				StatusCode: 404,
 				Body:       io.NopCloser(bytes.NewReader(body)),
@@ -157,7 +157,7 @@ func TestUserManager_UpdateUser(t *testing.T) {
 				},
 			}, nil
 		})
-		_, err := um.UpdateUser(context.Background(), "ghost", entityUser{Id: "ghost"}, nil)
+		_, err := um.UpdateUser(context.Background(), "ghost", User{Id: "ghost"}, nil)
 		if err == nil {
 			t.Errorf("UpdateUser() error = nil, want error")
 		}
@@ -185,7 +185,7 @@ func TestUserManager_DeleteUser(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
 		t.Parallel()
 		um := newTestUserManager(func(req *http.Request) (*http.Response, error) {
-			body, _ := json.Marshal(&nuxeoError{Message: "not found"})
+			body, _ := json.Marshal(&NuxeoError{Message: "not found"})
 			return &http.Response{
 				StatusCode: 404,
 				Body:       io.NopCloser(bytes.NewReader(body)),
@@ -204,8 +204,8 @@ func TestUserManager_DeleteUser(t *testing.T) {
 func TestUserManager_SearchUsers(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		t.Parallel()
-		users := entityUsers{}
-		users.Entries = []entityUser{{Id: "john"}, {Id: "jane"}}
+		users := Users{}
+		users.Entries = []User{{Id: "john"}, {Id: "jane"}}
 		um := newTestUserManager(func(req *http.Request) (*http.Response, error) {
 			body, _ := json.Marshal(&users)
 			return &http.Response{
@@ -228,7 +228,7 @@ func TestUserManager_SearchUsers(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
 		t.Parallel()
 		um := newTestUserManager(func(req *http.Request) (*http.Response, error) {
-			body, _ := json.Marshal(&nuxeoError{Message: "bad query"})
+			body, _ := json.Marshal(&NuxeoError{Message: "bad query"})
 			return &http.Response{
 				StatusCode: 400,
 				Body:       io.NopCloser(bytes.NewReader(body)),
@@ -259,7 +259,7 @@ func TestUserManager_AddUserToGroup(t *testing.T) {
 			name:       "success",
 			user:       "alice",
 			group:      "devs",
-			mockResp:   &entityUser{Id: "alice"},
+			mockResp:   &User{Id: "alice"},
 			mockStatus: 200,
 			wantId:     "alice",
 		},
@@ -267,7 +267,7 @@ func TestUserManager_AddUserToGroup(t *testing.T) {
 			name:       "not found",
 			user:       "ghost",
 			group:      "devs",
-			mockResp:   &nuxeoError{Message: "not found"},
+			mockResp:   &NuxeoError{Message: "not found"},
 			mockStatus: 404,
 			wantErr:    true,
 		},
@@ -307,7 +307,7 @@ func TestUserManager_AddUserToGroup(t *testing.T) {
 func TestUserManager_FetchGroup(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		t.Parallel()
-		group := entityGroup{Id: "admins"}
+		group := Group{Id: "admins"}
 		um := newTestUserManager(func(req *http.Request) (*http.Response, error) {
 			body, _ := json.Marshal(&group)
 			return &http.Response{
@@ -330,7 +330,7 @@ func TestUserManager_FetchGroup(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
 		t.Parallel()
 		um := newTestUserManager(func(req *http.Request) (*http.Response, error) {
-			body, _ := json.Marshal(&nuxeoError{Message: "not found"})
+			body, _ := json.Marshal(&NuxeoError{Message: "not found"})
 			return &http.Response{
 				StatusCode: 404,
 				Body:       io.NopCloser(bytes.NewReader(body)),
@@ -349,7 +349,7 @@ func TestUserManager_FetchGroup(t *testing.T) {
 func TestUserManager_CreateGroup(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		t.Parallel()
-		group := entityGroup{Id: "devs"}
+		group := Group{Id: "devs"}
 		um := newTestUserManager(func(req *http.Request) (*http.Response, error) {
 			body, _ := json.Marshal(&group)
 			return &http.Response{
@@ -372,7 +372,7 @@ func TestUserManager_CreateGroup(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
 		t.Parallel()
 		um := newTestUserManager(func(req *http.Request) (*http.Response, error) {
-			body, _ := json.Marshal(&nuxeoError{Message: "bad request"})
+			body, _ := json.Marshal(&NuxeoError{Message: "bad request"})
 			return &http.Response{
 				StatusCode: 400,
 				Body:       io.NopCloser(bytes.NewReader(body)),
@@ -381,7 +381,7 @@ func TestUserManager_CreateGroup(t *testing.T) {
 				},
 			}, nil
 		})
-		_, err := um.CreateGroup(context.Background(), entityGroup{Id: "bad"}, nil)
+		_, err := um.CreateGroup(context.Background(), Group{Id: "bad"}, nil)
 		if err == nil {
 			t.Errorf("CreateGroup() error = nil, want error")
 		}
@@ -391,7 +391,7 @@ func TestUserManager_CreateGroup(t *testing.T) {
 func TestUserManager_UpdateGroup(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		t.Parallel()
-		group := entityGroup{Id: "devs"}
+		group := Group{Id: "devs"}
 		um := newTestUserManager(func(req *http.Request) (*http.Response, error) {
 			body, _ := json.Marshal(&group)
 			return &http.Response{
@@ -414,7 +414,7 @@ func TestUserManager_UpdateGroup(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
 		t.Parallel()
 		um := newTestUserManager(func(req *http.Request) (*http.Response, error) {
-			body, _ := json.Marshal(&nuxeoError{Message: "not found"})
+			body, _ := json.Marshal(&NuxeoError{Message: "not found"})
 			return &http.Response{
 				StatusCode: 404,
 				Body:       io.NopCloser(bytes.NewReader(body)),
@@ -423,7 +423,7 @@ func TestUserManager_UpdateGroup(t *testing.T) {
 				},
 			}, nil
 		})
-		_, err := um.UpdateGroup(context.Background(), "ghost", entityGroup{Id: "ghost"}, nil)
+		_, err := um.UpdateGroup(context.Background(), "ghost", Group{Id: "ghost"}, nil)
 		if err == nil {
 			t.Errorf("UpdateGroup() error = nil, want error")
 		}
@@ -451,7 +451,7 @@ func TestUserManager_DeleteGroup(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
 		t.Parallel()
 		um := newTestUserManager(func(req *http.Request) (*http.Response, error) {
-			body, _ := json.Marshal(&nuxeoError{Message: "not found"})
+			body, _ := json.Marshal(&NuxeoError{Message: "not found"})
 			return &http.Response{
 				StatusCode: 404,
 				Body:       io.NopCloser(bytes.NewReader(body)),
@@ -470,8 +470,8 @@ func TestUserManager_DeleteGroup(t *testing.T) {
 func TestUserManager_SearchGroup(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		t.Parallel()
-		groups := entityGroups{}
-		groups.Entries = []entityGroup{{Id: "admins"}, {Id: "devs"}}
+		groups := Groups{}
+		groups.Entries = []Group{{Id: "admins"}, {Id: "devs"}}
 		um := newTestUserManager(func(req *http.Request) (*http.Response, error) {
 			body, _ := json.Marshal(&groups)
 			return &http.Response{
@@ -494,7 +494,7 @@ func TestUserManager_SearchGroup(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
 		t.Parallel()
 		um := newTestUserManager(func(req *http.Request) (*http.Response, error) {
-			body, _ := json.Marshal(&nuxeoError{Message: "bad query"})
+			body, _ := json.Marshal(&NuxeoError{Message: "bad query"})
 			return &http.Response{
 				StatusCode: 400,
 				Body:       io.NopCloser(bytes.NewReader(body)),
@@ -525,7 +525,7 @@ func TestUserManager_AttachGroupToUser(t *testing.T) {
 			name:       "success",
 			group:      "devs",
 			user:       "alice",
-			mockResp:   &entityGroup{Id: "devs"},
+			mockResp:   &Group{Id: "devs"},
 			mockStatus: 200,
 			wantId:     "devs",
 		},
@@ -533,7 +533,7 @@ func TestUserManager_AttachGroupToUser(t *testing.T) {
 			name:       "not found",
 			group:      "ghost",
 			user:       "bob",
-			mockResp:   &nuxeoError{Message: "not found"},
+			mockResp:   &NuxeoError{Message: "not found"},
 			mockStatus: 404,
 			wantErr:    true,
 		},
@@ -583,14 +583,14 @@ func TestUserManager_FetchGroupMemberUsers(t *testing.T) {
 		{
 			name:       "success",
 			group:      "devs",
-			mockResp:   &entityUsers{Entries: []entityUser{{Id: "alice"}, {Id: "bob"}}},
+			mockResp:   &Users{Entries: []User{{Id: "alice"}, {Id: "bob"}}},
 			mockStatus: 200,
 			wantCount:  2,
 		},
 		{
 			name:       "not found",
 			group:      "ghost",
-			mockResp:   &nuxeoError{Message: "not found"},
+			mockResp:   &NuxeoError{Message: "not found"},
 			mockStatus: 404,
 			wantErr:    true,
 		},
@@ -639,14 +639,14 @@ func TestUserManager_FetchGroupMemberGroups(t *testing.T) {
 		{
 			name:       "success",
 			group:      "devs",
-			mockResp:   &entityGroups{Entries: []entityGroup{{Id: "admins"}, {Id: "devs"}}},
+			mockResp:   &Groups{Entries: []Group{{Id: "admins"}, {Id: "devs"}}},
 			mockStatus: 200,
 			wantCount:  2,
 		},
 		{
 			name:       "not found",
 			group:      "ghost",
-			mockResp:   &nuxeoError{Message: "not found"},
+			mockResp:   &NuxeoError{Message: "not found"},
 			mockStatus: 404,
 			wantErr:    true,
 		},
@@ -693,13 +693,13 @@ func TestUserManager_FetchWorkflowInstances(t *testing.T) {
 	}{
 		{
 			name:       "success",
-			mockResp:   &entityWorkflows{Entries: []entityWorkflow{{Id: "wf1"}, {Id: "wf2"}}},
+			mockResp:   &Workflows{Entries: []Workflow{{Id: "wf1"}, {Id: "wf2"}}},
 			mockStatus: 200,
 			wantCount:  2,
 		},
 		{
 			name:       "not found",
-			mockResp:   &nuxeoError{Message: "not found"},
+			mockResp:   &NuxeoError{Message: "not found"},
 			mockStatus: 404,
 			wantErr:    true,
 		},
@@ -737,7 +737,7 @@ func TestUserManager_FetchWorkflowInstances(t *testing.T) {
 func TestUserManager_StartWorkflowInstance(t *testing.T) {
 	tests := []struct {
 		name       string
-		input      entityWorkflow
+		input      Workflow
 		mockResp   any
 		mockStatus int
 		mockErr    error
@@ -746,21 +746,21 @@ func TestUserManager_StartWorkflowInstance(t *testing.T) {
 	}{
 		{
 			name:       "success",
-			input:      entityWorkflow{Id: "wf1"},
-			mockResp:   &entityWorkflow{Id: "wf1"},
+			input:      Workflow{Id: "wf1"},
+			mockResp:   &Workflow{Id: "wf1"},
 			mockStatus: 201,
 			wantId:     "wf1",
 		},
 		{
 			name:       "bad request",
-			input:      entityWorkflow{Id: "bad"},
-			mockResp:   &nuxeoError{Message: "bad request"},
+			input:      Workflow{Id: "bad"},
+			mockResp:   &NuxeoError{Message: "bad request"},
 			mockStatus: 400,
 			wantErr:    true,
 		},
 		{
 			name:    "http error",
-			input:   entityWorkflow{Id: "wf1"},
+			input:   Workflow{Id: "wf1"},
 			mockErr: errors.New("network error"),
 			wantErr: true,
 		},
@@ -806,7 +806,7 @@ func TestUserManager_FetchCurrentUser(t *testing.T) {
 			name:        "success",
 			loginResp:   map[string]string{"username": "john"},
 			loginStatus: 200,
-			userResp:    &entityUser{Id: "john"},
+			userResp:    &User{Id: "john"},
 			userStatus:  200,
 			wantUserId:  "john",
 		},
@@ -819,7 +819,7 @@ func TestUserManager_FetchCurrentUser(t *testing.T) {
 			name:        "login returns no username",
 			loginResp:   map[string]string{},
 			loginStatus: 200,
-			userResp:    &entityUser{Id: ""},
+			userResp:    &User{Id: ""},
 			userStatus:  200,
 			wantErr:     false, // changed from true to false
 			wantUserId:  "",    // explicitly expect empty user id
@@ -828,7 +828,7 @@ func TestUserManager_FetchCurrentUser(t *testing.T) {
 			name:        "user fetch error",
 			loginResp:   map[string]string{"username": "ghost"},
 			loginStatus: 200,
-			userResp:    &nuxeoError{Message: "not found"},
+			userResp:    &NuxeoError{Message: "not found"},
 			userStatus:  404,
 			wantErr:     true,
 		},

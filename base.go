@@ -63,7 +63,6 @@ type paginableEntities[T any] struct {
 // Field represents a Nuxeo property value, supporting dynamic types and JSON encoding.
 type Field json.RawMessage
 
-// NewField creates a Field from any Go value, marshaling it to JSON.
 func NewField(value any) (Field, error) {
 	if value == nil {
 		return Field(json.RawMessage("null")), nil
@@ -74,6 +73,76 @@ func NewField(value any) (Field, error) {
 	} else {
 		return Field{}, fmt.Errorf("failed to marshal field value: %w", err)
 	}
+}
+
+// NewStringField creates a new Field instance representing a Nuxeo String property.
+func NewStringField(value string) Field {
+	val, _ := NewField(value)
+	return val
+}
+
+// NewStringListField creates a new Field instance representing a Nuxeo String List property.
+func NewStringListField(value []string) Field {
+	val, _ := NewField(value)
+	return val
+}
+
+// NewIntegerField creates a new Field instance representing a Nuxeo Long property.
+func NewIntegerField(value int) Field {
+	val, _ := NewField(value)
+	return val
+}
+
+// NewIntegerListField creates a new Field instance representing a Nuxeo Long List property.
+func NewIntegerListField(value []int) Field {
+	val, _ := NewField(value)
+	return val
+}
+
+// NewFloatField creates a new Field instance representing a Nuxeo Double property.
+func NewFloatField(value float64) Field {
+	val, _ := NewField(value)
+	return val
+}
+
+// NewFloatListField creates a new Field instance representing a Nuxeo Double List property.
+func NewFloatListField(value []float64) Field {
+	val, _ := NewField(value)
+	return val
+}
+
+// NewBooleanField creates a new Field instance representing a Nuxeo Boolean property.
+func NewBooleanField(value bool) Field {
+	val, _ := NewField(value)
+	return val
+}
+
+// NewBooleanListField creates a new Field instance representing a Nuxeo Boolean List property.
+func NewBooleanListField(value []bool) Field {
+	val, _ := NewField(value)
+	return val
+}
+
+// NewTimeField creates a new Field instance representing a Nuxeo Calendar property.
+func NewTimeField(value ISO8601Time) Field {
+	val, _ := NewField(value)
+	return val
+}
+
+// NewTimeListField creates a new Field instance representing a Nuxeo Calendar List property.
+func NewTimeListField(value []ISO8601Time) Field {
+	val, _ := NewField(value)
+	return val
+}
+
+// NewComplexField creates a new Field instance representing a Nuxeo Complex Property.
+func NewComplexField(value any) (Field, error) {
+	return NewField(value)
+}
+
+// NewComplexListField creates a new Field instance representing a Nuxeo Complex Property List.
+func NewComplexListField(value []any) (Field, error) {
+	return NewField(value)
 }
 
 // MarshalJSON implements the json.Marshaler interface for Field.
@@ -93,7 +162,7 @@ func (f *Field) UnmarshalJSON(data []byte) error {
 
 // IsNull returns true if the Field is null.
 func (f Field) IsNull() bool {
-	return string(f) == "null"
+	return string(f) == "\"null\"" || string(f) == "null"
 }
 
 // String returns the Field value as a string (Nuxeo String).

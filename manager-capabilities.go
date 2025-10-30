@@ -25,13 +25,13 @@ type capabilitiesManager struct {
 // Example usage:
 //
 //	capabilities, err := cm.FetchCapabilities(ctx)
-func (cm *capabilitiesManager) FetchCapabilities(ctx context.Context) (*entityCapabilities, error) {
+func (cm *capabilitiesManager) FetchCapabilities(ctx context.Context) (*Capabilities, error) {
 	path := internal.PathApiV1 + "/capabilities"
-	res, err := cm.client.NewRequest(ctx, nil).SetResult(&entityCapabilities{}).SetError(&nuxeoError{}).Get(path)
+	res, err := cm.client.NewRequest(ctx, nil).SetResult(&Capabilities{}).SetError(&NuxeoError{}).Get(path)
 
 	if err := handleNuxeoError(err, res); err != nil {
 		cm.logger.Error("Failed to fetch capabilities", slog.String("error", err.Error()))
 		return nil, err
 	}
-	return res.Result().(*entityCapabilities), nil
+	return res.Result().(*Capabilities), nil
 }

@@ -27,13 +27,13 @@ func TestTaskManager_FetchTasks(t *testing.T) {
 	}{
 		{
 			name:    "success",
-			resp:    entityTasks{Entries: []entityTask{{entity: entity{EntityType: "task"}}}},
+			resp:    Tasks{Entries: []Task{{entity: entity{EntityType: "task"}}}},
 			status:  http.StatusOK,
 			wantErr: false,
 		},
 		{
 			name:    "error response",
-			resp:    nuxeoError{Message: "fail"},
+			resp:    NuxeoError{Message: "fail"},
 			status:  http.StatusBadRequest,
 			wantErr: true,
 		},
@@ -74,13 +74,13 @@ func TestTaskManager_FetchTask(t *testing.T) {
 	}{
 		{
 			name:    "success",
-			resp:    entityTask{entity: entity{EntityType: "task"}},
+			resp:    Task{entity: entity{EntityType: "task"}},
 			status:  http.StatusOK,
 			wantErr: false,
 		},
 		{
 			name:    "not found",
-			resp:    nuxeoError{Message: "not found"},
+			resp:    NuxeoError{Message: "not found"},
 			status:  http.StatusNotFound,
 			wantErr: true,
 		},
@@ -121,13 +121,13 @@ func TestTaskManager_ReassignTask(t *testing.T) {
 	}{
 		{
 			name:    "success",
-			resp:    entityTask{entity: entity{EntityType: "task"}},
+			resp:    Task{entity: entity{EntityType: "task"}},
 			status:  http.StatusOK,
 			wantErr: false,
 		},
 		{
 			name:    "error response",
-			resp:    nuxeoError{Message: "fail"},
+			resp:    NuxeoError{Message: "fail"},
 			status:  http.StatusBadRequest,
 			wantErr: true,
 		},
@@ -168,13 +168,13 @@ func TestTaskManager_DelegateTask(t *testing.T) {
 	}{
 		{
 			name:    "success",
-			resp:    entityTask{entity: entity{EntityType: "task"}},
+			resp:    Task{entity: entity{EntityType: "task"}},
 			status:  http.StatusOK,
 			wantErr: false,
 		},
 		{
 			name:    "error response",
-			resp:    nuxeoError{Message: "fail"},
+			resp:    NuxeoError{Message: "fail"},
 			status:  http.StatusBadRequest,
 			wantErr: true,
 		},
@@ -215,13 +215,13 @@ func TestTaskManager_CompleteTask(t *testing.T) {
 	}{
 		{
 			name:    "success",
-			resp:    entityTask{entity: entity{EntityType: "task"}},
+			resp:    Task{entity: entity{EntityType: "task"}},
 			status:  http.StatusOK,
 			wantErr: false,
 		},
 		{
 			name:    "error response",
-			resp:    nuxeoError{Message: "fail"},
+			resp:    NuxeoError{Message: "fail"},
 			status:  http.StatusBadRequest,
 			wantErr: true,
 		},

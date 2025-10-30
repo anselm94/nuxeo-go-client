@@ -2,7 +2,7 @@ package nuxeo
 
 // EntityGroup represents a Nuxeo group entity.
 // It includes group properties, member users, member groups, and parent groups.
-type entityGroup struct {
+type Group struct {
 	entity
 	Id           string           `json:"id"`
 	Properties   map[string]Field `json:"properties"`
@@ -13,8 +13,8 @@ type entityGroup struct {
 
 // NewGroup creates a new EntityGroup with the given group ID.
 // The group ID is set as both the Id and the "id" property.
-func NewGroup(groupId string) *entityGroup {
-	return &entityGroup{
+func NewGroup(groupId string) *Group {
+	return &Group{
 		entity: entity{
 			EntityType: EntityTypeGroup,
 		},
@@ -22,4 +22,4 @@ func NewGroup(groupId string) *entityGroup {
 	}
 }
 
-type entityGroups paginableEntities[entityGroup]
+type Groups paginableEntities[Group]

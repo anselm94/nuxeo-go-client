@@ -122,7 +122,7 @@ func TestSetAuthCode_Success(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/oauth2/token" && r.Method == http.MethodPost {
 			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"access_token": "tok",
 				"token_type":   "bearer",
 			})
@@ -153,7 +153,7 @@ func TestSetAuthCode_Error(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/oauth2/token" && r.Method == http.MethodPost {
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"error": "invalid_grant",
 			})
 			return
@@ -174,7 +174,7 @@ func TestGetTokenSource_ClientCredentials(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/oauth2/token" && r.Method == http.MethodPost {
 			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]any{
 				"access_token": "client-token",
 				"token_type":   "bearer",
 			})

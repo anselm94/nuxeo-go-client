@@ -1,8 +1,8 @@
 package nuxeo
 
-// EntityAuditLogEntry represents a single audit log entry for a Nuxeo document or event.
+// AuditLogEntry represents a single audit log entry for a Nuxeo document or event.
 // It contains metadata about the event, principal, document, and extended fields.
-type entityAuditLogEntry struct {
+type AuditLogEntry struct {
 	entity
 	ID            int              `json:"id"`
 	Category      string           `json:"category"`
@@ -19,5 +19,5 @@ type entityAuditLogEntry struct {
 	Extended      map[string]Field `json:"extended"`
 }
 
-// EntityAudit is a paginated collection of EntityAuditLogEntry objects.
-type entityAudit paginableEntities[entityAuditLogEntry]
+// Audit is a paginated collection of AuditLogEntry objects.
+type Audit paginableEntities[AuditLogEntry]

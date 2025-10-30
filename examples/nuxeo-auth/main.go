@@ -3,10 +3,19 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/anselm94/nuxeo-go-client"
 	nuxeoauth "github.com/anselm94/nuxeo-go-client/auth"
 )
+
+type CustomAuthenticator struct{}
+
+func (ca *CustomAuthenticator) GetAuthHeaders(ctx context.Context, req *http.Request) map[string]string {
+	return map[string]string{
+		"X-Custom-Auth": "custom-auth-value",
+	}
+}
 
 func main() {
 	// 1. initialize context
@@ -19,13 +28,19 @@ func main() {
 	// 2.a Basic Authenticator
 	authenticator = nuxeoauth.NewBasicAuthenticator("Administrator", "Administrator")
 
-	// // 2.b Bearer Authenticator
+	// ####
+	// #### 2.b Bearer Authenticator ####
+	// ####
 	// authenticator = nuxeoauth.NewBearerAuthenticator("your-bearer-token")
 
-	// // 2.c Token Authenticator
+	// ####
+	// #### 2.c Token Authenticator ####
+	// ####
 	// authenticator = nuxeoauth.NewTokenAuthenticator("your-token")
 
-	// // 2.d.1 OAuth2 Authenticator (Authorization Code Flow)
+	// ####
+	// #### 2.d.1 OAuth2 Authenticator (Authorization Code Flow) ####
+	// ####
 	// authCodeFlowOptions := nuxeoauth.NewOAuth2AuthorizationCodeOptions("your-client-id", "your-client-secret", "your-redirect-uri")
 	// authCodeOauthAuthenticator := nuxeoauth.NewOAuth2Authenticator(authCodeFlowOptions, "https://demo.nuxeo.com/nuxeo")
 	// authenticator = authCodeOauthAuthenticator
@@ -40,15 +55,24 @@ func main() {
 	// 	panic(err)
 	// }
 
-	// // 2.d.2 OAuth2 Authenticator (Client Credentials Flow)
+	// ####
+	// #### 2.d.2 OAuth2 Authenticator (Client Credentials Flow) ####
+	// ####
 	// clientCredFlowOptions := nuxeoauth.NewOAuth2ClientCredentialsOptions("your-client-id", "your-client-secret")
 	// clientCredOauthAuthenticator := nuxeoauth.NewOAuth2Authenticator(clientCredFlowOptions, "https://demo.nuxeo.com/nuxeo")
 	// authenticator = clientCredOauthAuthenticator
 
-	// // 2.d.3 OAuth2 Authenticator (Jwt Token Flow)
+	// ####
+	// #### 2.d.3 OAuth2 Authenticator (Jwt Token Flow) ####
+	// ####
 	// jwtFlowOptions := nuxeoauth.NewOAuth2JwtOptions("your-jwt-token")
 	// jwtOauthAuthenticator := nuxeoauth.NewOAuth2Authenticator(jwtFlowOptions, "https://demo.nuxeo.com/nuxeo")
 	// authenticator = jwtOauthAuthenticator
+
+	// ####
+	// #### 2.e Custom Authenticator ####
+	// ####
+	// authenticator = &CustomAuthenticator{}
 
 	// 3. Initialize Nuxeo client
 	nuxeoClientOptions := nuxeo.DefaultNuxeoClientOptions()

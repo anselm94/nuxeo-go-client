@@ -39,21 +39,17 @@ func TestUserGetters(t *testing.T) {
 	t.Parallel()
 	u := NewUser("jdoe")
 	// Set all properties
-	props := map[string]any{
-		UserPropertyPassword:  "secret",
-		UserPropertyFirstName: "John",
-		UserPropertyLastName:  "Doe",
-		UserPropertyEmail:     "jdoe@example.com",
-		UserPropertyGroups:    []string{"admins", "users"},
-		UserPropertyCompany:   "Acme",
-		UserPropertyTenantId:  "tenant1",
+	props := map[string]Field{
+		UserPropertyPassword:  NewStringField("secret"),
+		UserPropertyFirstName: NewStringField("John"),
+		UserPropertyLastName:  NewStringField("Doe"),
+		UserPropertyEmail:     NewStringField("jdoe@example.com"),
+		UserPropertyGroups:    NewStringListField([]string{"admins", "users"}),
+		UserPropertyCompany:   NewStringField("Acme"),
+		UserPropertyTenantId:  NewStringField("tenant1"),
 	}
 	for k, v := range props {
-		f, err := NewField(v)
-		if err != nil {
-			t.Fatalf("NewField error for %s: %v", k, err)
-		}
-		u.Properties[k] = f
+		u.SetProperty(k, v)
 	}
 	if got := u.IdOrUsername(); got != "jdoe" {
 		t.Errorf("IdOrUsername: got %q, want 'jdoe'", got)
@@ -120,7 +116,7 @@ func TestUserPropertyAndSetProperty(t *testing.T) {
 	t.Parallel()
 	u := NewUser("jdoe")
 	// Set custom property
-	u.SetProperty("custom", "customval")
+	u.SetProperty("custom", NewStringField("customval"))
 	f, ok := u.Property("custom")
 	if !ok {
 		t.Error("custom property not found")
@@ -129,17 +125,11 @@ func TestUserPropertyAndSetProperty(t *testing.T) {
 	if err != nil || str == nil || *str != "customval" {
 		t.Errorf("custom property value: got %v, want 'customval'", str)
 	}
-	// Set invalid value (should not panic)
-	u.SetProperty("invalid", make(chan int))
-	// Should not be set due to marshal error
-	if _, ok := u.Property("invalid"); ok {
-		t.Error("invalid property should not be set")
-	}
 }
 
 func TestUserExtendedGroups(t *testing.T) {
 	t.Parallel()
-	groups := []entityExtendedGroup{
+	groups := []ExtendedGroup{
 		{Name: "admins", Label: "Admins", Url: "/group/admins"},
 		{Name: "users", Label: "Users", Url: "/group/users"},
 	}

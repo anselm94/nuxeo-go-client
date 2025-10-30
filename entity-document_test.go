@@ -17,8 +17,8 @@ func TestNewDocument(t *testing.T) {
 	if doc.entity.EntityType != EntityTypeDocument {
 		t.Errorf("expected EntityType 'document', got '%s'", doc.entity.EntityType)
 	}
-	if doc.Properties == nil || len(doc.Properties) != 0 {
-		t.Errorf("expected empty Properties map, got %v", doc.Properties)
+	if _, ok := doc.Properties[DocumentPropertyDCTitle]; !ok {
+		t.Errorf("expected dc:title property map, got none")
 	}
 }
 
@@ -55,7 +55,7 @@ func TestFacetMethods(t *testing.T) {
 func TestPropertyMethods(t *testing.T) {
 	doc := NewDocument("File", "myfile")
 	// Set property
-	doc.SetProperty("dc:title", "Test Title")
+	doc.SetProperty("dc:title", NewStringField("Test Title"))
 	field, found := doc.Property("dc:title")
 	if !found {
 		t.Error("expected property 'dc:title' to be found")
@@ -65,7 +65,7 @@ func TestPropertyMethods(t *testing.T) {
 		t.Errorf("expected property value 'Test Title', got '%v', err: %v", str, err)
 	}
 	// Update property
-	doc.SetProperty("dc:title", "New Title")
+	doc.SetProperty("dc:title", NewStringField("New Title"))
 	field, found = doc.Property("dc:title")
 	str, err = field.String()
 	if err != nil || str == nil || *str != "New Title" {
@@ -131,7 +131,7 @@ func TestEdgeCases(t *testing.T) {
 		}
 	})
 	t.Run("Nil property value", func(t *testing.T) {
-		doc.SetProperty("dc:title", nil)
+		doc.SetProperty("dc:title", NewStringField("null"))
 		field, found := doc.Property("dc:title")
 		if !found {
 			t.Error("expected property to be found")

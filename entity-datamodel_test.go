@@ -14,7 +14,7 @@ func TestEntitySchema_GetPrefix(t *testing.T) {
 		{"Both empty", "", "", ""},
 	}
 	for _, tc := range cases {
-		s := entitySchema{Prefix: tc.prefix, PrefixAliased: tc.prefixAliased}
+		s := Schema{Prefix: tc.prefix, PrefixAliased: tc.prefixAliased}
 		if got := s.GetPrefix(); got != tc.expected {
 			t.Errorf("%s: GetPrefix() = %q, want %q", tc.name, got, tc.expected)
 		}
@@ -41,7 +41,7 @@ func TestEntitySchemaField_TypeChecks(t *testing.T) {
 		{"Unknown type", "other", false, false, false, false, false, false},
 	}
 	for _, tc := range cases {
-		f := entitySchemaField{DataType: tc.dataType}
+		f := SchemaField{DataType: tc.dataType}
 		if f.IsBlob() != tc.isBlob {
 			t.Errorf("%s: IsBlob() = %v, want %v", tc.name, f.IsBlob(), tc.isBlob)
 		}
@@ -64,7 +64,7 @@ func TestEntitySchemaField_TypeChecks(t *testing.T) {
 }
 
 func TestEntitySchemaField_Initialization(t *testing.T) {
-	f := entitySchemaField{DataType: "string", IsArray: true, Fields: nil}
+	f := SchemaField{DataType: "string", IsArray: true, Fields: nil}
 	if f.DataType != "string" {
 		t.Errorf("DataType = %q, want %q", f.DataType, "string")
 	}
@@ -77,10 +77,10 @@ func TestEntitySchemaField_Initialization(t *testing.T) {
 }
 
 func TestEntitySchema_Initialization(t *testing.T) {
-	fields := map[string]entitySchemaField{
+	fields := map[string]SchemaField{
 		"field1": {DataType: "string"},
 	}
-	s := entitySchema{Name: "schema1", Prefix: "pfx", PrefixAliased: "pfxAlias", Fields: fields}
+	s := Schema{Name: "schema1", Prefix: "pfx", PrefixAliased: "pfxAlias", Fields: fields}
 	if s.Name != "schema1" {
 		t.Errorf("Name = %q, want %q", s.Name, "schema1")
 	}
@@ -96,8 +96,8 @@ func TestEntitySchema_Initialization(t *testing.T) {
 }
 
 func TestEntityFacet_Initialization(t *testing.T) {
-	schemas := []entitySchema{{Name: "schemaA"}, {Name: "schemaB"}}
-	f := entityFacet{Name: "facet1", Schemas: schemas}
+	schemas := []Schema{{Name: "schemaA"}, {Name: "schemaB"}}
+	f := Facet{Name: "facet1", Schemas: schemas}
 	if f.Name != "facet1" {
 		t.Errorf("Name = %q, want %q", f.Name, "facet1")
 	}
@@ -110,8 +110,8 @@ func TestEntityFacet_Initialization(t *testing.T) {
 }
 
 func TestEntityDocType_Initialization(t *testing.T) {
-	schemas := []entitySchema{{Name: "schemaX"}}
-	dt := entityDocType{Name: "docType1", Parent: "parentType", Facets: []string{"facetA"}, Schemas: schemas}
+	schemas := []Schema{{Name: "schemaX"}}
+	dt := DocType{Name: "docType1", Parent: "parentType", Facets: []string{"facetA"}, Schemas: schemas}
 	if dt.Name != "docType1" {
 		t.Errorf("Name = %q, want %q", dt.Name, "docType1")
 	}
@@ -127,8 +127,8 @@ func TestEntityDocType_Initialization(t *testing.T) {
 }
 
 func TestEntitySchemas_AndEntityFacets_Initialization(t *testing.T) {
-	schemas := entitySchemas{{Name: "schema1"}, {Name: "schema2"}}
-	facets := entityFacets{{Name: "facet1"}, {Name: "facet2"}}
+	schemas := Schemas{{Name: "schema1"}, {Name: "schema2"}}
+	facets := Facets{{Name: "facet1"}, {Name: "facet2"}}
 	if len(schemas) != 2 {
 		t.Errorf("entitySchemas length = %d, want 2", len(schemas))
 	}
@@ -141,43 +141,43 @@ func TestEntitySchemaField_UnmarshalJSON(t *testing.T) {
 	cases := []struct {
 		name    string
 		input   string
-		expect  entitySchemaField
+		expect  SchemaField
 		wantErr bool
 	}{
 		{
 			name:    "String type",
 			input:   `"string"`,
-			expect:  entitySchemaField{DataType: "string", IsArray: false, Fields: nil},
+			expect:  SchemaField{DataType: "string", IsArray: false, Fields: nil},
 			wantErr: false,
 		},
 		{
 			name:    "String array type",
 			input:   `"string[]"`,
-			expect:  entitySchemaField{DataType: "string", IsArray: true, Fields: nil},
+			expect:  SchemaField{DataType: "string", IsArray: true, Fields: nil},
 			wantErr: false,
 		},
 		{
 			name:    "Complex object",
 			input:   `{"type": "complex", "fields": {"sub": {"type": "string"}}}`,
-			expect:  entitySchemaField{DataType: "complex", IsArray: false, Fields: map[string]entitySchemaField{"sub": {DataType: "string"}}},
+			expect:  SchemaField{DataType: "complex", IsArray: false, Fields: map[string]SchemaField{"sub": {DataType: "string"}}},
 			wantErr: false,
 		},
 		{
 			name:    "Complex array object",
 			input:   `{"type": "complex[]", "fields": {"sub": {"type": "string"}}}`,
-			expect:  entitySchemaField{DataType: "complex", IsArray: true, Fields: map[string]entitySchemaField{"sub": {DataType: "string"}}},
+			expect:  SchemaField{DataType: "complex", IsArray: true, Fields: map[string]SchemaField{"sub": {DataType: "string"}}},
 			wantErr: false,
 		},
 		{
 			name:    "Malformed JSON",
 			input:   `{"type": "string"`, // missing closing brace
-			expect:  entitySchemaField{},
+			expect:  SchemaField{},
 			wantErr: true,
 		},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			var f entitySchemaField
+			var f SchemaField
 			err := f.UnmarshalJSON([]byte(tc.input))
 			if tc.wantErr {
 				if err == nil {
@@ -242,7 +242,7 @@ func TestEntityDocTypes_UnmarshalJSON(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			var dt entityDocTypes
+			var dt DocTypes
 			err := dt.UnmarshalJSON([]byte(tc.input))
 			if tc.wantErr {
 				if err == nil {
@@ -270,9 +270,9 @@ func TestEntityDocTypes_UnmarshalJSON(t *testing.T) {
 }
 
 func TestEntityDocTypes_Initialization(t *testing.T) {
-	docTypes := map[string]entityDocType{"typeA": {Name: "typeA"}}
-	schemas := map[string]entitySchema{"schemaA": {Name: "schemaA"}}
-	dt := entityDocTypes{DocTypes: docTypes, Schemas: schemas}
+	docTypes := map[string]DocType{"typeA": {Name: "typeA"}}
+	schemas := map[string]Schema{"schemaA": {Name: "schemaA"}}
+	dt := DocTypes{DocTypes: docTypes, Schemas: schemas}
 	if dt.DocTypes["typeA"].Name != "typeA" {
 		t.Errorf("DocTypes[\"typeA\"].Name = %q, want %q", dt.DocTypes["typeA"].Name, "typeA")
 	}

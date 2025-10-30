@@ -13,22 +13,22 @@ func TestNuxeoError_Error(t *testing.T) {
 
 	tests := []struct {
 		name  string
-		input nuxeoError
+		input NuxeoError
 		want  string
 	}{
 		{
 			name:  "Typical error",
-			input: nuxeoError{Status: 404, Message: "Not Found"},
+			input: NuxeoError{Status: 404, Message: "Not Found"},
 			want:  "Nuxeo Exception: 404 - Not Found",
 		},
 		{
 			name:  "Empty message",
-			input: nuxeoError{Status: 500, Message: ""},
+			input: NuxeoError{Status: 500, Message: ""},
 			want:  "Nuxeo Exception: 500 - ",
 		},
 		{
 			name:  "Zero status",
-			input: nuxeoError{Status: 0, Message: "No Status"},
+			input: NuxeoError{Status: 0, Message: "No Status"},
 			want:  "Nuxeo Exception: 0 - No Status",
 		},
 	}
@@ -49,7 +49,7 @@ func TestHandleNuxeoError(t *testing.T) {
 	t.Parallel()
 
 	errSentinel := errors.New("sentinel error")
-	nuxeoErr := &nuxeoError{Status: 400, Message: "Bad Request"}
+	nuxeoErr := &NuxeoError{Status: 400, Message: "Bad Request"}
 	genericErr := errors.New("generic error")
 
 	tests := []struct {
@@ -127,7 +127,7 @@ func TestHandleNuxeoError(t *testing.T) {
 					}
 					if r.IsError() {
 						switch e := r.Error().(type) {
-						case *nuxeoError:
+						case *NuxeoError:
 							return e
 						case error:
 							return e
@@ -151,7 +151,7 @@ func TestHandleNuxeoError(t *testing.T) {
 					t.Errorf("Expected error %v, got %v", tc.wantErr, got)
 				}
 			case "nuxeo":
-				e, ok := got.(*nuxeoError)
+				e, ok := got.(*NuxeoError)
 				if !ok {
 					t.Fatalf("Expected nuxeoError type, got %T, value: %#v", got, got)
 				}

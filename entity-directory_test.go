@@ -28,7 +28,8 @@ func TestEntityDirectoryEntry_Id(t *testing.T) {
 	for _, tc := range cases {
 		d := NewDirectoryEntry(tc.id)
 		if tc.propId != nil {
-			d.SetProperty(DirectoryPropertyId, tc.propId)
+			fieldVal, _ := NewField(tc.propId)
+			d.SetProperty(DirectoryPropertyId, fieldVal)
 		}
 		if got := d.Id(); got != tc.expect {
 			t.Errorf("%s: Id() = %q, want %q", tc.name, got, tc.expect)
@@ -38,7 +39,7 @@ func TestEntityDirectoryEntry_Id(t *testing.T) {
 
 func TestEntityDirectoryEntry_Label(t *testing.T) {
 	d := NewDirectoryEntry("")
-	d.SetProperty(DirectoryPropertyLabel, "labelValue")
+	d.SetProperty(DirectoryPropertyLabel, NewStringField("labelValue"))
 	if got := d.Label(); got != "labelValue" {
 		t.Errorf("Label() = %q, want %q", got, "labelValue")
 	}
@@ -51,7 +52,7 @@ func TestEntityDirectoryEntry_Label(t *testing.T) {
 
 func TestEntityDirectoryEntry_Ordering(t *testing.T) {
 	d := NewDirectoryEntry("")
-	d.SetProperty(DirectoryPropertyOrdering, 42.5)
+	d.SetProperty(DirectoryPropertyOrdering, NewFloatField(42.5))
 	if got := d.Ordering(); got != 42.5 {
 		t.Errorf("Ordering() = %v, want 42.5", got)
 	}
@@ -64,7 +65,7 @@ func TestEntityDirectoryEntry_Ordering(t *testing.T) {
 
 func TestEntityDirectoryEntry_Obsolete(t *testing.T) {
 	d := NewDirectoryEntry("")
-	d.SetProperty(DirectoryPropertyObsolete, 1.0)
+	d.SetProperty(DirectoryPropertyObsolete, NewFloatField(1.0))
 	if got := d.Obsolete(); got != 1.0 {
 		t.Errorf("Obsolete() = %v, want 1.0", got)
 	}
@@ -77,7 +78,7 @@ func TestEntityDirectoryEntry_Obsolete(t *testing.T) {
 
 func TestEntityDirectoryEntry_Property(t *testing.T) {
 	d := NewDirectoryEntry("")
-	d.SetProperty("foo", "bar")
+	d.SetProperty("foo", NewStringField("bar"))
 	val, found := d.Property("foo")
 	if !found {
 		t.Errorf("Property() did not find key 'foo'")
@@ -94,7 +95,7 @@ func TestEntityDirectoryEntry_Property(t *testing.T) {
 
 func TestEntityDirectoryEntry_SetProperty(t *testing.T) {
 	d := NewDirectoryEntry("")
-	d.SetProperty("foo", "bar")
+	d.SetProperty("foo", NewStringField("bar"))
 	val, found := d.Property("foo")
 	if !found {
 		t.Errorf("SetProperty() did not set key 'foo'")
@@ -104,7 +105,7 @@ func TestEntityDirectoryEntry_SetProperty(t *testing.T) {
 		t.Errorf("SetProperty() value = %v, want 'bar'", str)
 	}
 	// Overwrite property
-	d.SetProperty("foo", "baz")
+	d.SetProperty("foo", NewStringField("baz"))
 	val2, _ := d.Property("foo")
 	str2, _ := val2.String()
 	if str2 == nil || *str2 != "baz" {

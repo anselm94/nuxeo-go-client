@@ -42,13 +42,13 @@ func TestRepository_FetchDocumentRoot(t *testing.T) {
 	}{
 		{
 			name:       "success",
-			mockResp:   &entityDocument{ID: "rootdoc"},
+			mockResp:   &Document{ID: "rootdoc"},
 			mockStatus: 200,
 			wantDocID:  "rootdoc",
 		},
 		{
 			name:       "not found",
-			mockResp:   &nuxeoError{Message: "not found"},
+			mockResp:   &NuxeoError{Message: "not found"},
 			mockStatus: 404,
 			wantErr:    true,
 		},
@@ -96,14 +96,14 @@ func TestRepository_FetchDocumentById(t *testing.T) {
 		{
 			name:       "success",
 			docID:      "doc123",
-			mockResp:   &entityDocument{ID: "doc123"},
+			mockResp:   &Document{ID: "doc123"},
 			mockStatus: 200,
 			wantDocID:  "doc123",
 		},
 		{
 			name:       "not found",
 			docID:      "missing",
-			mockResp:   &nuxeoError{Message: "not found"},
+			mockResp:   &NuxeoError{Message: "not found"},
 			mockStatus: 404,
 			wantErr:    true,
 		},
@@ -152,14 +152,14 @@ func TestRepository_FetchDocumentByPath(t *testing.T) {
 		{
 			name:       "success",
 			docPath:    "/default-domain/workspaces",
-			mockResp:   &entityDocument{ID: "docpath123"},
+			mockResp:   &Document{ID: "docpath123"},
 			mockStatus: 200,
 			wantDocID:  "docpath123",
 		},
 		{
 			name:       "not found",
 			docPath:    "/missing",
-			mockResp:   &nuxeoError{Message: "not found"},
+			mockResp:   &NuxeoError{Message: "not found"},
 			mockStatus: 404,
 			wantErr:    true,
 		},
@@ -198,7 +198,7 @@ func TestRepository_FetchDocumentByPath(t *testing.T) {
 func TestRepository_CreateDocumentById(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		t.Parallel()
-		doc := entityDocument{ID: "newdoc"}
+		doc := Document{ID: "newdoc"}
 		repo := newTestRepository(func(req *http.Request) (*http.Response, error) {
 			body, _ := json.Marshal(&doc)
 			return &http.Response{
@@ -219,14 +219,14 @@ func TestRepository_CreateDocumentById(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
 		t.Parallel()
 		repo := newTestRepository(func(req *http.Request) (*http.Response, error) {
-			body, _ := json.Marshal(&nuxeoError{Message: "bad request"})
+			body, _ := json.Marshal(&NuxeoError{Message: "bad request"})
 			return &http.Response{
 				StatusCode: 400,
 				Body:       io.NopCloser(bytes.NewReader(body)),
 				Header:     http.Header{"Content-Type": []string{"application/json"}},
 			}, nil
 		})
-		_, err := repo.CreateDocumentById(context.Background(), "parent123", entityDocument{ID: "fail"}, nil)
+		_, err := repo.CreateDocumentById(context.Background(), "parent123", Document{ID: "fail"}, nil)
 		if err == nil {
 			t.Errorf("CreateDocumentById() error = nil, want error")
 		}
@@ -236,7 +236,7 @@ func TestRepository_CreateDocumentById(t *testing.T) {
 func TestRepository_CreateDocumentByPath(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		t.Parallel()
-		doc := entityDocument{ID: "createdbyPath"}
+		doc := Document{ID: "createdbyPath"}
 		repo := newTestRepository(func(req *http.Request) (*http.Response, error) {
 			body, _ := json.Marshal(&doc)
 			return &http.Response{
@@ -257,14 +257,14 @@ func TestRepository_CreateDocumentByPath(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
 		t.Parallel()
 		repo := newTestRepository(func(req *http.Request) (*http.Response, error) {
-			body, _ := json.Marshal(&nuxeoError{Message: "bad request"})
+			body, _ := json.Marshal(&NuxeoError{Message: "bad request"})
 			return &http.Response{
 				StatusCode: 400,
 				Body:       io.NopCloser(bytes.NewReader(body)),
 				Header:     http.Header{"Content-Type": []string{"application/json"}},
 			}, nil
 		})
-		_, err := repo.CreateDocumentByPath(context.Background(), "/default-domain/workspaces", entityDocument{ID: "fail"}, nil)
+		_, err := repo.CreateDocumentByPath(context.Background(), "/default-domain/workspaces", Document{ID: "fail"}, nil)
 		if err == nil {
 			t.Errorf("CreateDocumentByPath() error = nil, want error")
 		}
@@ -274,7 +274,7 @@ func TestRepository_CreateDocumentByPath(t *testing.T) {
 func TestRepository_UpdateDocument(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		t.Parallel()
-		doc := entityDocument{ID: "updatedDoc"}
+		doc := Document{ID: "updatedDoc"}
 		repo := newTestRepository(func(req *http.Request) (*http.Response, error) {
 			body, _ := json.Marshal(&doc)
 			return &http.Response{
@@ -295,14 +295,14 @@ func TestRepository_UpdateDocument(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
 		t.Parallel()
 		repo := newTestRepository(func(req *http.Request) (*http.Response, error) {
-			body, _ := json.Marshal(&nuxeoError{Message: "update failed"})
+			body, _ := json.Marshal(&NuxeoError{Message: "update failed"})
 			return &http.Response{
 				StatusCode: 400,
 				Body:       io.NopCloser(bytes.NewReader(body)),
 				Header:     http.Header{"Content-Type": []string{"application/json"}},
 			}, nil
 		})
-		_, err := repo.UpdateDocument(context.Background(), "failDoc", entityDocument{ID: "failDoc"}, nil)
+		_, err := repo.UpdateDocument(context.Background(), "failDoc", Document{ID: "failDoc"}, nil)
 		if err == nil {
 			t.Errorf("UpdateDocument() error = nil, want error")
 		}
@@ -328,7 +328,7 @@ func TestRepository_DeleteDocument(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
 		t.Parallel()
 		repo := newTestRepository(func(req *http.Request) (*http.Response, error) {
-			body, _ := json.Marshal(&nuxeoError{Message: "not found"})
+			body, _ := json.Marshal(&NuxeoError{Message: "not found"})
 			return &http.Response{
 				StatusCode: 404,
 				Body:       io.NopCloser(bytes.NewReader(body)),
@@ -345,8 +345,8 @@ func TestRepository_DeleteDocument(t *testing.T) {
 func TestRepository_Query(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		t.Parallel()
-		docs := entityDocuments{}
-		docs.Entries = []entityDocument{{ID: "doc1"}, {ID: "doc2"}}
+		docs := Documents{}
+		docs.Entries = []Document{{ID: "doc1"}, {ID: "doc2"}}
 		repo := newTestRepository(func(req *http.Request) (*http.Response, error) {
 			body, _ := json.Marshal(&docs)
 			return &http.Response{
@@ -367,7 +367,7 @@ func TestRepository_Query(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
 		t.Parallel()
 		repo := newTestRepository(func(req *http.Request) (*http.Response, error) {
-			body, _ := json.Marshal(&nuxeoError{Message: "bad query"})
+			body, _ := json.Marshal(&NuxeoError{Message: "bad query"})
 			return &http.Response{
 				StatusCode: 400,
 				Body:       io.NopCloser(bytes.NewReader(body)),
@@ -398,8 +398,8 @@ func TestRepository_QueryByProvider(t *testing.T) {
 			providerName:     "myProvider",
 			queryParams:      []string{"foo=bar"},
 			namedQueryParams: map[string]string{"nxql": "SELECT * FROM Document"},
-			mockResp: &entityDocuments{
-				Entries: []entityDocument{{ID: "docA"}, {ID: "docB"}},
+			mockResp: &Documents{
+				Entries: []Document{{ID: "docA"}, {ID: "docB"}},
 			},
 			mockStatus: 200,
 			wantDocIDs: []string{"docA", "docB"},
@@ -409,8 +409,8 @@ func TestRepository_QueryByProvider(t *testing.T) {
 			providerName:     "emptyProvider",
 			queryParams:      nil,
 			namedQueryParams: map[string]string{},
-			mockResp: &entityDocuments{
-				Entries: []entityDocument{},
+			mockResp: &Documents{
+				Entries: []Document{},
 			},
 			mockStatus: 200,
 			wantDocIDs: []string{},
@@ -420,7 +420,7 @@ func TestRepository_QueryByProvider(t *testing.T) {
 			providerName:     "missingProvider",
 			queryParams:      nil,
 			namedQueryParams: map[string]string{},
-			mockResp:         &nuxeoError{Message: "provider not found"},
+			mockResp:         &NuxeoError{Message: "provider not found"},
 			mockStatus:       404,
 			wantErr:          true,
 		},
@@ -487,14 +487,14 @@ func TestRepository_FetchAuditByPath(t *testing.T) {
 		{
 			name:        "success",
 			docPath:     "/default-domain/workspaces",
-			mockResp:    &entityAudit{Entries: []entityAuditLogEntry{{ID: 101}}},
+			mockResp:    &Audit{Entries: []AuditLogEntry{{ID: 101}}},
 			mockStatus:  200,
 			wantAuditID: 101,
 		},
 		{
 			name:       "not found",
 			docPath:    "/missing",
-			mockResp:   &nuxeoError{Message: "not found"},
+			mockResp:   &NuxeoError{Message: "not found"},
 			mockStatus: 404,
 			wantErr:    true,
 		},
@@ -543,14 +543,14 @@ func TestRepository_FetchAuditById(t *testing.T) {
 		{
 			name:        "success",
 			docID:       "doc123",
-			mockResp:    &entityAudit{Entries: []entityAuditLogEntry{{ID: 202}}},
+			mockResp:    &Audit{Entries: []AuditLogEntry{{ID: 202}}},
 			mockStatus:  200,
 			wantAuditID: 202,
 		},
 		{
 			name:       "not found",
 			docID:      "missing",
-			mockResp:   &nuxeoError{Message: "not found"},
+			mockResp:   &NuxeoError{Message: "not found"},
 			mockStatus: 404,
 			wantErr:    true,
 		},
@@ -600,7 +600,7 @@ func TestRepository_FetchPermissionsByPath(t *testing.T) {
 		{
 			name:       "success",
 			docPath:    "/default-domain/workspaces",
-			mockResp:   &entityACP{ACLs: []entityACL{{Name: "local", ACEs: []entityACE{{Username: "bob"}}}}},
+			mockResp:   &ACP{ACLs: []ACL{{Name: "local", ACEs: []ACE{{Username: "bob"}}}}},
 			mockStatus: 200,
 			wantACLs:   1,
 			wantACE:    "bob",
@@ -608,7 +608,7 @@ func TestRepository_FetchPermissionsByPath(t *testing.T) {
 		{
 			name:       "not found",
 			docPath:    "/missing",
-			mockResp:   &nuxeoError{Message: "not found"},
+			mockResp:   &NuxeoError{Message: "not found"},
 			mockStatus: 404,
 			wantErr:    true,
 		},
@@ -663,7 +663,7 @@ func TestRepository_FetchPermissionsById(t *testing.T) {
 		{
 			name:       "success",
 			docID:      "doc123",
-			mockResp:   &entityACP{ACLs: []entityACL{{Name: "local", ACEs: []entityACE{{Username: "alice"}}}}},
+			mockResp:   &ACP{ACLs: []ACL{{Name: "local", ACEs: []ACE{{Username: "alice"}}}}},
 			mockStatus: 200,
 			wantACLs:   1,
 			wantACE:    "alice",
@@ -671,7 +671,7 @@ func TestRepository_FetchPermissionsById(t *testing.T) {
 		{
 			name:       "not found",
 			docID:      "missing",
-			mockResp:   &nuxeoError{Message: "not found"},
+			mockResp:   &NuxeoError{Message: "not found"},
 			mockStatus: 404,
 			wantErr:    true,
 		},
@@ -725,14 +725,14 @@ func TestRepository_FetchChildrenByPath(t *testing.T) {
 		{
 			name:       "success",
 			parentPath: "/default-domain/workspaces",
-			mockResp:   &entityDocuments{Entries: []entityDocument{{ID: "child1"}, {ID: "child2"}}},
+			mockResp:   &Documents{Entries: []Document{{ID: "child1"}, {ID: "child2"}}},
 			mockStatus: 200,
 			wantDocIDs: []string{"child1", "child2"},
 		},
 		{
 			name:       "not found",
 			parentPath: "/missing",
-			mockResp:   &nuxeoError{Message: "not found"},
+			mockResp:   &NuxeoError{Message: "not found"},
 			mockStatus: 404,
 			wantErr:    true,
 		},
@@ -792,14 +792,14 @@ func TestRepository_FetchChildrenById(t *testing.T) {
 		{
 			name:       "success",
 			parentId:   "parent123",
-			mockResp:   &entityDocuments{Entries: []entityDocument{{ID: "childA"}, {ID: "childB"}}},
+			mockResp:   &Documents{Entries: []Document{{ID: "childA"}, {ID: "childB"}}},
 			mockStatus: 200,
 			wantDocIDs: []string{"childA", "childB"},
 		},
 		{
 			name:       "not found",
 			parentId:   "missing",
-			mockResp:   &nuxeoError{Message: "not found"},
+			mockResp:   &NuxeoError{Message: "not found"},
 			mockStatus: 404,
 			wantErr:    true,
 		},
@@ -914,7 +914,7 @@ func TestRepository_StreamBlobByPath(t *testing.T) {
 				if blob.Length != tt.wantLength {
 					t.Errorf("StreamBlobByPath() Length = %v, want %v", blob.Length, tt.wantLength)
 				}
-				b, _ := io.ReadAll(blob.Stream)
+				b, _ := io.ReadAll(blob)
 				if !bytes.Equal(b, tt.mockBody) {
 					t.Errorf("StreamBlobByPath() stream body = %v, want %v", b, tt.mockBody)
 				}
@@ -991,7 +991,7 @@ func TestRepository_StreamBlobById(t *testing.T) {
 				if blob.Length != tt.wantLength {
 					t.Errorf("StreamBlobById() Length = %v, want %v", blob.Length, tt.wantLength)
 				}
-				b, _ := io.ReadAll(blob.Stream)
+				b, _ := io.ReadAll(blob)
 				if !bytes.Equal(b, tt.mockBody) {
 					t.Errorf("StreamBlobById() stream body = %v, want %v", b, tt.mockBody)
 				}
@@ -1004,7 +1004,7 @@ func TestRepository_StartWorkflowInstanceWithDocId(t *testing.T) {
 	tests := []struct {
 		name       string
 		docID      string
-		workflow   entityWorkflow
+		workflow   Workflow
 		mockResp   any
 		mockStatus int
 		mockErr    error
@@ -1014,23 +1014,23 @@ func TestRepository_StartWorkflowInstanceWithDocId(t *testing.T) {
 		{
 			name:       "success",
 			docID:      "doc123",
-			workflow:   entityWorkflow{Id: "wf1"},
-			mockResp:   &entityWorkflow{Id: "wf1"},
+			workflow:   Workflow{Id: "wf1"},
+			mockResp:   &Workflow{Id: "wf1"},
 			mockStatus: 201,
 			wantID:     "wf1",
 		},
 		{
 			name:       "bad request",
 			docID:      "doc123",
-			workflow:   entityWorkflow{Id: "wf1"},
-			mockResp:   &nuxeoError{Message: "bad request"},
+			workflow:   Workflow{Id: "wf1"},
+			mockResp:   &NuxeoError{Message: "bad request"},
 			mockStatus: 400,
 			wantErr:    true,
 		},
 		{
 			name:     "http error",
 			docID:    "doc123",
-			workflow: entityWorkflow{Id: "wf1"},
+			workflow: Workflow{Id: "wf1"},
 			mockErr:  errors.New("network error"),
 			wantErr:  true,
 		},
@@ -1064,7 +1064,7 @@ func TestRepository_StartWorkflowInstanceWithDocPath(t *testing.T) {
 	tests := []struct {
 		name       string
 		docPath    string
-		workflow   entityWorkflow
+		workflow   Workflow
 		mockResp   any
 		mockStatus int
 		mockErr    error
@@ -1074,23 +1074,23 @@ func TestRepository_StartWorkflowInstanceWithDocPath(t *testing.T) {
 		{
 			name:       "success",
 			docPath:    "/default-domain/workspaces",
-			workflow:   entityWorkflow{Id: "wf2"},
-			mockResp:   &entityWorkflow{Id: "wf2"},
+			workflow:   Workflow{Id: "wf2"},
+			mockResp:   &Workflow{Id: "wf2"},
 			mockStatus: 201,
 			wantID:     "wf2",
 		},
 		{
 			name:       "bad request",
 			docPath:    "/default-domain/workspaces",
-			workflow:   entityWorkflow{Id: "wf2"},
-			mockResp:   &nuxeoError{Message: "bad request"},
+			workflow:   Workflow{Id: "wf2"},
+			mockResp:   &NuxeoError{Message: "bad request"},
 			mockStatus: 400,
 			wantErr:    true,
 		},
 		{
 			name:     "http error",
 			docPath:  "/default-domain/workspaces",
-			workflow: entityWorkflow{Id: "wf2"},
+			workflow: Workflow{Id: "wf2"},
 			mockErr:  errors.New("network error"),
 			wantErr:  true,
 		},
@@ -1123,7 +1123,7 @@ func TestRepository_StartWorkflowInstanceWithDocPath(t *testing.T) {
 func TestRepository_FetchWorkflowInstancesByDocId(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		t.Parallel()
-		wfs := entityWorkflows{Entries: []entityWorkflow{{Id: "wf1"}, {Id: "wf2"}}}
+		wfs := Workflows{Entries: []Workflow{{Id: "wf1"}, {Id: "wf2"}}}
 		repo := newTestRepository(func(req *http.Request) (*http.Response, error) {
 			body, _ := json.Marshal(&wfs)
 			return &http.Response{
@@ -1144,7 +1144,7 @@ func TestRepository_FetchWorkflowInstancesByDocId(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
 		t.Parallel()
 		repo := newTestRepository(func(req *http.Request) (*http.Response, error) {
-			body, _ := json.Marshal(&nuxeoError{Message: "not found"})
+			body, _ := json.Marshal(&NuxeoError{Message: "not found"})
 			return &http.Response{
 				StatusCode: 404,
 				Body:       io.NopCloser(bytes.NewReader(body)),
@@ -1161,7 +1161,7 @@ func TestRepository_FetchWorkflowInstancesByDocId(t *testing.T) {
 func TestRepository_FetchWorkflowInstancesByDocPath(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		t.Parallel()
-		wfs := entityWorkflows{Entries: []entityWorkflow{{Id: "wfA"}, {Id: "wfB"}}}
+		wfs := Workflows{Entries: []Workflow{{Id: "wfA"}, {Id: "wfB"}}}
 		repo := newTestRepository(func(req *http.Request) (*http.Response, error) {
 			body, _ := json.Marshal(&wfs)
 			return &http.Response{
@@ -1182,7 +1182,7 @@ func TestRepository_FetchWorkflowInstancesByDocPath(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
 		t.Parallel()
 		repo := newTestRepository(func(req *http.Request) (*http.Response, error) {
-			body, _ := json.Marshal(&nuxeoError{Message: "not found"})
+			body, _ := json.Marshal(&NuxeoError{Message: "not found"})
 			return &http.Response{
 				StatusCode: 404,
 				Body:       io.NopCloser(bytes.NewReader(body)),
@@ -1209,14 +1209,14 @@ func TestRepository_FetchWorkflowInstance(t *testing.T) {
 		{
 			name:       "success",
 			wfID:       "wf123",
-			mockResp:   &entityWorkflow{Id: "wf123"},
+			mockResp:   &Workflow{Id: "wf123"},
 			mockStatus: 200,
 			wantID:     "wf123",
 		},
 		{
 			name:       "not found",
 			wfID:       "missing",
-			mockResp:   &nuxeoError{Message: "not found"},
+			mockResp:   &NuxeoError{Message: "not found"},
 			mockStatus: 404,
 			wantErr:    true,
 		},
@@ -1271,7 +1271,7 @@ func TestRepository_CancelWorkflowInstance(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
 		t.Parallel()
 		repo := newTestRepository(func(req *http.Request) (*http.Response, error) {
-			body, _ := json.Marshal(&nuxeoError{Message: "not found"})
+			body, _ := json.Marshal(&NuxeoError{Message: "not found"})
 			return &http.Response{
 				StatusCode: 404,
 				Body:       io.NopCloser(bytes.NewReader(body)),
@@ -1299,7 +1299,7 @@ func TestRepository_FetchWorkflowInstanceGraph(t *testing.T) {
 		{
 			name: "success",
 			wfID: "wf123",
-			mockResp: &entityWorkflowGraph{Nodes: map[string]Field{
+			mockResp: &WorkflowGraph{Nodes: map[string]Field{
 				"Id": fieldId,
 			}},
 			mockStatus:  200,
@@ -1308,7 +1308,7 @@ func TestRepository_FetchWorkflowInstanceGraph(t *testing.T) {
 		{
 			name:       "not found",
 			wfID:       "missing",
-			mockResp:   &nuxeoError{Message: "not found"},
+			mockResp:   &NuxeoError{Message: "not found"},
 			mockStatus: 404,
 			wantErr:    true,
 		},
@@ -1361,14 +1361,14 @@ func TestRepository_FetchWorkflowModel(t *testing.T) {
 		{
 			name:       "success",
 			modelName:  "modelA",
-			mockResp:   &entityWorkflow{Id: "modelA"},
+			mockResp:   &Workflow{Id: "modelA"},
 			mockStatus: 200,
 			wantID:     "modelA",
 		},
 		{
 			name:       "not found",
 			modelName:  "missing",
-			mockResp:   &nuxeoError{Message: "not found"},
+			mockResp:   &NuxeoError{Message: "not found"},
 			mockStatus: 404,
 			wantErr:    true,
 		},
@@ -1405,7 +1405,6 @@ func TestRepository_FetchWorkflowModel(t *testing.T) {
 }
 
 func TestRepository_FetchWorkflowModelGraph(t *testing.T) {
-	fieldId, _ := NewField("graphA")
 	tests := []struct {
 		name        string
 		modelName   string
@@ -1418,8 +1417,8 @@ func TestRepository_FetchWorkflowModelGraph(t *testing.T) {
 		{
 			name:      "success",
 			modelName: "modelA",
-			mockResp: &entityWorkflowGraph{Nodes: map[string]Field{
-				"Id": fieldId,
+			mockResp: &WorkflowGraph{Nodes: map[string]Field{
+				"Id": NewStringField("graphA"),
 			}},
 			mockStatus:  200,
 			wantGraphID: "graphA",
@@ -1427,7 +1426,7 @@ func TestRepository_FetchWorkflowModelGraph(t *testing.T) {
 		{
 			name:       "not found",
 			modelName:  "missing",
-			mockResp:   &nuxeoError{Message: "not found"},
+			mockResp:   &NuxeoError{Message: "not found"},
 			mockStatus: 404,
 			wantErr:    true,
 		},
@@ -1470,7 +1469,7 @@ func TestRepository_FetchWorkflowModelGraph(t *testing.T) {
 func TestRepository_FetchWorkflowModels(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		t.Parallel()
-		models := entityWorkflows{Entries: []entityWorkflow{{Id: "modelA"}, {Id: "modelB"}}}
+		models := Workflows{Entries: []Workflow{{Id: "modelA"}, {Id: "modelB"}}}
 		repo := newTestRepository(func(req *http.Request) (*http.Response, error) {
 			body, _ := json.Marshal(&models)
 			return &http.Response{
@@ -1491,7 +1490,7 @@ func TestRepository_FetchWorkflowModels(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
 		t.Parallel()
 		repo := newTestRepository(func(req *http.Request) (*http.Response, error) {
-			body, _ := json.Marshal(&nuxeoError{Message: "not found"})
+			body, _ := json.Marshal(&NuxeoError{Message: "not found"})
 			return &http.Response{
 				StatusCode: 404,
 				Body:       io.NopCloser(bytes.NewReader(body)),

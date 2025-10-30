@@ -30,12 +30,9 @@ func TestNewGroup(t *testing.T) {
 func TestEntityGroupFields(t *testing.T) {
 	t.Parallel()
 	props := map[string]Field{}
-	f, err := NewField("value")
-	if err != nil {
-		t.Fatalf("NewField error: %v", err)
-	}
+	f := NewStringField("value")
 	props["custom"] = f
-	g := &entityGroup{
+	g := &Group{
 		entity:       entity{EntityType: EntityTypeGroup},
 		Id:           "testgroup",
 		Properties:   props,

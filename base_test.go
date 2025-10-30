@@ -53,7 +53,7 @@ func TestField_StringAndStringList(t *testing.T) {
 	})
 
 	t.Run("String: valid string", func(t *testing.T) {
-		f, _ := NewField("hello")
+		f := NewStringField("hello")
 		str, err := f.String()
 		if err != nil {
 			t.Fatalf("String() error: %v", err)
@@ -75,7 +75,7 @@ func TestField_StringAndStringList(t *testing.T) {
 	})
 
 	t.Run("StringList: valid list", func(t *testing.T) {
-		f, _ := NewField([]string{"a", "b"})
+		f := NewStringListField([]string{"a", "b"})
 		lst, err := f.StringList()
 		if err != nil {
 			t.Fatalf("StringList() error: %v", err)
@@ -154,7 +154,7 @@ func TestField_NumericAndBoolMethods(t *testing.T) {
 	})
 
 	t.Run("Integer: valid", func(t *testing.T) {
-		f, _ := NewField(123)
+		f := NewIntegerField(123)
 		val, err := f.Integer()
 		if err != nil {
 			t.Fatalf("Integer() error: %v", err)
@@ -165,7 +165,7 @@ func TestField_NumericAndBoolMethods(t *testing.T) {
 	})
 
 	t.Run("IntegerList: valid", func(t *testing.T) {
-		f, _ := NewField([]int{1, 2, 3})
+		f := NewIntegerListField([]int{1, 2, 3})
 		lst, err := f.IntegerList()
 		if err != nil {
 			t.Fatalf("IntegerList() error: %v", err)
@@ -176,7 +176,7 @@ func TestField_NumericAndBoolMethods(t *testing.T) {
 	})
 
 	t.Run("Float: valid", func(t *testing.T) {
-		f, _ := NewField(3.14)
+		f := NewFloatField(3.14)
 		val, err := f.Float()
 		if err != nil {
 			t.Fatalf("Float() error: %v", err)
@@ -187,7 +187,7 @@ func TestField_NumericAndBoolMethods(t *testing.T) {
 	})
 
 	t.Run("FloatList: valid", func(t *testing.T) {
-		f, _ := NewField([]float64{1.1, 2.2})
+		f := NewFloatListField([]float64{1.1, 2.2})
 		lst, err := f.FloatList()
 		if err != nil {
 			t.Fatalf("FloatList() error: %v", err)
@@ -198,7 +198,7 @@ func TestField_NumericAndBoolMethods(t *testing.T) {
 	})
 
 	t.Run("Boolean: valid", func(t *testing.T) {
-		f, _ := NewField(true)
+		f := NewBooleanField(true)
 		val, err := f.Boolean()
 		if err != nil {
 			t.Fatalf("Boolean() error: %v", err)
@@ -209,7 +209,7 @@ func TestField_NumericAndBoolMethods(t *testing.T) {
 	})
 
 	t.Run("BooleanList: valid", func(t *testing.T) {
-		f, _ := NewField([]bool{true, false})
+		f := NewBooleanListField([]bool{true, false})
 		lst, err := f.BooleanList()
 		if err != nil {
 			t.Fatalf("BooleanList() error: %v", err)
@@ -237,7 +237,7 @@ func TestField_TimeAndTimeList(t *testing.T) {
 	t.Run("Time: valid", func(t *testing.T) {
 		tm := time.Date(2023, 1, 2, 3, 4, 5, 0, time.UTC)
 		iso := ISO8601Time(tm)
-		f, _ := NewField(iso)
+		f := NewTimeField(iso)
 		val, err := f.Time()
 		if err != nil {
 			t.Fatalf("Time() error: %v", err)
@@ -250,7 +250,7 @@ func TestField_TimeAndTimeList(t *testing.T) {
 	t.Run("TimeList: valid", func(t *testing.T) {
 		tm1 := ISO8601Time(time.Date(2023, 1, 2, 3, 4, 5, 0, time.UTC))
 		tm2 := ISO8601Time(time.Date(2024, 2, 3, 4, 5, 6, 0, time.UTC))
-		f, _ := NewField([]ISO8601Time{tm1, tm2})
+		f := NewTimeListField([]ISO8601Time{tm1, tm2})
 		lst, err := f.TimeList()
 		if err != nil {
 			t.Fatalf("TimeList() error: %v", err)
@@ -268,7 +268,7 @@ func TestField_ComplexAndComplexList(t *testing.T) {
 		type Foo struct {
 			Bar string `json:"bar"`
 		}
-		f, _ := NewField(Foo{Bar: "baz"})
+		f, _ := NewComplexField(Foo{Bar: "baz"})
 		var out Foo
 		err := f.Complex(&out)
 		if err != nil {
@@ -283,7 +283,7 @@ func TestField_ComplexAndComplexList(t *testing.T) {
 		type Foo struct {
 			Bar string `json:"bar"`
 		}
-		f, _ := NewField([]Foo{{Bar: "a"}, {Bar: "b"}})
+		f, _ := NewComplexField([]Foo{{Bar: "a"}, {Bar: "b"}})
 		var out []Foo
 		err := f.ComplexList(&out)
 		if err != nil {
@@ -296,7 +296,7 @@ func TestField_ComplexAndComplexList(t *testing.T) {
 
 	t.Run("Complex: null", func(t *testing.T) {
 		type Foo struct{ Bar string }
-		f, _ := NewField(nil)
+		f, _ := NewComplexField(nil)
 		var out Foo
 		err := f.Complex(&out)
 		if err != nil {

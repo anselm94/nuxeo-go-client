@@ -1,8 +1,8 @@
 package nuxeo
 
-// entityCapabilities represents the server capabilities as returned by the Nuxeo REST API /capabilities endpoint.
+// Capabilities represents the server capabilities as returned by the Nuxeo REST API /capabilities endpoint.
 // See: https://doc.nuxeo.com/rest-api/1/capabilities-endpoint/
-type entityCapabilities struct {
+type Capabilities struct {
 	entity
 	// Server contains Nuxeo server distribution information.
 	Server struct {

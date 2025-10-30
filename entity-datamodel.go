@@ -5,63 +5,63 @@ import (
 	"strings"
 )
 
-// entitySchema represents a Nuxeo schema entity as returned by the Data Model API.
+// Schema represents a Nuxeo schema entity as returned by the Data Model API.
 // See: https://doc.nuxeo.com/rest-api/1/data-model-endpoint/#get-a-schema
 // Fields:
 //   - Name: schema name
 //   - Prefix: schema prefix (for property names)
 //   - PrefixAliased: alternative prefix field (from Nuxeo API)
 //   - Fields: map of field names to schema field definitions
-type entitySchema struct {
+type Schema struct {
 	entity
-	Name          string                       `json:"name"`
-	Prefix        string                       `json:"prefix"`
-	PrefixAliased string                       `json:"@prefix"`
-	Fields        map[string]entitySchemaField `json:"fields"`
+	Name          string                 `json:"name"`
+	Prefix        string                 `json:"prefix"`
+	PrefixAliased string                 `json:"@prefix"`
+	Fields        map[string]SchemaField `json:"fields"`
 }
 
-func (s entitySchema) GetPrefix() string {
+func (s Schema) GetPrefix() string {
 	if s.Prefix != "" {
 		return s.Prefix
 	}
 	return s.PrefixAliased
 }
 
-// entitySchemaField describes a field in a Nuxeo schema.
+// SchemaField describes a field in a Nuxeo schema.
 // DataType: type of the field (e.g. string, boolean, date, blob, complex)
 // IsArray: true if the field is an array
 // Fields: for complex types, nested fields
-type entitySchemaField struct {
+type SchemaField struct {
 	DataType string
 	IsArray  bool
-	Fields   map[string]entitySchemaField
+	Fields   map[string]SchemaField
 }
 
-func (sf entitySchemaField) IsBlob() bool {
+func (sf SchemaField) IsBlob() bool {
 	return sf.DataType == "blob"
 }
 
-func (sf entitySchemaField) IsBoolean() bool {
+func (sf SchemaField) IsBoolean() bool {
 	return sf.DataType == "boolean"
 }
 
-func (sf entitySchemaField) IsComplex() bool {
+func (sf SchemaField) IsComplex() bool {
 	return sf.DataType == "complex"
 }
 
-func (sf entitySchemaField) IsDate() bool {
+func (sf SchemaField) IsDate() bool {
 	return sf.DataType == "date"
 }
 
-func (sf entitySchemaField) IsLong() bool {
+func (sf SchemaField) IsLong() bool {
 	return sf.DataType == "long"
 }
 
-func (sf entitySchemaField) IsString() bool {
+func (sf SchemaField) IsString() bool {
 	return sf.DataType == "string"
 }
 
-func (sf *entitySchemaField) UnmarshalJSON(data []byte) error {
+func (sf *SchemaField) UnmarshalJSON(data []byte) error {
 	strLength := len(data)
 	if strLength == 0 {
 		return json.Unmarshal(data, sf) // let json handle empty input
@@ -72,7 +72,7 @@ func (sf *entitySchemaField) UnmarshalJSON(data []byte) error {
 		strVal := strings.Trim(string(data), "\"")
 		isMultiValued := strings.HasSuffix(strVal, "[]")
 		strVal = strings.TrimSuffix(strVal, "[]")
-		*sf = entitySchemaField{
+		*sf = SchemaField{
 			DataType: strVal,
 			IsArray:  isMultiValued,
 			Fields:   nil,
@@ -82,8 +82,8 @@ func (sf *entitySchemaField) UnmarshalJSON(data []byte) error {
 
 	// if value is a complex object
 	var complexSchemaField struct {
-		DataType string                       `json:"type"`
-		Fields   map[string]entitySchemaField `json:"fields"`
+		DataType string                 `json:"type"`
+		Fields   map[string]SchemaField `json:"fields"`
 	}
 	if err := json.Unmarshal(data, &complexSchemaField); err != nil {
 		return err
@@ -91,7 +91,7 @@ func (sf *entitySchemaField) UnmarshalJSON(data []byte) error {
 
 	isMultiValued := strings.HasSuffix(complexSchemaField.DataType, "[]")
 	complexSchemaField.DataType = strings.TrimSuffix(complexSchemaField.DataType, "[]")
-	*sf = entitySchemaField{
+	*sf = SchemaField{
 		DataType: complexSchemaField.DataType,
 		IsArray:  isMultiValued,
 		Fields:   complexSchemaField.Fields,
@@ -99,68 +99,68 @@ func (sf *entitySchemaField) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// entitySchemas is a slice of entitySchema, representing a collection of schemas.
-type entitySchemas []entitySchema
+// Schemas is a slice of entitySchema, representing a collection of schemas.
+type Schemas []Schema
 
-// entityFacet represents a Nuxeo facet entity as returned by the Data Model API.
+// Facet represents a Nuxeo facet entity as returned by the Data Model API.
 // See: https://doc.nuxeo.com/rest-api/1/data-model-endpoint/#get-a-facet
 // Fields:
 //   - Name: facet name
 //   - Schemas: schemas associated with the facet
-type entityFacet struct {
+type Facet struct {
 	entity
-	Name    string         `json:"name,omitempty"`
-	Schemas []entitySchema `json:"schemas"`
+	Name    string   `json:"name,omitempty"`
+	Schemas []Schema `json:"schemas"`
 }
 
-// entityFacets is a slice of entityFacet, representing a collection of facets.
-type entityFacets []entityFacet
+// Facets is a slice of entityFacet, representing a collection of facets.
+type Facets []Facet
 
-// entityDocType represents a Nuxeo document type entity as returned by the Data Model API.
+// DocType represents a Nuxeo document type entity as returned by the Data Model API.
 // See: https://doc.nuxeo.com/rest-api/1/data-model-endpoint/#get-a-document-type
 // Fields:
 //   - Name: document type name
 //   - Parent: parent document type
 //   - Facets: list of facet names
 //   - Schemas: schemas associated with the document type
-type entityDocType struct {
+type DocType struct {
 	entity
-	Name    string         `json:"name,omitempty"`
-	Parent  string         `json:"parent"`
-	Facets  []string       `json:"facets"`
-	Schemas []entitySchema `json:"schemas"` // can be []string or "Schema" based on get all doc types vs get single doc type
+	Name    string   `json:"name,omitempty"`
+	Parent  string   `json:"parent"`
+	Facets  []string `json:"facets"`
+	Schemas []Schema `json:"schemas"` // can be []string or "Schema" based on get all doc types vs get single doc type
 }
 
-// entityDocTypes represents the response from GET /config/types.
+// DocTypes represents the response from GET /config/types.
 // Contains all document types and their associated schemas.
 // See: https://doc.nuxeo.com/rest-api/1/data-model-endpoint/#get-all-document-types
-type entityDocTypes struct {
-	DocTypes map[string]entityDocType `json:"docTypes"`
-	Schemas  map[string]entitySchema  `json:"schemas"`
+type DocTypes struct {
+	DocTypes map[string]DocType `json:"docTypes"`
+	Schemas  map[string]Schema  `json:"schemas"`
 }
 
-func (dt *entityDocTypes) UnmarshalJSON(data []byte) error {
+func (dt *DocTypes) UnmarshalJSON(data []byte) error {
 	var vDocTypes struct {
 		DocTypes map[string]struct {
 			Parent  string   `json:"parent"`
 			Facets  []string `json:"facets"`
 			Schemas []string `json:"schemas"`
 		} `json:"docTypes"`
-		Schemas map[string]map[string]entitySchemaField `json:"schemas"`
+		Schemas map[string]map[string]SchemaField `json:"schemas"`
 	}
 	if err := json.Unmarshal(data, &vDocTypes); err != nil {
 		return err
 	}
 
-	*dt = entityDocTypes{
-		DocTypes: make(map[string]entityDocType, len(vDocTypes.DocTypes)),
-		Schemas:  make(map[string]entitySchema, len(vDocTypes.Schemas)),
+	*dt = DocTypes{
+		DocTypes: make(map[string]DocType, len(vDocTypes.DocTypes)),
+		Schemas:  make(map[string]Schema, len(vDocTypes.Schemas)),
 	}
 
 	for name, schemaFields := range vDocTypes.Schemas {
 		prefixField := schemaFields["@prefix"]
 		delete(schemaFields, "@prefix") // "@prefix" is not an actual field of the schema but Nuxeo uses it to convey the prefix info
-		(*dt).Schemas[name] = entitySchema{
+		(*dt).Schemas[name] = Schema{
 			Name:          name,
 			Prefix:        prefixField.DataType, // "@prefix" field holds the prefix string in its DataType
 			PrefixAliased: prefixField.DataType, // "@prefix" field holds the prefix string in its DataType
@@ -169,13 +169,13 @@ func (dt *entityDocTypes) UnmarshalJSON(data []byte) error {
 	}
 
 	for name, vDocType := range vDocTypes.DocTypes {
-		docTypeSchemas := make([]entitySchema, 0, len(vDocType.Schemas))
+		docTypeSchemas := make([]Schema, 0, len(vDocType.Schemas))
 		for _, schemaName := range vDocType.Schemas {
 			if schema, exists := (*dt).Schemas[schemaName]; exists {
 				docTypeSchemas = append(docTypeSchemas, schema)
 			}
 		}
-		(*dt).DocTypes[name] = entityDocType{
+		(*dt).DocTypes[name] = DocType{
 			Name:    name,
 			Parent:  vDocType.Parent,
 			Facets:  vDocType.Facets,
