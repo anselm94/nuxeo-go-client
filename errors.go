@@ -31,6 +31,12 @@ func handleNuxeoError(err error, res *resty.Response) error {
 	}
 	if res.IsError() {
 		if nuxeoErr, ok := res.Error().(*NuxeoError); ok {
+			// if it's a nuxeo error, set fields which may or may not be set
+			nuxeoErr.EntityType = "exception"
+			nuxeoErr.Status = res.StatusCode()
+			if nuxeoErr.Message == "" {
+				nuxeoErr.Message = res.Status()
+			}
 			return nuxeoErr
 		}
 		if err, ok := res.Error().(error); ok {
