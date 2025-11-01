@@ -51,14 +51,11 @@ func (m *mockAuthenticator) GetAuthHeaders(r *resty.Request) map[string]string {
 func TestNewClient_DefaultsAndCustomOptions(t *testing.T) {
 	t.Run("nil options uses defaults", func(t *testing.T) {
 		client := NewClient("http://localhost", nil)
-		if client.authenticator == nil {
-			t.Errorf("authenticator should not be nil")
-		}
 		if client.logger == nil {
 			t.Errorf("logger should not be nil")
 		}
-		if client.timeout != 30*time.Second {
-			t.Errorf("timeout should be 30s by default, got %v", client.timeout)
+		if client.Timeout() != 30*time.Second {
+			t.Errorf("timeout should be 30s by default, got %v", client.Timeout())
 		}
 		if client.headers == nil {
 			t.Errorf("headers should not be nil")
@@ -81,15 +78,13 @@ func TestNewClient_DefaultsAndCustomOptions(t *testing.T) {
 			CustomHeaders:           customHeaders,
 		}
 		client := NewClient("http://localhost", opts)
-		if client.authenticator != mockAuth {
-			t.Errorf("custom authenticator not set")
-		}
-		if client.timeout != customTimeout {
+		if client.Timeout() != customTimeout {
 			t.Errorf("custom timeout not set")
 		}
 		if client.headers["X-Test"] != "value" {
 			t.Errorf("custom header not set")
 		}
+		// authenticator cannot be directly checked
 	})
 }
 
@@ -200,11 +195,6 @@ func TestNuxeoClient_MiddlewareInvocation(t *testing.T) {
 	_, _ = client.NewRequest(context.Background(), nil).Request.Get("/notfound")
 	if !beforeCalled {
 		t.Errorf("BeforeRequestMiddleware not called")
-	}
-	// AfterResponseMiddleware is only called on response, so we can't easily test without a real server
-	// But we can check that it's set
-	if client.middlewareAfterResponse == nil {
-		t.Errorf("AfterResponseMiddleware not set")
 	}
 }
 

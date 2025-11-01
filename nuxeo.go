@@ -37,6 +37,9 @@ type nuxeoClientOptions struct {
 	CustomHeaders           map[string]string
 }
 
+// DefaultNuxeoClientOptions returns the default options for NuxeoClient.
+//
+// Note: `Authenticator` must be set through options, and it cannot be set later
 func DefaultNuxeoClientOptions() nuxeoClientOptions {
 	return nuxeoClientOptions{
 		Authenticator:           nuxeoauth.NewNoOpAuthenticator(),
@@ -54,18 +57,12 @@ func DefaultNuxeoClientOptions() nuxeoClientOptions {
 
 // NuxeoClient is the main client for interacting with the Nuxeo API.
 type NuxeoClient struct {
-	authenticator           Authenticator
-	logger                  *slog.Logger
-	middlewareBeforeRequest *resty.RequestMiddleware
-	middlewareAfterResponse *resty.ResponseMiddleware
+	logger *slog.Logger
 
 	// config
-
-	timeout time.Duration
 	headers map[string]string
 
 	// internal
-
 	restClient *resty.Client
 }
 
@@ -81,47 +78,33 @@ func NewClient(baseUrl string, options *nuxeoClientOptions) *NuxeoClient {
 		options = &defaultOptions
 	}
 
-	// apply options
-	client.authenticator = options.Authenticator
-	client.logger = options.Logger
-	if options.BeforeRequestMiddleware != nil {
-		client.middlewareBeforeRequest = &options.BeforeRequestMiddleware
-	}
-	if options.AfterResponseMiddleware != nil {
-		client.middlewareAfterResponse = &options.AfterResponseMiddleware
-	}
-	client.timeout = options.Timeout
-	maps.Copy(client.headers, options.CustomHeaders)
-
 	// setup resty client
 	client.restClient = resty.New()
 	client.restClient.SetBaseURL(baseUrl)
 
-	// setup authenticator
-	if client.authenticator == nil {
-		client.authenticator = nuxeoauth.NewNoOpAuthenticator()
-	}
-	client.restClient.AddRequestMiddleware(func(c *resty.Client, r *resty.Request) error {
-		headers := client.authenticator.GetAuthHeaders(r)
-		for k, v := range headers {
-			r.SetHeader(k, v)
-		}
-		return nil
-	})
-
-	// setup middlewares
-	if client.middlewareBeforeRequest != nil {
-		client.restClient.AddRequestMiddleware(*client.middlewareBeforeRequest)
-	}
-	if client.middlewareAfterResponse != nil {
-		client.restClient.AddResponseMiddleware(*client.middlewareAfterResponse)
+	// authenticator
+	if options.Authenticator != nil {
+		client.AddMiddlewareBeforeRequest(func(c *resty.Client, r *resty.Request) error {
+			headers := options.Authenticator.GetAuthHeaders(r)
+			for k, v := range headers {
+				r.SetHeader(k, v)
+			}
+			return nil
+		})
 	}
 
-	// setup connection config
-	if client.timeout == 0 {
-		client.timeout = 30 * time.Second // default timeout
-	}
-	client.restClient.SetTimeout(client.timeout)
+	// logger
+	client.SetLogger(options.Logger)
+
+	// middlewares
+	client.AddMiddlewareBeforeRequest(options.BeforeRequestMiddleware)
+	client.AddMiddlewareAfterResponse(options.AfterResponseMiddleware)
+
+	// headers
+	maps.Copy(client.headers, options.CustomHeaders)
+
+	// timeout
+	client.SetTimeout(options.Timeout)
 
 	return client
 }
@@ -129,6 +112,50 @@ func NewClient(baseUrl string, options *nuxeoClientOptions) *NuxeoClient {
 // Close releases resources held by the NuxeoClient.
 func (c *NuxeoClient) Close() error {
 	return c.restClient.Close()
+}
+
+// SetHeader sets a custom header for all requests made by the NuxeoClient.
+func (c *NuxeoClient) SetHeader(key string, value string) {
+	c.headers[key] = value
+}
+
+// RemoveHeader removes a custom header from the NuxeoClient.
+func (c *NuxeoClient) RemoveHeader(key string) {
+	delete(c.headers, key)
+}
+
+// SetLogger sets the logger for the NuxeoClient.
+func (c *NuxeoClient) SetLogger(logger *slog.Logger) {
+	if logger == nil {
+		logger = slog.Default()
+	}
+	c.logger = logger
+}
+
+// AddMiddlewareBeforeRequest adds a request middleware to the NuxeoClient.
+func (c *NuxeoClient) AddMiddlewareBeforeRequest(middleware resty.RequestMiddleware) {
+	if middleware != nil {
+		c.restClient.AddRequestMiddleware(middleware)
+	}
+}
+
+// AddMiddlewareAfterResponse adds a response middleware to the NuxeoClient.
+func (c *NuxeoClient) AddMiddlewareAfterResponse(middleware resty.ResponseMiddleware) {
+	if middleware != nil {
+		c.restClient.AddResponseMiddleware(middleware)
+	}
+}
+
+// SetTimeout sets the timeout for all requests made by the NuxeoClient.
+func (c *NuxeoClient) SetTimeout(timeout time.Duration) {
+	if timeout <= 0 {
+		timeout = 30 * time.Second
+	}
+	c.restClient.SetTimeout(timeout)
+}
+
+func (c *NuxeoClient) Timeout() time.Duration {
+	return c.restClient.Timeout()
 }
 
 // NewRequest creates a new Nuxeo API request with the given context and options.
