@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log/slog"
 	"maps"
-	"net/http"
 	"strings"
 	"time"
 
@@ -22,7 +21,7 @@ import (
 // Authenticator defines the interface for authentication strategies.
 type Authenticator interface {
 	// GetAuthHeaders returns authentication headers for the request context.
-	GetAuthHeaders(ctx context.Context, req *http.Request) map[string]string
+	GetAuthHeaders(req *resty.Request) map[string]string
 }
 
 //////////////////////////////
@@ -103,7 +102,7 @@ func NewClient(baseUrl string, options *nuxeoClientOptions) *NuxeoClient {
 		client.authenticator = nuxeoauth.NewNoOpAuthenticator()
 	}
 	client.restClient.AddRequestMiddleware(func(c *resty.Client, r *resty.Request) error {
-		headers := client.authenticator.GetAuthHeaders(r.Context(), r.RawRequest)
+		headers := client.authenticator.GetAuthHeaders(r)
 		for k, v := range headers {
 			r.SetHeader(k, v)
 		}

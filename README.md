@@ -188,7 +188,7 @@ type CustomAuthenticator struct {
 	// Add any necessary fields
 }
 
-func (a *CustomAuthenticator) GetAuthHeaders(ctx context.Context, req *http.Request) map[string]string {
+func (a *CustomAuthenticator) GetAuthHeaders(req *resty.Request) map[string]string {
 	// Implement your custom authentication logic to return headers
 	return map[string]string{
 		"X-Custom-Auth": "custom-auth-value",

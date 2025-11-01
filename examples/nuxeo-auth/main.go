@@ -3,15 +3,15 @@ package main
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/anselm94/nuxeo-go-client"
 	nuxeoauth "github.com/anselm94/nuxeo-go-client/auth"
+	"resty.dev/v3"
 )
 
 type CustomAuthenticator struct{}
 
-func (ca *CustomAuthenticator) GetAuthHeaders(ctx context.Context, req *http.Request) map[string]string {
+func (ca *CustomAuthenticator) GetAuthHeaders(req *resty.Request) map[string]string {
 	return map[string]string{
 		"X-Custom-Auth": "custom-auth-value",
 	}

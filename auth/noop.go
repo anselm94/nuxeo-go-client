@@ -1,8 +1,7 @@
 package nuxeoauth
 
 import (
-	"context"
-	"net/http"
+	"resty.dev/v3"
 )
 
 // NoOpAuthenticator implements no-op placeholder authentication.
@@ -14,7 +13,7 @@ func NewNoOpAuthenticator() *NoOpAuthenticator {
 	return &NoOpAuthenticator{}
 }
 
-func (a *NoOpAuthenticator) GetAuthHeaders(ctx context.Context, req *http.Request) map[string]string {
+func (a *NoOpAuthenticator) GetAuthHeaders(req *resty.Request) map[string]string {
 	// No operation performed
 	return map[string]string{}
 }

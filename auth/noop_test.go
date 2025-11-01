@@ -28,7 +28,7 @@ func TestNoOpAuthenticator_GetAuthHeaders(t *testing.T) {
 	auth := NewNoOpAuthenticator()
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			headers := auth.GetAuthHeaders(tc.ctx, tc.req)
+			headers := auth.GetAuthHeaders(nil)
 			if headers == nil {
 				t.Errorf("Expected empty map, got nil")
 			}

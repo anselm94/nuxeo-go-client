@@ -1,8 +1,6 @@
 package nuxeoauth
 
 import (
-	"context"
-	"net/http"
 	"testing"
 )
 
@@ -50,7 +48,7 @@ func TestBearerAuthenticator_GetAuthHeaders(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			auth := NewBearerAuthenticator(tt.token)
-			headers := auth.GetAuthHeaders(context.Background(), &http.Request{})
+			headers := auth.GetAuthHeaders(nil)
 			val, ok := headers["Authorization"]
 			if tt.expectHeader {
 				if !ok {

@@ -44,7 +44,7 @@ func TestDefaultNuxeoClientOptions(t *testing.T) {
 // --- Minimal mock Authenticator ---
 type mockAuthenticator struct{}
 
-func (m *mockAuthenticator) GetAuthHeaders(ctx context.Context, req *http.Request) map[string]string {
+func (m *mockAuthenticator) GetAuthHeaders(r *resty.Request) map[string]string {
 	return map[string]string{"X-Mock": "mocked"}
 }
 

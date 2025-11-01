@@ -42,10 +42,10 @@ authenticator := nuxeoauth.NewOAuth2Authenticator(oauth2Option, "https://nuxeo.e
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
+	"resty.dev/v3"
 )
 
 const (
@@ -113,7 +113,7 @@ func NewOAuth2Authenticator(options OAuth2Options, baseUrl string) *OAuth2Authen
 	}
 }
 
-func (a *OAuth2Authenticator) GetAuthHeaders(ctx context.Context, req *http.Request) map[string]string {
+func (a *OAuth2Authenticator) GetAuthHeaders(req *resty.Request) map[string]string {
 	headers := make(map[string]string)
 	if a.tokenSource != nil {
 		if token, err := a.tokenSource.Token(); err == nil && token != nil {

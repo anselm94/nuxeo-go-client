@@ -14,9 +14,9 @@ authenticator := nuxeoauth.NewBasicAuthenticator("Administrator", "password")
 */
 
 import (
-	"context"
 	"encoding/base64"
-	"net/http"
+
+	"resty.dev/v3"
 )
 
 // BasicAuthenticator implements basic username/password authentication.
@@ -33,7 +33,7 @@ func NewBasicAuthenticator(username string, password string) *BasicAuthenticator
 	}
 }
 
-func (a *BasicAuthenticator) GetAuthHeaders(ctx context.Context, req *http.Request) map[string]string {
+func (a *BasicAuthenticator) GetAuthHeaders(req *resty.Request) map[string]string {
 	headers := make(map[string]string)
 	if a.username != "" && a.password != "" {
 		cred := a.username + ":" + a.password

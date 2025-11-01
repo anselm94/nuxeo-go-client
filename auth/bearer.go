@@ -1,5 +1,7 @@
 package nuxeoauth
 
+import "resty.dev/v3"
+
 /**
 BearerAuthenticator implements Bearer token authentication.
 
@@ -13,11 +15,6 @@ authenticator := nuxeoauth.NewBearerAuthenticator("your-bearer-token")
 ```
 */
 
-import (
-	"context"
-	"net/http"
-)
-
 // BearerAuthenticator implements Bearer token authentication.
 type BearerAuthenticator struct {
 	token string
@@ -30,7 +27,7 @@ func NewBearerAuthenticator(token string) *BearerAuthenticator {
 	}
 }
 
-func (a *BearerAuthenticator) GetAuthHeaders(ctx context.Context, req *http.Request) map[string]string {
+func (a *BearerAuthenticator) GetAuthHeaders(req *resty.Request) map[string]string {
 	headers := make(map[string]string)
 	if a.token != "" {
 		headers["Authorization"] = "Bearer " + a.token

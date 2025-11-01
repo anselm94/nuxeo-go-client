@@ -1,8 +1,6 @@
 package nuxeoauth
 
 import (
-	"context"
-	"net/http"
 	"testing"
 )
 
@@ -45,7 +43,7 @@ func TestTokenAuthenticator_GetAuthHeaders(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			auth := NewTokenAuthenticator(tc.token)
-			headers := auth.GetAuthHeaders(context.Background(), &http.Request{})
+			headers := auth.GetAuthHeaders(nil)
 			if len(headers) != len(tc.expected) {
 				t.Errorf("Expected %d headers, got %d", len(tc.expected), len(headers))
 			}

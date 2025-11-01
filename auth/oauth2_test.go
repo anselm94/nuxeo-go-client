@@ -85,7 +85,7 @@ func TestGetAuthHeaders_JWT(t *testing.T) {
 	}
 	_ = tok
 	auth.tokenSource = ts
-	headers := auth.GetAuthHeaders(context.Background(), &http.Request{})
+	headers := auth.GetAuthHeaders(nil)
 	if headers["Authorization"] != "Bearer jwt-token" {
 		t.Errorf("Expected Authorization header with jwt-token, got: %v", headers)
 	}
@@ -95,7 +95,7 @@ func TestGetAuthHeaders_ClientCredentials(t *testing.T) {
 	auth := NewOAuth2Authenticator(NewOAuth2ClientCredentialsOptions("cid", "csecret"), "http://base")
 	tok := &oauth2.Token{AccessToken: "access-token"}
 	auth.tokenSource = &mockTokenSource{token: tok}
-	headers := auth.GetAuthHeaders(context.Background(), &http.Request{})
+	headers := auth.GetAuthHeaders(nil)
 	if headers["Authorization"] != "Bearer access-token" {
 		t.Errorf("Expected Authorization header with access-token, got: %v", headers)
 	}
@@ -103,7 +103,7 @@ func TestGetAuthHeaders_ClientCredentials(t *testing.T) {
 
 func TestGetAuthHeaders_NoTokenSource(t *testing.T) {
 	auth := NewOAuth2Authenticator(NewOAuth2ClientCredentialsOptions("cid", "csecret"), "http://base")
-	headers := auth.GetAuthHeaders(context.Background(), &http.Request{})
+	headers := auth.GetAuthHeaders(nil)
 	if len(headers) != 0 {
 		t.Errorf("Expected empty headers when no tokenSource, got: %v", headers)
 	}
