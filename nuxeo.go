@@ -147,7 +147,7 @@ func (c *NuxeoClient) NewRequest(ctx context.Context, options *nuxeoRequestOptio
 }
 
 // CapabilitiesManager returns a manager for Nuxeo server capabilities.
-func (c *NuxeoClient) CapabilitiesManager(ctx context.Context) *capabilitiesManager {
+func (c *NuxeoClient) CapabilitiesManager() *capabilitiesManager {
 	return &capabilitiesManager{
 		client: c,
 		logger: c.logger,
@@ -241,7 +241,7 @@ func (c *NuxeoClient) ServerVersion(ctx context.Context) (*ServerVersion, error)
 	version := &ServerVersion{}
 
 	// first get the server version from capabilities
-	capabilities, err := c.CapabilitiesManager(ctx).FetchCapabilities(ctx)
+	capabilities, err := c.CapabilitiesManager().FetchCapabilities(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get server version: %w", err)
 	}

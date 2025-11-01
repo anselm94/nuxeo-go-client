@@ -103,9 +103,7 @@ func TestNuxeoClient_Close(t *testing.T) {
 
 func TestNuxeoClient_ManagerGetters(t *testing.T) {
 	client := NewClient("http://localhost", nil)
-	ctx := context.Background()
-
-	if m := client.CapabilitiesManager(ctx); m == nil {
+	if m := client.CapabilitiesManager(); m == nil {
 		t.Errorf("CapabilitiesManager should not be nil")
 	}
 	if m := client.Repository(); m == nil {
