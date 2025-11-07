@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- 
+
+## [0.2.3] - 2025-11-07
+
+### Changed
+
 - fix: add `IsDouble` method and update tests for double data type handling
 
 - fix: add mutex for thread-safe header management in NuxeoClient
@@ -45,6 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Idiomatic Go client for Nuxeo's REST and Automation API.
 
 [unreleased]: https://github.com/anselm94/nuxeo-go-client/compare/v1.1.1...HEAD
+[0.2.3]: https://github.com/anselm94/nuxeo-go-client/releases/tag/v0.2.3
 [0.2.2]: https://github.com/anselm94/nuxeo-go-client/releases/tag/v0.2.2
 [0.2.1]: https://github.com/anselm94/nuxeo-go-client/releases/tag/v0.2.1
 [0.2.0]: https://github.com/anselm94/nuxeo-go-client/releases/tag/v0.2.0
