@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"maps"
 	"strings"
+	"sync"
 	"time"
 
 	nuxeoauth "github.com/anselm94/nuxeo-go-client/auth"
@@ -57,6 +58,8 @@ func DefaultNuxeoClientOptions() nuxeoClientOptions {
 
 // NuxeoClient is the main client for interacting with the Nuxeo API.
 type NuxeoClient struct {
+	mu sync.Mutex
+
 	logger *slog.Logger
 
 	// config
@@ -116,11 +119,17 @@ func (c *NuxeoClient) Close() error {
 
 // SetHeader sets a custom header for all requests made by the NuxeoClient.
 func (c *NuxeoClient) SetHeader(key string, value string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	c.headers[key] = value
 }
 
 // RemoveHeader removes a custom header from the NuxeoClient.
 func (c *NuxeoClient) RemoveHeader(key string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	delete(c.headers, key)
 }
 

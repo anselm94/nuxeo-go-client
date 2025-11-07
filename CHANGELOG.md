@@ -9,7 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- 
+- fix: add `IsDouble` method and update tests for double data type handling
+
+- fix: add mutex for thread-safe header management in NuxeoClient
 
 ## [0.2.2] - 2025-11-01
 
