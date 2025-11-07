@@ -21,7 +21,7 @@ func NewACP() *ACP {
 // An ACL contains a name and a list of ACEs (Access Control Entries).
 type ACL struct {
 	Name string `json:"name"`
-	ACEs []ACE  `json:"ace"`
+	ACEs []ACE  `json:"aces"`
 }
 
 // NewACL creates a new ACL with the specified name.
