@@ -57,6 +57,10 @@ func (sf SchemaField) IsLong() bool {
 	return sf.DataType == "long"
 }
 
+func (sf SchemaField) IsDouble() bool {
+	return sf.DataType == "double"
+}
+
 func (sf SchemaField) IsString() bool {
 	return sf.DataType == "string"
 }

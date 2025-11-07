@@ -30,15 +30,17 @@ func TestEntitySchemaField_TypeChecks(t *testing.T) {
 		isComplex bool
 		isDate    bool
 		isLong    bool
+		isDouble  bool
 		isString  bool
 	}{
-		{"Blob type", "blob", true, false, false, false, false, false},
-		{"Boolean type", "boolean", false, true, false, false, false, false},
-		{"Complex type", "complex", false, false, true, false, false, false},
-		{"Date type", "date", false, false, false, true, false, false},
-		{"Long type", "long", false, false, false, false, true, false},
-		{"String type", "string", false, false, false, false, false, true},
-		{"Unknown type", "other", false, false, false, false, false, false},
+		{"Blob type", "blob", true, false, false, false, false, false, false},
+		{"Boolean type", "boolean", false, true, false, false, false, false, false},
+		{"Complex type", "complex", false, false, true, false, false, false, false},
+		{"Date type", "date", false, false, false, true, false, false, false},
+		{"Long type", "long", false, false, false, false, true, false, false},
+		{"Double type", "double", false, false, false, false, false, true, false},
+		{"String type", "string", false, false, false, false, false, false, true},
+		{"Unknown type", "other", false, false, false, false, false, false, false},
 	}
 	for _, tc := range cases {
 		f := SchemaField{DataType: tc.dataType}
@@ -56,6 +58,9 @@ func TestEntitySchemaField_TypeChecks(t *testing.T) {
 		}
 		if f.IsLong() != tc.isLong {
 			t.Errorf("%s: IsLong() = %v, want %v", tc.name, f.IsLong(), tc.isLong)
+		}
+		if f.IsDouble() != tc.isDouble {
+			t.Errorf("%s: IsDouble() = %v, want %v", tc.name, f.IsDouble(), tc.isDouble)
 		}
 		if f.IsString() != tc.isString {
 			t.Errorf("%s: IsString() = %v, want %v", tc.name, f.IsString(), tc.isString)
