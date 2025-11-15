@@ -2,7 +2,11 @@ package nuxeo
 
 import (
 	"io"
+	"iter"
+	"mime/multipart"
 	"strconv"
+
+	"github.com/anselm94/nuxeo-go-client/internal"
 )
 
 // blob represents a binary object in Nuxeo, typically used for file uploads and document properties.
@@ -31,6 +35,30 @@ type blob struct {
 	Data string `json:"data"`
 	// (Readonly) Blob URL
 	BlobUrl string `json:"blobUrl"`
+}
+
+// blobs reads blobs from a multipart.Reader and returns them as an iter.Seq[blob].
+func blobs(mr *multipart.Reader) iter.Seq[blob] {
+	return func(yield func(blob) bool) {
+		for {
+			part, err := mr.NextPart()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				break
+			}
+			blob := blob{
+				Filename:   part.FileName(),
+				MimeType:   part.Header.Get(internal.HeaderContentType),
+				Length:     part.Header.Get(internal.HeaderContentLength),
+				ReadCloser: part,
+			}
+			if !yield(blob) {
+				break
+			}
+		}
+	}
 }
 
 // NewBlob creates a new Blob instance with the specified filename, MIME type, length, and data stream.

@@ -404,6 +404,9 @@ func TestISO8601Time_MarshalUnmarshalJSON(t *testing.T) {
 		tm := time.Date(2025, 10, 27, 15, 4, 5, 0, time.UTC)
 		iso := ISO8601Time(tm)
 		b, err := iso.MarshalJSON()
+		if b != nil && string(b) != `"2025-10-27T15:04:05Z"` {
+			t.Errorf("MarshalJSON got %q, want %q", string(b), `"2025-10-27T15:04:05Z"`)
+		}
 		if err != nil {
 			t.Fatalf("MarshalJSON error: %v", err)
 		}

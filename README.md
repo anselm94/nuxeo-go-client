@@ -238,13 +238,17 @@ operationManager := nuxeoClient.OperationManager()
 // Run a Nuxeo Automation operation
 op := nuxeo.NewOperation("Document.Query")
 op.SetParam("query", "SELECT * FROM Document WHERE dc:creator = 'Administrator'")
-var result nuxeo.Documents
-err := operationManager.ExecuteInto(ctx, *op, &result, nil)
+opRes, err := operationManager.Execute(ctx, *op, nil)
 if err != nil {
 	panic(err)
 }
 
-for _, doc := range result.Entries {
+documents, err := opRes.AsDocumentList()
+if err != nil {
+	panic(err)
+}
+
+for _, doc := range documents.Entries {
 	fmt.Println(doc.Title)
 }
 ```

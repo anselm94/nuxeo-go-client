@@ -242,8 +242,13 @@ func (um *userManager) FetchCurrentUser(ctx context.Context) (*User, error) {
 	}{}
 
 	operationLogin := NewOperation("login")
-	if err := um.client.OperationManager().ExecuteInto(ctx, *operationLogin, loginInfo, nil); err != nil {
-		um.logger.Error("Failed to fetch current user login info", slog.String("error", err.Error()))
+	opRes, err := um.client.OperationManager().Execute(ctx, *operationLogin, nil)
+	if err != nil {
+		um.logger.Error("failed to execute login operation", slog.String("error", err.Error()))
+		return nil, err
+	}
+	if err := opRes.As(loginInfo); err != nil {
+		um.logger.Error("failed to decode login operation response", slog.String("error", err.Error()))
 		return nil, err
 	}
 

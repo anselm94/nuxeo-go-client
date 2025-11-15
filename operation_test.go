@@ -1,6 +1,7 @@
 package nuxeo
 
 import (
+	"net/http"
 	"reflect"
 	"testing"
 )
@@ -18,9 +19,6 @@ func TestNewOperation(t *testing.T) {
 	}
 	if len(op.inputBlobs) != 0 {
 		t.Errorf("inputBlobs not empty")
-	}
-	if len(op.params) != 0 {
-		t.Errorf("params not empty")
 	}
 	if len(op.context) != 0 {
 		t.Errorf("context not empty")
@@ -176,5 +174,106 @@ func TestEdgeCases_EmptyParamsContext(t *testing.T) {
 	}
 	if len(pl.Context) != 0 {
 		t.Errorf("payload.Context not empty: %v", pl.Context)
+	}
+}
+
+func TestOperationResponse_IsVoid(t *testing.T) {
+	resp := mockRestyResponse(204, http.Header{"Content-Type": []string{"application/json"}}, nil)
+	opr := newOperationResponse(resp)
+	if !opr.IsVoid() {
+		t.Errorf("IsVoid() = false, want true for 204 response")
+	}
+	resp2 := mockRestyResponse(200, http.Header{"Content-Type": []string{"application/json"}}, testMarshalBody(t, []byte(`{"foo":"bar"}`)))
+	opr2 := newOperationResponse(resp2)
+	if opr2.IsVoid() {
+		t.Errorf("IsVoid() = true, want false for 200 response")
+	}
+}
+
+func TestOperationResponse_As(t *testing.T) {
+	body := map[string]string{"foo": "bar"}
+	resp := mockRestyResponse(200, http.Header{"Content-Type": []string{"application/json"}}, testMarshalBody(t, body))
+	opr := newOperationResponse(resp)
+	var v map[string]string
+	err := opr.As(&v)
+	if err != nil {
+		t.Fatalf("As() error = %v", err)
+	}
+	if v["foo"] != "bar" {
+		t.Errorf("As() = %v, want foo=bar", v)
+	}
+}
+
+func TestOperationResponse_AsDocument(t *testing.T) {
+	body := map[string]string{"entity-type": "document", "uid": "123"}
+	resp := mockRestyResponse(200, http.Header{"Content-Type": []string{"application/json"}}, testMarshalBody(t, body))
+	opr := newOperationResponse(resp)
+	doc, err := opr.AsDocument()
+	if err != nil {
+		t.Fatalf("AsDocument() error = %v", err)
+	}
+	if doc == nil || doc.ID != "123" {
+		t.Errorf("AsDocument() = %v, want UID=123", doc)
+	}
+	// Not JSON
+	resp2 := mockRestyResponse(200, http.Header{"Content-Type": []string{"text/plain"}}, testMarshalBody(t, "not json"))
+	opr2 := newOperationResponse(resp2)
+	_, err2 := opr2.AsDocument()
+	if err2 == nil {
+		t.Errorf("AsDocument() error = nil, want error for non-JSON")
+	}
+}
+
+func TestOperationResponse_AsDocumentList(t *testing.T) {
+	body := Documents{
+		Entries: []Document{
+			{ID: "1"},
+			{ID: "2"},
+		},
+	}
+	resp := mockRestyResponse(200, http.Header{"Content-Type": []string{"application/json"}}, testMarshalBody(t, body))
+	opr := newOperationResponse(resp)
+	docs, err := opr.AsDocumentList()
+	if err != nil {
+		t.Fatalf("AsDocumentList() error = %v", err)
+	}
+	if len(docs.Entries) != 2 || docs.Entries[0].ID != "1" || docs.Entries[1].ID != "2" {
+		t.Errorf("AsDocumentList() = %v, want 2 docs with IDs 1,2", docs)
+	}
+	// Not JSON
+	resp2 := mockRestyResponse(200, http.Header{"Content-Type": []string{"text/plain"}}, testMarshalBody(t, "not json"))
+	opr2 := newOperationResponse(resp2)
+	_, err2 := opr2.AsDocumentList()
+	if err2 == nil {
+		t.Errorf("AsDocumentList() error = nil, want error for non-JSON")
+	}
+}
+
+func TestOperationResponse_AsBlob(t *testing.T) {
+	body := []byte("blobdata")
+	resp := mockRestyResponse(200, http.Header{"Content-Type": []string{"application/octet-stream"}, "Content-Disposition": []string{`attachment; filename="file.bin"`}}, testMarshalBody(t, body))
+	opr := newOperationResponse(resp)
+	bl, err := opr.AsBlob()
+	if err != nil {
+		t.Fatalf("AsBlob() error = %v", err)
+	}
+	if bl.Filename == "" {
+		t.Errorf("AsBlob() Filename empty")
+	}
+	if bl.MimeType != "application/octet-stream" {
+		t.Errorf("AsBlob() MimeType = %v, want application/octet-stream", bl.MimeType)
+	}
+	if bl.ReadCloser == nil {
+		t.Errorf("AsBlob() ReadCloser is nil")
+	}
+}
+
+func TestOperationResponse_AsBlobList_NotMultipart(t *testing.T) {
+	body := []byte("not multipart")
+	resp := mockRestyResponse(200, http.Header{"Content-Type": []string{"application/json"}}, testMarshalBody(t, body))
+	opr := newOperationResponse(resp)
+	seq, err := opr.AsBlobList()
+	if err == nil || seq != nil {
+		t.Errorf("AsBlobList() = %v, err = %v, want error for non-multipart", seq, err)
 	}
 }

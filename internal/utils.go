@@ -53,3 +53,12 @@ func GetStreamFilenameFrom(res *resty.Response) string {
 	}
 	return params["filename"]
 }
+
+func GetStreamBoundary(res *resty.Response) string {
+	contentType := res.Header().Get(HeaderContentType)
+	_, params, err := mime.ParseMediaType(contentType)
+	if err != nil {
+		return ""
+	}
+	return params["boundary"]
+}

@@ -1,9 +1,16 @@
 package nuxeo
 
 import (
+	"encoding/json"
 	"fmt"
+	"iter"
+	"mime/multipart"
+	"strconv"
 	"strings"
 	"time"
+
+	"github.com/anselm94/nuxeo-go-client/internal"
+	"resty.dev/v3"
 )
 
 ///////////////////////////
@@ -28,6 +35,73 @@ type operationPayload struct {
 	Input   string            `json:"input,omitempty"`
 	Params  map[string]string `json:"params,omitempty"`
 	Context map[string]string `json:"context,omitempty"`
+}
+
+type operationResponse struct {
+	res *resty.Response
+}
+
+// newOperationResponse creates a new operationResponse from the given resty.Response.
+func newOperationResponse(res *resty.Response) *operationResponse {
+	return &operationResponse{
+		res: res,
+	}
+}
+
+// IsVoid returns true if the operation response has no content (HTTP 204).
+func (o *operationResponse) IsVoid() bool {
+	return o.res.StatusCode() == 204
+}
+
+// As decodes the operation response body into the given value.
+func (o *operationResponse) As(value any) error {
+	return json.NewDecoder(o.res.Body).Decode(value)
+}
+
+// AsDocument decodes the operation response as a Document.
+func (o *operationResponse) AsDocument() (*Document, error) {
+	if !strings.HasPrefix(o.res.Header().Get("Content-Type"), "application/json") {
+		return nil, fmt.Errorf("operation response is not a document")
+	}
+	var doc Document
+	if err := o.As(&doc); err != nil {
+		return nil, err
+	}
+	return &doc, nil
+}
+
+// AsDocumentList decodes the operation response as a list of Documents.
+func (o *operationResponse) AsDocumentList() (Documents, error) {
+	if !strings.HasPrefix(o.res.Header().Get("Content-Type"), "application/json") {
+		return Documents{}, fmt.Errorf("operation response is not a document list")
+	}
+	var docs Documents
+	if err := o.As(&docs); err != nil {
+		return Documents{}, err
+	}
+	return docs, nil
+}
+
+// AsBlob decodes the operation response as a Blob.
+func (o *operationResponse) AsBlob() (*blob, error) {
+	blob := &blob{
+		Filename:   internal.GetStreamFilenameFrom(o.res),
+		MimeType:   internal.GetStreamContentTypeFrom(o.res),
+		Length:     strconv.Itoa(internal.GetStreamContentLengthFrom(o.res)),
+		ReadCloser: o.res.Body,
+	}
+	return blob, nil
+}
+
+// AsBlobList decodes the operation response as a list of Blobs from a multipart/mixed response.
+func (o *operationResponse) AsBlobList() (iter.Seq[blob], error) {
+	if !strings.HasPrefix(o.res.Header().Get("Content-Type"), "multipart/mixed") {
+		return nil, fmt.Errorf("operation response is not a blob list")
+	}
+	// parse multipart/mixed response
+	boundary := internal.GetStreamBoundary(o.res)
+	mr := multipart.NewReader(o.res.Body, boundary)
+	return blobs(mr), nil
 }
 
 // NewOperation creates a new Nuxeo Automation operation request.

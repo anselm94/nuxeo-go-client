@@ -42,11 +42,13 @@ func testMarshalBody(t *testing.T, v any) io.ReadCloser {
 	return io.NopCloser(bytes.NewReader(b))
 }
 
-type mockRestyResponse struct {
-	isError bool
-	errVal  any
+func mockRestyResponse(statusCode int, headers http.Header, body io.ReadCloser) *resty.Response {
+	return &resty.Response{
+		Body: body,
+		RawResponse: &http.Response{
+			StatusCode: statusCode,
+			Header:     headers,
+			Body:       body,
+		},
+	}
 }
-
-// Implements minimal resty.Response interface for testing
-func (s *mockRestyResponse) IsError() bool { return s.isError }
-func (s *mockRestyResponse) Error() any    { return s.errVal }
