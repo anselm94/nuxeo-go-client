@@ -3,8 +3,8 @@ package nuxeo
 import (
 	"context"
 	"fmt"
-	"io"
 	"log/slog"
+	"strconv"
 
 	"github.com/anselm94/nuxeo-go-client/internal"
 )
@@ -106,59 +106,17 @@ func (bum *batchUploadManager) ExecuteBatchUpload(ctx context.Context, batchId s
 	return res.Result(), nil
 }
 
-// uploadOptions specifies parameters for file uploads (normal or chunked) in a batch.
-// Includes file metadata and chunking info for multipart uploads.
-type uploadOptions struct {
-	fileName         string
-	fileSize         int64
-	fileMimeType     string
-	uploadChunkIndex int64
-	totalChunkCount  int64
-}
-
-// NewUploadOptions creates upload options for normal uploads.
-//
-// fileName: Name of the file being uploaded with extension. (E.g., "document.pdf")
-// fileSize: Size of the file being uploaded in bytes.
-// fileType: MIME type of the file being uploaded. (E.g., "application/pdf")
-func NewUploadOptions(fileName string, fileSize int64, fileType string) *uploadOptions {
-	return &uploadOptions{
-		fileName:     fileName,
-		fileSize:     fileSize,
-		fileMimeType: fileType,
-	}
-}
-
-// NewChunkUploadOptions creates uploadOptions for a chunked (multipart) file upload.
-// Sets file name, size, MIME type, chunk index, and total chunk count headers for the upload request.
-// See: https://doc.nuxeo.com/nxdoc/batch-upload-endpoint/#upload-a-file-in-chunks
-//
-// fileName: Name of the file being uploaded with extension. (E.g., "document.pdf")
-// fileSize: Total size of the file being uploaded in bytes.
-// fileType: MIME type of the file being uploaded. (E.g., "application/pdf")
-// uploadChunkIndex: Index of the current chunk being uploaded (starting from 0).
-// totalChunkCount: Total number of chunks the file is divided into.
-func NewChunkUploadOptions(fileName string, fileSize int64, fileType string, uploadChunkIndex int64, totalChunkCount int64) *uploadOptions {
-	return &uploadOptions{
-		fileName:         fileName,
-		fileSize:         fileSize,
-		fileMimeType:     fileType,
-		uploadChunkIndex: uploadChunkIndex,
-		totalChunkCount:  totalChunkCount,
-	}
-}
-
 // Upload uploads a file, setting all required headers.
-func (bum *batchUploadManager) Upload(ctx context.Context, batchId string, fileIdx string, uploadOptions *uploadOptions, blob io.Reader, options *nuxeoRequestOptions) (*batchUpload, error) {
-	path := internal.PathApiV1 + "/upload/" + batchId + "/" + fileIdx
+func (bum *batchUploadManager) Upload(ctx context.Context, batchId string, fileIdx int, blob *blob, options *nuxeoRequestOptions) (*batchUpload, error) {
+	path := internal.PathApiV1 + "/upload/" + batchId + "/" + strconv.Itoa(fileIdx)
 
 	request := bum.client.NewRequest(ctx, options).
 		SetHeader("X-Upload-Type", "normal").
-		SetHeader("X-File-Name", uploadOptions.fileName).
-		SetHeader("X-File-Type", uploadOptions.fileMimeType).
-		SetHeader("X-File-Size", fmt.Sprintf("%d", uploadOptions.fileSize)).
+		SetHeader("X-File-Name", blob.Filename).
+		SetHeader("X-File-Type", blob.MimeType).
+		SetHeader("X-File-Size", fmt.Sprintf("%d", blob.Size())).
 		SetContentLength(true).
-		SetHeader(internal.HeaderContentLength, fmt.Sprintf("%d", uploadOptions.fileSize)).
+		SetHeader(internal.HeaderContentLength, fmt.Sprintf("%d", blob.Size())).
 		SetContentType(internal.HeaderValueOctetStream)
 
 	res, err := request.SetBody(blob).SetResult(&batchUpload{}).SetError(&NuxeoError{}).Post(path)
@@ -171,18 +129,18 @@ func (bum *batchUploadManager) Upload(ctx context.Context, batchId string, fileI
 }
 
 // Upload uploads a chunk to a batch, setting all required headers.
-func (bum *batchUploadManager) UploadAsChunk(ctx context.Context, batchId string, fileIdx string, blob io.Reader, uploadOptions uploadOptions, options *nuxeoRequestOptions) (*batchUpload, error) {
-	path := internal.PathApiV1 + "/upload/" + batchId + "/" + fileIdx
+func (bum *batchUploadManager) UploadAsChunk(ctx context.Context, batchId string, fileIdx int, chunkIdx int, totalChunks int, blob *blob, options *nuxeoRequestOptions) (*batchUpload, error) {
+	path := internal.PathApiV1 + "/upload/" + batchId + "/" + strconv.Itoa(fileIdx)
 
 	request := bum.client.NewRequest(ctx, options).
 		SetHeader("X-Upload-Type", "chunked").
-		SetHeader("X-File-Name", uploadOptions.fileName).
-		SetHeader("X-File-Type", uploadOptions.fileMimeType).
-		SetHeader("X-File-Size", fmt.Sprintf("%d", uploadOptions.fileSize)).
-		SetHeader("X-Upload-Chunk-Index", fmt.Sprintf("%d", uploadOptions.uploadChunkIndex)).
-		SetHeader("X-Upload-Chunk-Count", fmt.Sprintf("%d", uploadOptions.totalChunkCount)).
+		SetHeader("X-File-Name", blob.Filename).
+		SetHeader("X-File-Type", blob.MimeType).
+		SetHeader("X-File-Size", fmt.Sprintf("%d", blob.Size())).
+		SetHeader("X-Upload-Chunk-Index", fmt.Sprintf("%d", chunkIdx)).
+		SetHeader("X-Upload-Chunk-Count", fmt.Sprintf("%d", totalChunks)).
 		SetContentLength(true).
-		SetHeader(internal.HeaderContentLength, fmt.Sprintf("%d", uploadOptions.fileSize)).
+		SetHeader(internal.HeaderContentLength, fmt.Sprintf("%d", blob.Size())).
 		SetContentType(internal.HeaderValueOctetStream)
 
 	res, err := request.SetBody(blob).SetResult(&batchUpload{}).SetError(&NuxeoError{}).Post(path)

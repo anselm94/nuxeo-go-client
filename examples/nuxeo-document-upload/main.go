@@ -42,8 +42,8 @@ func main() {
 	fileLength, _ := file.Stat()
 
 	// upload the file to the batch
-	uploadOpts := nuxeo.NewUploadOptions("example.pdf", fileLength.Size(), "application/pdf")
-	batchUploadInfo, err := uploadManager.Upload(ctx, batch.BatchId, "0", uploadOpts, file, nil)
+	uploadBlob := nuxeo.NewBlob("example.pdf", "application/pdf", fileLength.Size(), file)
+	batchUploadInfo, err := uploadManager.Upload(ctx, batch.BatchId, 0, uploadBlob, nil)
 	if err != nil {
 		panic(err)
 	}

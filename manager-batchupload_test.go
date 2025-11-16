@@ -1,6 +1,7 @@
 package nuxeo
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -388,7 +389,7 @@ func TestBatchUploadManager_Upload(t *testing.T) {
 					"X-Upload-Type": "normal",
 					"X-File-Name":   "file1",
 					"X-File-Type":   "application/pdf",
-					"X-File-Size":   "123",
+					"X-File-Size":   "10",
 				}
 				for k, v := range expected {
 					if got := req.Header.Get(k); got != v {
@@ -408,7 +409,7 @@ func TestBatchUploadManager_Upload(t *testing.T) {
 				"X-Upload-Type": "normal",
 				"X-File-Name":   "file1",
 				"X-File-Type":   "application/pdf",
-				"X-File-Size":   "123",
+				"X-File-Size":   "10",
 			},
 		},
 		{
@@ -427,8 +428,8 @@ func TestBatchUploadManager_Upload(t *testing.T) {
 			t.Parallel()
 			client := newMockNuxeoClient(tc.respond)
 			bum := &batchUploadManager{client: client, logger: slog.Default()}
-			opts := NewUploadOptions("file1", 123, "application/pdf")
-			batch, err := bum.Upload(context.Background(), "batch1", "0", opts, strings.NewReader("blobdata"), &nuxeoRequestOptions{})
+			blob := NewBlob("file1", "application/pdf", 10, io.NopCloser(bytes.NewReader([]byte("blobdata"))))
+			batch, err := bum.Upload(context.Background(), "batch1", 0, blob, &nuxeoRequestOptions{})
 			if tc.wantErr && err == nil {
 				t.Errorf("expected error, got nil")
 			}
@@ -463,7 +464,7 @@ func TestBatchUploadManager_UploadAsChunk(t *testing.T) {
 					"X-Upload-Type":        "chunked",
 					"X-File-Name":          "file1",
 					"X-File-Type":          "application/pdf",
-					"X-File-Size":          "123",
+					"X-File-Size":          "10",
 					"X-Upload-Chunk-Index": "0",
 					"X-Upload-Chunk-Count": "1",
 				}
@@ -497,14 +498,8 @@ func TestBatchUploadManager_UploadAsChunk(t *testing.T) {
 			t.Parallel()
 			client := newMockNuxeoClient(tc.respond)
 			bum := &batchUploadManager{client: client, logger: slog.Default()}
-			opts := uploadOptions{
-				fileName:         "file1",
-				fileSize:         123,
-				fileMimeType:     "application/pdf",
-				uploadChunkIndex: 0,
-				totalChunkCount:  1,
-			}
-			batch, err := bum.UploadAsChunk(context.Background(), "batch1", "0", strings.NewReader("chunkdata"), opts, &nuxeoRequestOptions{})
+			blob := NewBlob("file1", "application/pdf", 10, io.NopCloser(bytes.NewReader([]byte("chunkdata"))))
+			batch, err := bum.UploadAsChunk(context.Background(), "batch1", 0, 0, 1, blob, nil)
 			if tc.wantErr && err == nil {
 				t.Errorf("expected error, got nil")
 			}

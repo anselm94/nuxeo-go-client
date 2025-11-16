@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- 
+- refactor!: update upload options to use NewBlob and simplify upload methods
 
 ## [0.3.0] - 2025-11-15
 
