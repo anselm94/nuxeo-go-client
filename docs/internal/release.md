@@ -13,6 +13,7 @@ This document outlines the steps to be followed for releasing a new version of t
 
 1. **Determine Version**: Decide the new version number based on the changes made (major, minor, patch) following [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 2. **Update Changelog**: Move the changes from the "Unreleased" section to a new section with the determined version number and release date.
+3. **Commit the Changelog**: Commit the updated `CHANGELOG.md` file with a message like `chore: release vX.Y.Z`.
 3. **Tag the Release**:
    ```bash
    git tag -a vX.Y.Z -m "Release version X.Y.Z"
